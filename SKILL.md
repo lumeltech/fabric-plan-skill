@@ -9,17 +9,17 @@ Use the Python CLI from this skill's directory. Use a separate task directory fo
 
 ## Choose the scope before building
 
-- **New Plan:** translate the requested business grain, time horizon, inputs, measures and calculations into sheets. Include the Home definition, dashboard coverage, Arial and Page Navigators for a complete application.
-- **Extension or repair:** start from a fresh export. Preserve unknown fields, unrelated part bytes, existing identities, input values, formulas, conditional formatting and Forecast settings. Change only the requested surfaces and their dependencies.
+- **New Plan:** build from the current model and business spec. Enable public Home visibility; role-specific cards, layout and priority can be prepared locally but not published. For a complete application, check each requested sheet against the spec, each Planning grid's dashboard coverage, Arial on authored text, and a Page Navigator with resolved destinations on every dashboard.
+- **Extension or repair:** patch a fresh, complete export of the named Plan; do not rebuild it from the model. Preserve unknown fields, unrelated part bytes, identities, formulas and settings outside the requested change and its dependencies. If storage keys or grain must change, establish a supported migration and authorized before/after checks of planner values at the same entity, period and scenario. Stop if required retention cannot be verified.
 - **Inspection or design:** do not mutate the workspace. Distinguish a proposed change from a saved or verified one.
 
 ## Execution
 
 1. Identify the target model and workspace. Use current model metadata for field names, types, hierarchy levels and aggregation. Do not deploy the synthetic fixtures. If a required source, identity or field cannot be resolved, identify the missing input rather than inventing one.
 2. Use `python plan.py discover "business request"` to narrow the choice of topic, or select a guide below. Read only the topic needed. `python plan.py --help` is the inventory of executable commands; use a subcommand's `--help` for its arguments.
-3. Construct and validate a local candidate. For example, `python plan.py build --model fixtures/model.json --spec fixtures/finance-spec.json --out /path/to/trial` exercises a synthetic build without credentials. Check required input registrations, formula references, sheet bindings, dashboard geometry and scope coverage before any write.
-4. Use only the documented **public Fabric APIs** for live operations. Require the user's explicit destination and write authorization. If a feature has no supported public route (for example, saving a role-specific Home layout), report it as unavailable. Do not call workload endpoints, attempt a token exchange, or substitute UI automation. A local constructor or example is not a live write capability.
-5. Export the result from the destination and compare it with the intended changes. Preserve native numeric identities as decimal strings. For existing Plans use saved placement identities, not sheet order. An embedded grid may hide its source sheet in Explorer, but its owner identity must remain usable for formulas and bindings.
+3. Construct and validate a local candidate. For example, `python plan.py build --model fixtures/model.json --spec fixtures/finance-spec.json --out /path/to/trial` writes local files without credentials. Before a workspace create or update, check required input registrations, formula references, sheet bindings, dashboard geometry and coverage against the request.
+4. Use only the documented **public Fabric APIs**. Export is a live read; create and update require explicit write authorization for the named destination. A new update rechecks the reviewed baseline. Stop on drift. This check is not atomic: coordinate exclusive editing if a concurrent overwrite is unacceptable. If a feature lacks a public route, report it as unavailable; do not substitute workload endpoints, token exchanges or UI automation.
+5. Export the result from the destination and compare it with the intended changes. Preserve native numeric identities as decimal strings. Placement identifies where a grid appears; its source owner and measure identify what formulas and bindings consume. Check both using saved identities, not sheet order. Neither check proves stored values survived.
 6. Report what was built, validated locally, persisted, and verified interactively as separate outcomes. A saved definition does not prove that navigation, input or rendered layout works. After a failed write, read back current state before retrying; do not assume rollback.
 
 ## Packaging and publication boundary
@@ -34,7 +34,7 @@ Choose a reference directly; the list is a menu, not a reading sequence.
 |---|---|
 | Build, validate or update a definition | [Runtime guide](references/runtime-guide.md) |
 | Configure sheet measures and embedded dashboards | [Planning measures](references/planning-measures.md), [presentation](references/planning-presentation.md) |
-| Plan over time | [Forecast](references/forecast-authoring.md), [roll-forward balances](references/roll-forward-authoring.md), [roll-forward formula patterns](references/roll-forward-formula-patterns.md), [formula equality](references/formula-equality.md) |
+| Plan over time | [Forecast](references/forecast-authoring.md), [roll-forward balances (short default)](references/roll-forward-authoring.md), [formula equality](references/formula-equality.md). Only for full worked cases: [roll-forward formula patterns](references/roll-forward-formula-patterns.md). |
 | Connect sources | [InfoBridge](references/infobridge-construction.md), [PowerTable](references/powertable.md) |
 | Design input and allocations | [Editability](references/input-editability.md), [numeric constraints](references/numeric-input-constraints.md), [anchor measures](references/anchor-measures.md), [measure-weighted distribution](references/measure-weighted-distribution.md) |
 | Bind and aggregate measures | [Measure sources](references/measure-source-bindings.md), [numeric Values](references/numeric-column-values.md), [dimension leaf keys](references/dimension-leaf-keys.md), [storage context](references/storage-context.md), [totals](references/planning-totals-defaults.md) |

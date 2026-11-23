@@ -74,7 +74,7 @@ def provision(config,model,spec,run):
     spec=application_defaults(model,spec)
     preflight(spec)
     if config['name']!=spec['name']: raise ValueError('Creation name and authored Plan name differ')
-    if not config.get('authorizedMutation'): raise ValueError('Current user authorization required')
+    if config.get('authorizedMutation') is not True: raise ValueError('Current user authorization required')
     signature=sha(dumps({'model':model,'spec':spec,'target':{k:config[k] for k in ('apiBase','workspaceId','name')}}))
     cp=run/'construction.json'
     if cp.exists():

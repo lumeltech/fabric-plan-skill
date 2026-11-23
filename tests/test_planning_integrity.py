@@ -90,7 +90,7 @@ class PlanningIntegrityTests(unittest.TestCase):
         from runtime.transport import Client
         calls=[]
         with tempfile.TemporaryDirectory() as folder:
-            client=Client('https://example.invalid','UNSET_INTEGRITY_TEST_TOKEN',journal=folder,adapter=lambda *args:calls.append(args))
+            client=Client('https://api.fabric.microsoft.com/v1','UNSET_INTEGRITY_TEST_TOKEN',journal=folder,adapter=lambda *args:calls.append(args))
             with self.assertRaisesRegex(ValueError,'Incomplete Planning globalStyles'):
                 client.request('POST','/workspaces/w/plans',pack({'sheets/s/visuals/v/properties.json':{'properties':example()}}),label='rejected')
             self.assertEqual(calls,[]);self.assertEqual(list(Path(folder).iterdir()),[])

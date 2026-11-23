@@ -97,7 +97,7 @@ class AuthoringFlowTests(unittest.TestCase):
         def adapter(*args):
             calls.append(args[0]);return {'status':400,'headers':{},'body':{'message':"Cannot read properties of undefined (reading 'findOne')"}}
         with tempfile.TemporaryDirectory() as run,patch.dict(os.environ,{'FLOW_TEST_TOKEN':'synthetic-credential'}):
-            client=Client('https://example.invalid','FLOW_TEST_TOKEN',journal=run,adapter=adapter)
+            client=Client('https://api.fabric.microsoft.com/v1','FLOW_TEST_TOKEN',journal=run,adapter=adapter)
             for _ in range(2):
                 with self.assertRaises(HttpError) as error:client.request('POST','/workspaces/w/plans',{},label='same-request')
                 self.assertEqual(error.exception.status,400)

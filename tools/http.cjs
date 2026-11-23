@@ -2,7 +2,7 @@
 // Internal stdin/stdout adapter. Never print request headers or credentials.
 const fs=require('node:fs');
 (async()=>{const q=JSON.parse(fs.readFileSync(0,'utf8'));
-const u=new URL(q.url);if(u.protocol!=='https:'||u.username||u.password)throw Error('Invalid HTTPS URL');
+const u=new URL(q.url);if(u.origin!=='https://api.fabric.microsoft.com'||u.username||u.password||u.hash)throw Error('Invalid public Fabric URL');
 if(!/^Bearer \S+$/i.test(q.headers.Authorization) ||
     decodeURIComponent(u.pathname).split('/').some(s=>['coreapi','generatemwctokenv2'].includes(s.toLowerCase())))
     throw Error('Expected public Fabric bearer request');

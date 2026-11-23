@@ -88,7 +88,7 @@ class WorkflowServer:
     @staticmethod
     def pending(operation):
         return {'status': 202, 'headers': {
-            'location': 'https://example.invalid/v1/operations/' + operation, 'retry-after': '0'}, 'body': {}}
+            'location': 'https://api.fabric.microsoft.com/v1/operations/' + operation, 'retry-after': '0'}, 'body': {}}
 
 class IndependentApiTests(unittest.TestCase):
     def test_model_cli_discovers_tmdl_twice_without_recipe_or_native_flag(self):
@@ -96,7 +96,7 @@ class IndependentApiTests(unittest.TestCase):
         from contextlib import redirect_stdout
         from io import StringIO
 
-        api = 'https://example.invalid/v1'
+        api = 'https://api.fabric.microsoft.com/v1'
         config = self.directory / 'destination.json'
         config.write_text(json.dumps({'apiBase': api, 'tokenEnvironment': TOKEN_ENV,
             'modelReference': {'semanticModelWorkspaceId': 'workspace', 'semanticModelId': 'model'}}))
@@ -190,7 +190,7 @@ class WorkflowRegressionTests(unittest.TestCase):
                     {'key': 'allowed', 'kind': 'Native', 'source': 'Metrics[CanEdit]', 'label': 'CanEdit'},
                     {'key': 'hours', 'kind': 'DataInput', 'label': 'Available Hours',
                      'min_value': {'Static': 0}, 'allow_input': {'BasedOnFormula': '${allowed} > 0'}}]}]}
-        config = {'apiBase': 'https://example.invalid/v1',
+        config = {'apiBase': 'https://api.fabric.microsoft.com/v1',
             'workspaceId': 'workspace', 'name': spec['name'], 'tokenEnvironment': TOKEN_ENV, 'authorizedMutation': True}
         return config, model, spec
 

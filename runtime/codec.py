@@ -53,6 +53,8 @@ def parts(envelope):
         if p.get('payloadType')!='InlineBase64': raise ValueError('Unsupported payload type')
         decoded[path]=base64.b64decode(p['payload'],validate=True)
     return decoded
+def definition_hash(envelope):
+    return sha(dumps({k:sha(v) for k,v in sorted(parts(envelope).items())}))
 def unpack(envelope): return {k:loads(v.decode('utf-8-sig')) for k,v in parts(envelope).items()}
 def pack(raw):
     if not raw: raise ValueError('No parts')

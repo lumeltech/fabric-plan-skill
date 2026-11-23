@@ -222,9 +222,9 @@ class TransportTests(unittest.TestCase):
             self.calls.append((method,url,body)); item=responses.pop(0)
             if isinstance(item,Exception): raise item
             return item
-        return Client('https://api.example.invalid/v1','TEST_TOKEN',journal=self.tmp.name,adapter=adapter,sleep=lambda t:None)
+        return Client('https://api.fabric.microsoft.com/v1','TEST_TOKEN',journal=self.tmp.name,adapter=adapter,sleep=lambda t:None)
     def test_202_location_then_result(self):
-        c=self.client([{'status':202,'headers':{'Location':'https://api.example.invalid/v1/operations/op','Retry-After':'0'},'body':None},
+        c=self.client([{'status':202,'headers':{'Location':'https://api.fabric.microsoft.com/v1/operations/op','Retry-After':'0'},'body':None},
           {'status':200,'headers':{},'body':{'status':'Running'}},{'status':200,'headers':{},'body':{'status':'Succeeded'}},{'status':200,'headers':{},'body':{'definition':{'parts':[]}}}])
         r=c.finish(c.request('POST','/workspaces/w/plans/p/getDefinition',{},label='export'),'export'); self.assertIn('definition',r['body']); self.assertTrue(self.calls[-1][1].endswith('/result'))
     def test_read_throttle(self):
@@ -242,6 +242,23 @@ class TransportTests(unittest.TestCase):
     def test_untrusted_location(self):
         c=self.client([])
         with self.assertRaises(ValueError): c.finish({'status':202,'headers':{'location':'https://evil.invalid/steal'},'body':None},'a')
+    def test_config_cannot_expand_public_origin(self):
+        allowed=['api.fabric.microsoft.com','extra.invalid']
+        with self.assertRaises(ValueError):
+            Client('https://extra.invalid/v1','TEST_TOKEN',allowed,self.tmp.name)
+        c=Client('https://api.fabric.microsoft.com/v1','TEST_TOKEN',allowed,self.tmp.name,
+                 adapter=lambda *args:self.fail('Credential sent outside Fabric'))
+        with self.assertRaises(ValueError):
+            c.request('GET','https://extra.invalid/next')
+    def test_update_rechecks_changed_destination_without_submitting(self):
+        from runtime.codec import pack,definition_hash
+        from runtime.transport import plan_operation
+        before=pack({'example.json':{'value':1}})
+        changed=pack({'example.json':{'value':2}})
+        c=self.client([{'status':200,'headers':{},'body':changed}])
+        with self.assertRaisesRegex(ValueError,'Destination changed'):
+            plan_operation(c,'w','update','p',definition=before,baseline_hash=definition_hash(before))
+        self.assertEqual([url.rsplit('/',1)[-1] for _,url,_ in self.calls],['getDefinition'])
     def test_credentials_not_journaled(self):
         c=self.client([{'status':201,'headers':{},'body':{'id':'new'}}]); c.request('POST','/plans',{},label='create')
         self.assertTrue(all('mock-secret' not in f.read_text() for f in Path(self.tmp.name).glob('*')))

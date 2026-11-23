@@ -1,7 +1,7 @@
 """Offline layout decoding and Home visibility through public Plan definitions."""
 import os,subprocess,copy,uuid,urllib.parse
 from pathlib import Path
-from .codec import loads,unpack,patch,parts,sha
+from .codec import loads,unpack,patch,parts,sha,definition_hash
 from .transport import plan_operation
 
 def decode_roles(payload,node=None):
@@ -25,7 +25,7 @@ def visibility_via_alm(client,workspace,plan,show,label):
     # A resumed completed write verifies current state rather than reusing stale body.
     if raw[name]!=props:
         candidate=patch(before,{name:props},{name:sha(parts(before)[name])})
-        plan_operation(client,workspace,'update',plan,definition=candidate,label=label)
+        plan_operation(client,workspace,'update',plan,definition=candidate,label=label,baseline_hash=definition_hash(before))
     after=plan_operation(client,workspace,'export',plan,label=label+'-after-'+uuid.uuid4().hex)['body']
     new=unpack(after)
     if new[name].get('properties',{}).get('homeLayout',{}).get('show') is not show:

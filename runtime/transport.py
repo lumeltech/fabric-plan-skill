@@ -3,7 +3,8 @@ No implicit endpoint discovery guesses. Supply metadata-resolved API roots.
 """
 import urllib.request, urllib.error, urllib.parse, email.utils, datetime, time, os, base64, json, re, subprocess
 from pathlib import Path
-from .codec import load, loads, dumps, save, sha
+from .codec import load, loads, dumps, save, sha, definition_hash
+from uuid import uuid4
 class HttpError(RuntimeError):
     def __init__(self,status,body=None):
         self.status=status
@@ -22,14 +23,15 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 class Client:
     def __init__(self,base,token_env,allowed_hosts=None,journal=None,adapter=None,sleep=time.sleep):
         self.base=base.rstrip('/'); self.token_env=token_env
-        host=urllib.parse.urlsplit(base).netloc
-        self.allowed=set(allowed_hosts or [host]); self.allowed.add(host)
+        host='api.fabric.microsoft.com'
+        if self.base!='https://'+host+'/v1' or (allowed_hosts is not None and host not in allowed_hosts):
+            raise ValueError('Expected the public Fabric API base https://api.fabric.microsoft.com/v1')
         self.journal=Path(journal or 'run'); self.journal.mkdir(parents=True,exist_ok=True)
         self.adapter=adapter or self._http; self.sleep=sleep
         self.check_url(base)
     def check_url(self,url):
         p=urllib.parse.urlsplit(url)
-        if p.scheme!='https' or p.netloc not in self.allowed or p.username or p.password or p.fragment:
+        if p.scheme!='https' or p.netloc!='api.fabric.microsoft.com' or p.fragment:
             raise ValueError('Unapproved HTTPS endpoint')
         if {'coreapi','generatemwctokenv2'} & set(urllib.parse.unquote(p.path).lower().split('/')):
             raise ValueError('Expected a public Fabric API endpoint')
@@ -167,7 +169,7 @@ class Client:
             route=r.get('continuationUri')
             if not route and r.get('continuationToken'): raise ValueError('Continuation token requires endpoint-specific parameter adapter')
         return values
-def plan_operation(client,workspace,kind,plan_id=None,definition=None,name=None,label='plan'):
+def plan_operation(client,workspace,kind,plan_id=None,definition=None,name=None,label='plan',baseline_hash=None):
     base='/workspaces/'+urllib.parse.quote(workspace,safe='')+'/plans'
     if kind in ('create','create-blank'):
         if not name or (kind=='create' and not definition): raise ValueError('Name and full definition required')
@@ -175,6 +177,13 @@ def plan_operation(client,workspace,kind,plan_id=None,definition=None,name=None,
         if kind=='create': body['definition']=definition.get('definition',definition)
     elif kind in ('export','update'):
         if not plan_id: raise ValueError('planId required')
+        if kind=='update':
+            if not baseline_hash: raise ValueError('Update requires the reviewed definition hash')
+            # Journal replay can only resume the identical submission; a new one needs a fresh read.
+            if not (client.journal/(label+'.intent.json')).exists():
+                fresh=plan_operation(client,workspace,'export',plan_id,label=label+'-baseline-'+uuid4().hex)
+                if definition_hash(fresh['body'])!=baseline_hash:
+                    raise ValueError('Destination changed since reviewed baseline')
         route=base+'/'+urllib.parse.quote(plan_id,safe='')+('/getDefinition' if kind=='export' else '/updateDefinition')
         body={} if kind=='export' else {'definition':definition.get('definition',definition)}
     else: raise ValueError('Unknown Plan operation')

@@ -36,3 +36,16 @@ Export is a read; create and update are writes. For asynchronous operations,
 retain the operation receipt and resume with the same journal rather than
 submitting a second create. A completed operation establishes API acceptance,
 not formula evaluation, persisted cell values or permission to edit a cell.
+
+For a repair, use a new run or export label to obtain a fresh baseline rather
+than replaying a receipt. Patch the `body` of `result.json`; copy its top-level
+`baselineSha256` into the update config. Review the changed parts and authorize
+the update for that same Plan. A new update re-exports and compares the baseline;
+if it differs, reconcile and review a new candidate. This is not a server-side
+lock. Coordinate an exclusive edit window when loss of concurrent edits is
+unacceptable. Afterward, use a new export label for readback.
+
+Only `https://api.fabric.microsoft.com/v1` is a supported base. The transport's
+64 MiB response limit is local, not a Fabric capacity guarantee. Check available
+disk space and applicable destination limits before publishing large definitions.
+Report unknown limits or rejected payloads; do not silently drop parts.

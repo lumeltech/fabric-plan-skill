@@ -66,7 +66,7 @@ class PublicDashboardDelivery(unittest.TestCase):
             'b': {'originEntityId': '2', 'visualId': '3'}})
 
     def test_internal_endpoints_rejected_before_credentials_or_submission(self):
-        client = Client('https://example.test', 'UNSET_TEST_TOKEN', journal=ROOT,
+        client = Client('https://api.fabric.microsoft.com/v1', 'UNSET_TEST_TOKEN', journal=ROOT,
                         adapter=lambda *args: self.fail('Unexpected submission'))
         for route in ('/CoreAPI/v1/access/roles/layout/', '/metadata/v201606/generatemwctokenv2'):
             with self.subTest(route=route), self.assertRaisesRegex(ValueError, 'public Fabric'):

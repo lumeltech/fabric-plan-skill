@@ -2,7 +2,7 @@
 """Portable single-file skill runtime. All paths are explicit; no ambient repository."""
 import argparse,sys,copy,re,subprocess,os
 from pathlib import Path
-from runtime.codec import load,save,unpack,pack,parts,sha,dumps,safe_path
+from runtime.codec import load,save,unpack,pack,parts,sha,dumps,safe_path,definition_hash
 from runtime.construct import build
 from runtime.validate import validate_plan,schema_report
 ROOT=Path(__file__).resolve().parent
@@ -265,19 +265,12 @@ def main():
             if args.action!='create-blank':
                 if not payload: raise ValueError('Full reviewed payload required')
                 validate_plan(unpack(payload))
-            if not c.get('authorizedMutation'): raise ValueError('Set authorizedMutation only from current user-authorized scope')
+            if c.get('authorizedMutation') is not True: raise ValueError('Set authorizedMutation only from current user-authorized scope')
             if args.action=='update' and not c.get('baselineSha256'): raise ValueError('Update requires expected fresh baseline envelope hash')
         client=Client(c['apiBase'],c['tokenEnvironment'],c.get('allowedHosts'),Path(args.run)/'api')
-        # A submitted update resumes its recorded operation, not a second mutation.
-        # New updates need a genuinely fresh read-only export, never a cached baseline.
-        already_submitted=(Path(args.run)/'api'/(args.label+'.intent.json')).exists()
-        if args.action=='update' and not already_submitted:
-            from runtime.construct import guid
-            fresh=plan_operation(client,c['workspaceId'],'export',c['planId'],label=args.label+'-baseline-'+guid())['body']
-            # Canonical part mapping hash ignores export part order; exact raw payload bytes remain significant.
-            actual=sha(__import__('runtime.codec',fromlist=['dumps']).dumps({k:sha(v) for k,v in sorted(parts(fresh).items())}))
-            if actual!=c['baselineSha256']: raise ValueError('Destination changed since reviewed baseline')
-        result=plan_operation(client,c['workspaceId'],args.action,c.get('planId'),payload,c.get('name'),label=args.label)
+        result=plan_operation(client,c['workspaceId'],args.action,c.get('planId'),payload,c.get('name'),label=args.label,baseline_hash=c.get('baselineSha256'))
+        if args.action=='export':
+            result['baselineSha256']=definition_hash(result['body'])
         save(Path(args.run)/'result.json',result); print('Saved API result; inspect status; runtime behavior is not verified.')
 if __name__=='__main__':
     try: main()
