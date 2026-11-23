@@ -35,12 +35,7 @@ community resource for authoring and maintaining Fabric Plan applications.
   Microsoft's broader Fabric user community
 - [Planning in Microsoft Fabric: a shared vision through collaboration with Lumel](https://www.microsoft.com/en-us/microsoft-fabric/blog/2024/12/04/planning-in-microsoft-fabric-a-shared-vision-through-collaboration-with-lumel/)
 - [Lumel IBCS resources](https://lumel.com/ibcs/)
-
-<p align="center">
-  <a href="https://docs.fabricplan.com/">
-    <img src="https://lumel.com/wp-content/uploads/lumel-planning.svg" alt="Lumel enterprise planning on Microsoft Fabric" width="720">
-  </a>
-</p>
+ 
 
 ## Microsoft and Lumel
 
