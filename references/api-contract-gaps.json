@@ -75,8 +75,8 @@
       "statusNote": "The bundled algorithm and synthetic fixtures cover the first-layout hash producer. Remaining gaps do not disable supported construction/update operations."
     }
   ],
-  "policy": "continue-independent-work-with-explicit-alternatives-and-omissions",
-  "applicationWideVeto": false,
+  "policy": "continue-independent-local-work; explicit-approved-revised-scope-before-mutation",
+  "applicationWideVeto": true,
   "constructedComponents": [
     "dimension-id-map-and-native-descriptors",
     "database-lookup-column-config",
@@ -105,7 +105,7 @@
     "forecast-actuals-variance-chart"
   ],
   "executablePostImport": {
-    "command": "plan.py forecast-review",
+    "command": null,
     "implementation": "runtime/forecast_review.py",
     "guide": "forecast-review-execution.md",
     "capabilities": [
@@ -121,7 +121,8 @@
       "SUM numeric source",
       "prepared type-50 column charts",
       "asynchronous column jobs require target completion profile"
-    ]
+    ],
+    "transport": "approved-external-adapter; callable-only"
   },
   "forecastDefaults": {
     "implementation": "runtime/forecast.py",

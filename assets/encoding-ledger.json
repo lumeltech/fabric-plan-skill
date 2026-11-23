@@ -1,0 +1,461 @@
+{
+  "$comment": "One entry per feature encoding captured from a native sample. See references/intelligence/core/native-samples.md.",
+  "entries": [
+    {
+      "featureId": "CH-ANLY-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/charts/analytics-lines.md (Definition encoding)",
+      "evidence": "Live getDefinition export of a UI-created test Plan with default visuals and one configured drill-through; no before/after isolation or re-render check",
+      "productBuild": "",
+      "capturedOn": "2026-11-08",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "CH-CF-01",
+      "status": "unverified",
+      "path": "See references/intelligence/features/charts/chart-cf.md (Definition encoding)",
+      "evidence": "Live getDefinition export of a UI-created test Plan with default visuals and one configured drill-through; no before/after isolation or re-render check",
+      "productBuild": "",
+      "capturedOn": "2026-11-08",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "CH-LBL-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/charts/data-labels.md (Definition encoding)",
+      "evidence": "Native measure-keyed labelStyle with enabled:false, display:none, varianceDisplay:none applied to actual and PY LINE trellises; publish/readback and rendered inspection confirmed point labels off while axes, legends and titles remained. Other label-content, position and density variants remain observed, not verified.",
+      "productBuild": "",
+      "capturedOn": "",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "CH-LIB-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/charts/column-bar.md (Definition encoding)",
+      "evidence": "Live getDefinition export of a UI-created test Plan with default visuals and one configured drill-through; no before/after isolation or re-render check",
+      "productBuild": "",
+      "capturedOn": "2026-11-08",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "CH-LIB-02",
+      "status": "verified",
+      "path": "See references/intelligence/features/charts/waterfall.md (Definition encoding)",
+      "evidence": "Single-measure waterfall with a VALUES extra filter and renamed total bar; rendering user-confirmed in a published report",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "CH-LIB-03",
+      "status": "observed",
+      "path": "See references/intelligence/features/charts/line.md (Definition encoding)",
+      "evidence": "LINE_INTEGRATED actual vs prior year rendering previously user-confirmed; its month-order follow-up remains separately pending. Native LINE smallMultiplesChart PY borderColor/fillColor and lineArea solid 1.5px stroke published, read back and confirmed visible across all rendered panels with actual style preserved. This verifies the scoped trellis styling, not every line-family variant.",
+      "productBuild": "",
+      "capturedOn": "",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "CH-LIB-06",
+      "status": "observed",
+      "path": "See references/intelligence/features/charts/pie-donut.md (Definition encoding)",
+      "evidence": "Live getDefinition export of a UI-created test Plan with default visuals and one configured drill-through; no before/after isolation or re-render check",
+      "productBuild": "",
+      "capturedOn": "2026-11-08",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "CH-LIB-33",
+      "status": "observed",
+      "path": "See references/intelligence/features/charts/dumbbell-arrow-dot.md (Definition encoding)",
+      "evidence": "Saved native Plan exports studied by the companion Intelligence authoring library (merged); not isolated by a before/after capture in this skill; no re-render check",
+      "productBuild": "",
+      "capturedOn": "",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "CH-SORT-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/charts/sort-rank.md (Definition encoding)",
+      "evidence": "Measure-descending bar sort rendering user-confirmed in a published report; ascending category sort matches UI-saved time-axis charts (fix published, confirmation pending)",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "CV-BOX-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/canvas/horizontal-container.md (Definition encoding)",
+      "evidence": "Saved native Plan exports studied by the companion Intelligence authoring library (merged); not isolated by a before/after capture in this skill; no re-render check",
+      "productBuild": "",
+      "capturedOn": "",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "CV-ELEM-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/canvas/text-shapes-images.md (Definition encoding)",
+      "evidence": "Lexical text and shapes rendering user-confirmed. Later text-box padding/minimal-height fixes removed scrollbars; zero/disabled outer visualStyles.padding plus native shapeState.padding removed inset panel borders and stepped seams. Both refinements published, read back and visually checked. Image encoding remains uncaptured.",
+      "productBuild": "",
+      "capturedOn": "",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "CV-ELEM-02",
+      "status": "verified",
+      "path": "See references/intelligence/features/canvas/navigation-buttons.md (Definition encoding)",
+      "evidence": "pageDestinationId ordinal from a user UI save in the report editor, read back with getDefinition; hidden-page targets and icon names rendering user-confirmed in a published report; 2026-11-20 runtime: after four sheets were inserted before Help and Info, tabs selecting 1-5 showed Overview, two new sheets, Help and Info; selectedPages [1,4,5,6,7] then showed the five analysis pages and pageDestinationId 2 opened Help, so page ids are creation-order sheet ids, not positions (plan f0000000-0000-4000-8000-00000000007a)",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "CV-EMBED-01",
+      "status": "observed",
+      "path": "definition.json -> sheets[i].workloadItemEntityVisuals {visualType: PLANNING | POWERTABLE, isEmbedded: true}; host sheet.json -> properties.reactiveVisualProperties[], assignmentColumnMap (PowerTable)",
+      "evidence": "decoded native readbacks: Planning grid embedded on a REPORTING sheet; Planning and PowerTable visuals embedded on a REPORTING sheet with From Sheets consumers (see core/cross-module-blend.md)",
+      "productBuild": "",
+      "capturedOn": "",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "CV-FILT-01",
+      "status": "verified",
+      "path": "See references/intelligence/features/canvas/filter-pane.md (Definition encoding)",
+      "evidence": "Locked report-level VALUES filter and visual-level NESTED_RANKING/VALUES extra filters; totals reconciled to DAX and rendering user-confirmed in a published report",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "CV-HOME-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/canvas/home-layout.md (Definition encoding)",
+      "evidence": "Saved native Plan exports studied by the companion Intelligence authoring library (merged); not isolated by a before/after capture in this skill; no re-render check",
+      "productBuild": "",
+      "capturedOn": "",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "CV-INT-03",
+      "status": "observed",
+      "path": "See references/intelligence/features/canvas/drill-through.md (Definition encoding)",
+      "evidence": "Live getDefinition export of a UI-created test Plan with default visuals and one configured drill-through; no before/after isolation or re-render check",
+      "productBuild": "",
+      "capturedOn": "2026-11-08",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "CV-LAYER-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/canvas/layers-elements.md (Definition encoding)",
+      "evidence": "Layer order (higher = further back) rendering user-confirmed in a published report; grouping not captured; 2026-11-20 user editor save deleting two visuals renumbered every layerProperties.order on the page to 0..n in the same relative order (authored gaps such as 951 not preserved); 2026-11-20 after that deletion every complete updateDefinition omitting the two deleted visuals failed ImportFailed 'Sheets could not be imported. Event-trigger replacement rollback failed' (4 attempts: edited payload, identical retry with the report closed, payload with the live dataInput.json parts, unchanged round trip of the live definition; nothing persisted); re-emitting both hidden under their original ids with properties, writeback.json and definition.json registration from the pre-deletion readback persisted (operation reported UnknownError, readback-verified, pages rendered)",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "CV-LAYOUT-01",
+      "status": "verified",
+      "path": "See references/intelligence/features/canvas/canvas-layout.md (Definition encoding)",
+      "evidence": "Custom 1600x900 percentage canvas from a native capture; rendering user-confirmed across revisions. Later wallpaper-only refinement changed canvasStyle.wallpaper.value.color; all other parts and canvas background/dimensions matched readback. Rendered fitted view confirmed a distinct outside surround.",
+      "productBuild": "",
+      "capturedOn": "",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "CV-MARK-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/canvas/marker-mode.md (Definition encoding)",
+      "evidence": "Saved native Plan exports studied by the companion Intelligence authoring library (merged); not isolated by a before/after capture in this skill; no re-render check",
+      "productBuild": "",
+      "capturedOn": "",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "KPI-CARD-01",
+      "status": "verified",
+      "path": "See references/intelligence/features/kpi/kpi-cards.md (Definition encoding)",
+      "evidence": "Native sparkline card cloned and rebound (AC/PY/axis, PL to PY token conversion); values reconciled to DAX and rendering user-confirmed in a published report",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "KPI-CHART-01",
+      "status": "verified",
+      "path": "See references/intelligence/features/kpi/insight-charts.md (Definition encoding)",
+      "evidence": "Native AREA sparkline card; legend and ascending time sort settings; sparklines rendering user-confirmed in a published report; 2026-11-20: per-card line colour renders from the measure-keyed appearance.charts.measuresStyle entry (runtime-confirmed)",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "KPI-FMT-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/kpi/card-customization.md (Definition encoding)",
+      "evidence": "Mention number-format prefix and percent flags rendering user-confirmed. Later split-card refinements published/read back and visually checked: native panel fill behind disjoint text/badge items with white chart item; middle-left main text uses alignment:flex-start, justifyContent:center and left outer paragraphs; unchanged badge geometry with both layout axes and outer paragraphs centered. Currency mention overrides changed presentation only. Arbitrary grouped/flex layouts, formulas and images remain uncaptured.",
+      "productBuild": "",
+      "capturedOn": "",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "KPI-CONT-01",
+      "status": "unverified",
+      "path": "See references/intelligence/features/kpi/kpi-containers.md (Definition encoding)",
+      "evidence": "Existing flat gridLayout item geometry and native panel backgrounds were refined, published/read back and visually checked. A full-height main text item overlapped and hid a variance badge; disjoint main/badge items with background fill behind them resolved it. This does not capture true group/flex creation or membership; the container feature remains unverified.",
+      "productBuild": "",
+      "capturedOn": "",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "KPI-VAR-01",
+      "status": "verified",
+      "path": "See references/intelligence/features/kpi/kpi-variance.md (Definition encoding)",
+      "evidence": "Native prior-year card rich-text mentions and varianceMeasures; values, arrows and percentages rendering user-confirmed in a published report",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "MX-CF-01",
+      "status": "verified",
+      "path": "See references/intelligence/features/matrix/cf-rules.md (Definition encoding)",
+      "evidence": "Rule object from a user UI save in the report editor, read back with getDefinition; rules bound to engine manage_measures ids; highlights rendering user-confirmed in a published report; 2026-11-20: target fields highlightedMeasure/highlightedMeasureName/bubbleBasedOn and conditions[].basedOn/comparisonMeasure carry engine ids - a cloned ΔPL% rule retargeted to the Δ BUD id rendered (runtime-confirmed)",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "MX-CF-02",
+      "status": "observed",
+      "path": "See references/intelligence/features/matrix/cf-data-bars-color-scales.md (Definition encoding)",
+      "evidence": "User editor save (2026-11-20) read back: Matrix colour scale is a targetValue rule with colorScaleApplyTo continuous and a 100-step colour list; in-cell bars via chart_config Bar + formatConfig codes 25/26; the native heatmap donor carried the same targetValue rule. Authored colorScale-type rules painted nothing. Authored clones of the saved rule published 2026-11-20; their rendering pending; 2026-11-20 runtime: cloned targetValue scales rendered on saved engine ids (heatmap measure, PY variance %), not on builder-invented extra-measure ids",
+      "productBuild": "",
+      "capturedOn": "2026-11-20",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "MX-HIER-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/matrix/manage-hierarchies.md (Definition encoding)",
+      "evidence": "Live getDefinition export of a UI-created test Plan with default visuals and one configured drill-through; no before/after isolation or re-render check; 2026-11-20 runtime: globalStyles.hierarchyfontWeight bold and gridStyles.indentSpacing 16 rendered bold, indented parents; every saved Matrix kept expandCollapseIcon none and row_expand_state_config Grid Expanded (no collapsed default captured); 2026-11-20 user editor save: tableState.expandCollapseIcon plusMinusSquare on a Matrix with three row fields; a one-field Matrix left at none; row_expand_state_config unchanged (rows open expanded)",
+      "productBuild": "",
+      "capturedOn": "2026-11-08",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "MX-NUM-03",
+      "status": "verified",
+      "path": "See references/intelligence/features/matrix/semantic-formatting.md (Definition encoding)",
+      "evidence": "numberFormatting.semanticFormatting with positive/negative colours applied to reporting matrices; rendering user-confirmed in a published report",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "MX-TOT-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/matrix/totals-subtotals.md (Definition encoding)",
+      "evidence": "Live getDefinition export of a UI-created test Plan with default visuals and one configured drill-through; no before/after isolation or re-render check; 2026-11-20: removing totalRowsDisplay \"underlyingData\" from a newer-format owner hid the grand-total row; restoring it brought it back (runtime-confirmed); 2026-11-20 UI save: column_grand_total Right (Total column), columnTitleConfigs grand-total id 16017913890930171270 renamed All to Total, formatConfig.row styled the total row; 2026-11-20 runtime: totalDisplayConfig.totalCustomTitle.grandTotalTitle Total rendered on the row grand total",
+      "productBuild": "",
+      "capturedOn": "2026-11-08",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "MX-VIS-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/matrix/matrix-visual.md (Definition encoding)",
+      "evidence": "Saved native Plan exports studied by the companion Intelligence authoring library (merged); not isolated by a before/after capture in this skill; no re-render check; 2026-11-20: row_height_config applies row height and miscellaneous.isUserChangedFooter=true hides the Rows/Columns status bar (runtime-confirmed)",
+      "productBuild": "",
+      "capturedOn": "",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "SF-DATE-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/slicers/date-slider.md (Definition encoding)",
+      "evidence": "Native date slider reused in a report build and read back; preselected Last Year preset found in the template; rendering pending",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "SF-DATE-04",
+      "status": "observed",
+      "path": "See references/intelligence/features/slicers/date-presets.md (Definition encoding)",
+      "evidence": "Native date slider presets; selectedDatePreset preselection and customPresets.isHidden observed; behavior not runtime-tested",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "SF-DISP-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/slicers/display-settings.md (Definition encoding)",
+      "evidence": "forcedSelection with a stored default rendering user-confirmed in a published report; other display settings remain observed only",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "SF-FACET-01",
+      "status": "verified",
+      "path": "See references/intelligence/features/slicers/facet-filter.md (Definition encoding)",
+      "evidence": "Native facet samples and a user UI save in the report editor, read back with getDefinition (slicerFilterAssignments default); tile view, single-select default and forced selection rendering user-confirmed in a published report; toggle/checkbox views published, rendering pending; 2026-11-20: fixed-toolbar tile facet scrolled at 100px and fitted at 132px (26px title, 30px tiles), runtime-confirmed; 2026-11-20 user editor save (plan f0000000-0000-4000-8000-00000000007a): two pop-up page filters became dropdown facets - facetViewType dropdown, minModeSettings.enableMinModeFilter false, toolbarSettings.showTitle true, titleFontSize 13, titleFontBold false, displaySettings.imageDataPosition right (editor-added); separate text labels deleted; frames about 96-104px tall in a 116px band at 1920x1080",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "SF-FACET-02",
+      "status": "verified",
+      "path": "See references/intelligence/features/slicers/facet-category-style.md (Definition encoding)",
+      "evidence": "Native tile facet; tileGap from a user UI save in the report editor, read back with getDefinition; responsive one-row tiles in a ~104px frame rendering user-confirmed in a published report",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "SF-FACET-03",
+      "status": "observed",
+      "path": "See references/intelligence/features/slicers/facet-enhanced.md (Definition encoding)",
+      "evidence": "facetViewType textArea observed in read-only getDefinition exports of other UI-saved Plans in one workspace; operators and image filters not captured",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "SF-FEAT-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/slicers/saved-filters.md (Definition encoding)",
+      "evidence": "showSavedFilter false in every filter across read-only getDefinition exports of other UI-saved Plans in one workspace; true applied in a report build, rendering pending",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "SF-FEAT-02",
+      "status": "observed",
+      "path": "See references/intelligence/features/slicers/search.md (Definition encoding)",
+      "evidence": "Native facet with enableSearch; pop-up launcher shows the search box; search behavior not runtime-tested",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "SF-FEAT-03",
+      "status": "observed",
+      "path": "See references/intelligence/features/slicers/mass-filter.md (Definition encoding)",
+      "evidence": "Native facet with enableBulkCopyPaste beside the pop-up; applied in a report build, rendering pending",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "SF-FEAT-05",
+      "status": "verified",
+      "path": "See references/intelligence/features/slicers/popup-mode.md (Definition encoding)",
+      "evidence": "Native pop-up (minModeSettings.enableMinModeFilter) facet sample; pop-ups opening fully rendering user-confirmed in a published report; hierarchy pop-ups published, rendering pending; 2026-11-20: labelled pop-up launchers for long-list page filters rendered as filter/eraser icons beside 30px text labels on four pages; 2026-11-20: the user rejected unrequested pop-up page filters, converted them to dropdown facets and asked to be asked before pop-up mode is used (usage rule, not an encoding change)",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "SF-HIER-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/slicers/hierarchy-filter.md (Definition encoding)",
+      "evidence": "Eight multi-level hierarchy filters and single-level list variants in read-only getDefinition exports of other UI-saved Plans in one workspace; two- and three-level builds published and read back; rendering pending",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "SF-NUM-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/slicers/numeric-alphanumeric-filter.md (Definition encoding)",
+      "evidence": "configuration.visualType NUMERIC with tile view and stored numeric VALUES in read-only getDefinition exports of other UI-saved Plans in one workspace; slider form not captured",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "SF-QUICK-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/slicers/quick-mode.md (Definition encoding)",
+      "evidence": "Resulting filter types (FACET, hierarchy mode, DATE, NUMERIC) observed in read-only getDefinition exports of other UI-saved Plans in one workspace; Quick Mode action not captured",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "SF-TB-01",
+      "status": "verified",
+      "path": "See references/intelligence/features/slicers/toolbar.md (Definition encoding)",
+      "evidence": "Native toolbar groups; customTitleText titles rendering user-confirmed in a published report; toolbarType fixed/float/hide seen in read-only getDefinition exports of other UI-saved Plans in one workspace",
+      "productBuild": "",
+      "capturedOn": "2026-11-11",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "TB-TABLE-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/table/table.md (Definition encoding)",
+      "evidence": "Live getDefinition export of a UI-created test Plan with default visuals and one configured drill-through; no before/after isolation or re-render check",
+      "productBuild": "",
+      "capturedOn": "2026-11-08",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "MX-VIS-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/matrix/matrix-visual.md (Matrix initialization needs the model url)",
+      "evidence": "2026-11-19: Plan created via REST with legacy semanticModelReference including url persisted it on readback; both Matrices (crosstab heatmap and plmeasure variance) initialized and rendered data in Reading mode. Earlier API-created Plans without url failed with 'Failed to initialize application: unreachable'."
+    },
+    {
+      "featureId": "MX-SRT-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/matrix/sort-reorder.md (Definition encoding)",
+      "evidence": "User editor save (2026-11-20) read back: sorting.sort_type.ColWithMeasure with a column id that differs from the measure id; reuse on matching Matrices published, rendering pending",
+      "productBuild": "",
+      "capturedOn": "2026-11-20",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "MX-CHART-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/matrix/inline-charts.md (Definition encoding)",
+      "evidence": "User editor save (2026-11-20) read back: in-cell Bar on a measure column (chart_config + formatConfig codes 25/26); other chart types not captured",
+      "productBuild": "",
+      "capturedOn": "2026-11-20",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "MX-VAR-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/matrix/variance-columns.md (Definition encoding)",
+      "evidence": "User-saved Matrices read back: native PL and PY variance columns with AC/comparison/variance engine-id sets; replacing only AC/PL ids removed the variance columns (runtime-confirmed); PL variance columns rendering confirmed in a published report; 2026-11-20 runtime: extra ameasure headers changed only after pivot customName + isRenamed true; manage_measures labels alone kept the full measure name",
+      "productBuild": "",
+      "capturedOn": "2026-11-20",
+      "runtimeVerified": true
+    },
+    {
+      "featureId": "MX-NUM-01",
+      "status": "observed",
+      "path": "See references/intelligence/features/matrix/number-scaling.md (Definition encoding)",
+      "evidence": "User editor saves read back: formatConfig.measure codes 8 prefix, 9 percent, 11 decimals, 13 scaling; global numberFormatting group observed; 2026-11-20 runtime: model percent measures with code 9 rendered a doubled sign (25.80%%) and the model's decimals regardless of the assignment formatString or code 11; v10 removed 9/11 from them (rendering pending)",
+      "productBuild": "",
+      "capturedOn": "2026-11-20",
+      "runtimeVerified": false
+    },
+    {
+      "featureId": "CV-EXPL-01",
+      "status": "unverified",
+      "path": "See references/intelligence/features/canvas/explore-model.md (Definition encoding)",
+      "evidence": "2026-11-20: opening Explore Model from a sheet in the editor added a definition.json sheet entry (sheetType BI_REPORTING, displayName = current sheet, one UNKNOWN visual, no sheet or visual parts); not listed in the sheet Explorer; the next complete updateDefinition without it removed it with no visible change (plan f0000000-0000-4000-8000-00000000007a). The authorable feature encoding is not captured.",
+      "productBuild": "",
+      "capturedOn": "2026-11-20",
+      "runtimeVerified": false
+    }
+  ]
+}

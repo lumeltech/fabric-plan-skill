@@ -1,0 +1,128 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/plan/definition/Planning/DataInput/1.0.0/schema.json",
+  "columns": [
+    {
+      "boundToFilterContext": 10,
+      "columnMeta": {
+        "data_type": "Number",
+        "description": null,
+        "id": "2055735705734354016",
+        "label": "Actual Revenue",
+        "measure_type": {
+          "Native": {
+            "measure_role": "ACMeasure"
+          }
+        },
+        "name": "Actual Revenue"
+      },
+      "dataInputType": 6,
+      "description": null,
+      "measureGuid": "2055735705734354016",
+      "name": "Actual Revenue",
+      "visualId": "f0000000-0000-4000-8000-000000000018"
+    },
+    {
+      "boundToFilterContext": 10,
+      "columnMeta": {
+        "data_type": "Number",
+        "description": null,
+        "id": "14000520665448373249",
+        "label": "Revenue YoY %",
+        "measure_type": {
+          "Native": {
+            "measure_role": "ACMeasure"
+          }
+        },
+        "name": "Revenue YoY %"
+      },
+      "dataInputType": 6,
+      "description": null,
+      "measureGuid": "14000520665448373249",
+      "name": "Revenue YoY %",
+      "visualId": "f0000000-0000-4000-8000-000000000018"
+    },
+    {
+      "boundToFilterContext": 10,
+      "columnMeta": {
+        "data_type": "Number",
+        "description": null,
+        "id": "9837477649726619647",
+        "label": "Plan Revenue",
+        "measure_type": {
+          "Native": {
+            "measure_role": "ACMeasure"
+          }
+        },
+        "name": "Plan Revenue"
+      },
+      "dataInputType": 6,
+      "description": null,
+      "measureGuid": "9837477649726619647",
+      "name": "Plan Revenue",
+      "visualId": "f0000000-0000-4000-8000-000000000018"
+    },
+    {
+      "boundToFilterContext": 10,
+      "columnMeta": {
+        "data_type": "Text",
+        "description": "",
+        "id": "5604510547174481317",
+        "label": "Notes",
+        "measure_type": {
+          "DataInput": {
+            "allow_input": "ReadAndEdit",
+            "bound_to_filter_context": true,
+            "column_type": {
+              "ShortText": {
+                "allow_entry_on_totals_or_subtotals": true,
+                "default_value": null,
+                "field_validation": "AnyValue",
+                "maximum_length": null,
+                "minimum_length": null,
+                "prevent_null": false
+              }
+            },
+            "disable_write_access": false,
+            "id": "",
+            "on_change_formula": "",
+            "title": "Notes"
+          }
+        }
+      },
+      "dataInputType": 1,
+      "description": null,
+      "measureGuid": "5604510547174481317",
+      "name": "Notes",
+      "visualId": "f0000000-0000-4000-8000-000000000018"
+    },
+    {
+      "boundToFilterContext": 10,
+      "columnMeta": {
+        "data_type": "Text",
+        "description": "",
+        "id": "17919631694473960484",
+        "label": "Assign to",
+        "measure_type": {
+          "DataInput": {
+            "allow_input": "ReadAndEdit",
+            "bound_to_filter_context": true,
+            "column_type": {
+              "Person": {
+                "allow_entry_on_totals_or_subtotals": true
+              }
+            },
+            "disable_write_access": false,
+            "id": "",
+            "on_change_formula": "",
+            "title": "Assign to"
+          }
+        }
+      },
+      "dataInputType": 7,
+      "description": null,
+      "measureGuid": "17919631694473960484",
+      "name": "Assign to",
+      "visualId": "f0000000-0000-4000-8000-000000000018"
+    }
+  ]
+}

@@ -10,7 +10,15 @@
 > provisioning, separate phases and actual gaps. Preserve the latest targeted
 > fixes; historical coverage statements below are release-scoped.
 
-> Executable Forecast review update: use [forecast-review-execution.md](forecast-review-execution.md) and `plan.py forecast-review` for From Sheets SUM, quarterly commentary/variance, negative formatting and comparison charts. This separate post-import phase is bundled; do not treat a convenience-provisioner omission as missing capability. Forecast defaults inherit a working reference, otherwise UTC and distribute-to-children=true.
+> Forecast review update: use
+> [forecast-review-execution.md](forecast-review-execution.md) and the bundled
+> `runtime.forecast_review` callables for From Sheets SUM, quarterly
+> commentary/variance, negative formatting and comparison charts. This separate
+> workload phase requires an approved external adapter and has no current CLI
+> route. Do not treat its convenience-provisioner omission as missing code, but
+> do report it as unavailable when the adapter profile is unavailable. Forecast
+> defaults inherit a working reference, otherwise UTC and
+> distribute-to-children=true.
 
 > Maintenance fallback: when a requested PowerTable cannot be bound, deploy a visible native PowerTable sheet with deferred connection using `maintenance-deferred-connection.md`. Do not omit the sheet solely for a connection gap. Preserve chart Visual level field registrations using `chart-visual-filters.md`.
 
@@ -41,7 +49,7 @@ replace unknown data with zero or deploy formulas with unresolved dependencies.
 
 Use `runtime.dimension_mapping.dimension_mapping(model, assignments, mappings, descriptor_only_assignments=(), skip_support=None)` or `construct-native dimension-mapping`. The normal Planning builder accepts `dimensionIdMappings`, `dimensionSkipSupport` and `lookupContextAssignments` and writes the result at `properties.visualState.dimension_id_mapping`.
 
-Example business grain: Employee Ãƒâ€” Month, with Scenario as storage context. Display employee names, but persist coordinates against a same-table stable employee key. Department is a descriptive grouping only if the retained Employee key already identifies the intended entity. The observed native strategies are:
+Example business grain: Employee x Month, with Scenario as storage context. Display employee names, but persist coordinates against a same-table stable employee key. Department is a descriptive grouping only if the retained Employee key already identifies the intended entity. The observed native strategies are:
 
 ```json
 {
@@ -89,7 +97,7 @@ Use `embedded_planning(owner_sheet, visual_id)` to construct a portable dashboar
 
 After API creation/import, read the dashboard's complete native inventory and resolve actual runtime visual IDs. Place the embedded visual in the dashboard's `reactiveVisualProperties` entry using `runtime.layout.place_native`, fresh page ETags and `runtime.layout.audit`. An override's runtime `visualId` is not the portable GUID. Its `originEntityId` must belong to the destination runtime; do not copy the example's small integer strings.
 
-The example uses a 1600 Ãƒâ€” 1002 canvas with `elementScalingUnit:"percentage"`: position and dimensions are fractions from 0 to 1, not percentages from 0 to 100 and not pixels. It reserves the lower area for a broad rectangular workbench. Derive a fresh layout for the requested content: consistent margins, aligned filter/card rows, a compact navigator and a readable full-width workbench. Validate all neighbors, reserved regions and bounds; preserve source-owner geometry. Use the native page readback to verify the effective rectangle. API geometry does not establish pixel-perfect rendering.
+The example uses a 1600 x 1002 canvas with `elementScalingUnit:"percentage"`: position and dimensions are fractions from 0 to 1, not percentages from 0 to 100 and not pixels. It reserves the lower area for a broad rectangular workbench. Derive a fresh layout for the requested content: consistent margins, aligned filter/card rows, a compact navigator and a readable full-width workbench. Validate all neighbors, reserved regions and bounds; preserve source-owner geometry. Use the native page readback to verify the effective rectangle. API geometry does not establish pixel-perfect rendering.
 
 ## PowerTable lookup and column construction
 

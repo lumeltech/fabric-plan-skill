@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "release": "v43",
+  "release": "v50",
   "scope": "All F01-F30 modules plus cross-cutting authoring workflows",
   "discoveryOnly": true,
-  "executionPolicy": "Follow documented bundled routes, preserve original requirements, import supported components together, and use only the required native phases. No automatic reduced-scope or reference-only substitute.",
+  "executionPolicy": "Follow the current SKILL.md profile and transport matrix. Preserve the original requirements, import public-definition components together, and use only reachable CLI commands. Callables marked approved-external-adapter require an organization-approved profile and are not shipped CLI routes. No automatic reduced-scope deployment.",
   "coverageMeaning": {
     "integrated": "A selected basic path is composed by build/provision; consult listed limits.",
     "separate-phase": "A shipped CLI or Python helper supplies selected operations outside the base provisioner.",
@@ -81,23 +81,23 @@
       "phase": "local"
     },
     "column-create": {
-      "command": "python plan.py builder-api column-create --config builder.json --input create.request.json --run run --label column",
-      "description": "Create or resume a native column after destination identities exist; verify SQL columnType or OneLake dataInputType without duplicate creation.",
+      "command": null,
+      "description": "Create or resume a native column after destination identities exist; verify SQL columnType or OneLake dataInputType without duplicate creation. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "Application builder profile; request visual_id, payload and optional version. Complete asynchronous creation before registering dependents. See native-column-readback.md; keep the same authored measureGuid after a saved-record validation failure.",
       "symbols": [
         "runtime.builder_api.create_column",
         "runtime.builder_api.column_matches"
       ],
-      "phase": "live-write"
+      "phase": "approved-external-adapter"
     },
     "column-register": {
-      "command": "python plan.py builder-api column-register --config builder.json --input register.request.json --run run --label registration",
-      "description": "Register the created measure in visibility, aggregation and formatting companions.",
+      "command": null,
+      "description": "Register the created measure in visibility, aggregation and formatting companions. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "Request entity_id, visual_id, payload, row_aggregation, column_aggregation, format_entries and optional visible. Use returned destination IDs. Saved native type validation accepts the verified OneLake alias; native-column-readback.md.",
       "symbols": [
         "runtime.builder_api.register_column"
       ],
-      "phase": "live-write"
+      "phase": "approved-external-adapter"
     },
     "forecast": {
       "command": "python plan.py build --model current-model.json --spec forecast.json --out draft",
@@ -111,8 +111,8 @@
       "phase": "local"
     },
     "forecast-review": {
-      "command": "python plan.py forecast-review --config destination.json --input examples/forecast-review.request.json --run run",
-      "description": "Apply direct From Sheets SUM, quarterly text commentary, formula variance, negative formatting and comparison charts after base import.",
+      "command": null,
+      "description": "Apply direct From Sheets SUM, quarterly text commentary, formula variance, negative formatting and comparison charts after base import. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "Adapt the named source/target sheets, measures and charts in examples/forecast-review.request.json to the current application. Resolve actuals, source Forecast and compatible destination grain.",
       "symbols": [
         "runtime.forecast_review.quarterly_review",
@@ -120,7 +120,7 @@
         "runtime.forecast_review.comparison_chart",
         "runtime.forecast_review.apply_negative_variance"
       ],
-      "phase": "live-write"
+      "phase": "approved-external-adapter"
     },
     "forecast-repair": {
       "command": "python plan.py forecast-repair --baseline definition.json --input examples/forecast-repair.request.json --out candidate.json",
@@ -132,14 +132,14 @@
       "phase": "local"
     },
     "pivot": {
-      "command": "python plan.py native pivot --config destination.json --input pivot.request.json --run run --label pivot",
-      "description": "Activate an existing saved Pivot after building its symbolic configuration.",
+      "command": null,
+      "description": "Activate an existing saved Pivot after building its symbolic configuration. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "Build sheet pivots/activePivot first; request entityId, visualId, pivotId from the current destination.",
       "symbols": [
         "runtime.pivots.compile_pivots",
         "runtime.activation.select_saved_pivot"
       ],
-      "phase": "live-write"
+      "phase": "approved-external-adapter"
     },
     "filters": {
       "command": "python plan.py build --model current-model.json --spec application.json --out draft",
@@ -177,22 +177,22 @@
       "phase": "local"
     },
     "rule-create": {
-      "command": "python plan.py builder-api rule-create --config engine.json --input rule-create.request.json --run run --label rule",
-      "description": "Submit a supported rule on a verified engine rules mount.",
+      "command": null,
+      "description": "Submit a supported rule on a verified engine rules mount. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "Engine builder profile, engineRulesMountVerified and payload. Rule persistence/trigger execution are separate from submission.",
       "symbols": [
         "runtime.builder_api.create_rule"
       ],
-      "phase": "live-write"
+      "phase": "approved-external-adapter"
     },
     "bridge-query": {
-      "command": "python plan.py builder-api bridge-query --config builder.json --input operation.request.json --run run --label bridge-query",
-      "description": "Inspect or execute the selected InfoBridge phase; respect source/job dependencies.",
+      "command": null,
+      "description": "Inspect or execute the selected InfoBridge phase; respect source/job dependencies. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "query_id",
       "symbols": [
         "runtime.builder_api.bridge_query"
       ],
-      "phase": "live-read"
+      "phase": "approved-external-adapter"
     },
     "bridge-append": {
       "command": "python plan.py construct-bridge append --input bridge.request.json --out bridge.json",
@@ -249,40 +249,40 @@
       "phase": "local"
     },
     "bridge-inventory": {
-      "command": "python plan.py builder-api bridge-inventory --config builder.json --input operation.request.json --run run --label bridge-inventory",
-      "description": "Inspect or execute the selected InfoBridge phase; respect source/job dependencies.",
+      "command": null,
+      "description": "Inspect or execute the selected InfoBridge phase; respect source/job dependencies. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "workload_id",
       "symbols": [
         "runtime.builder_api.bridge_inventory"
       ],
-      "phase": "live-read"
+      "phase": "approved-external-adapter"
     },
     "bridge-reload": {
-      "command": "python plan.py builder-api bridge-reload --config builder.json --input operation.request.json --run run --label bridge-reload",
-      "description": "Inspect or execute the selected InfoBridge phase; respect source/job dependencies.",
+      "command": null,
+      "description": "Inspect or execute the selected InfoBridge phase; respect source/job dependencies. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "query_id",
       "symbols": [
         "runtime.builder_api.reload_query"
       ],
-      "phase": "live-write"
+      "phase": "approved-external-adapter"
     },
     "bridge-poll": {
-      "command": "python plan.py builder-api bridge-poll --config builder.json --input operation.request.json --run run --label bridge-poll",
-      "description": "Inspect or execute the selected InfoBridge phase; respect source/job dependencies.",
+      "command": null,
+      "description": "Inspect or execute the selected InfoBridge phase; respect source/job dependencies. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "workload_id, job_ids, event_id_fields, status_field and the actual notification profile",
       "symbols": [
         "runtime.builder_api.poll_bridge"
       ],
-      "phase": "live-read"
+      "phase": "approved-external-adapter"
     },
     "bridge-stream": {
-      "command": "python plan.py builder-api bridge-stream --config builder.json --input operation.request.json --run run --label bridge-stream",
-      "description": "Inspect or execute the selected InfoBridge phase; respect source/job dependencies.",
+      "command": null,
+      "description": "Inspect or execute the selected InfoBridge phase; respect source/job dependencies. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "source_id; optional skip, limit",
       "symbols": [
         "runtime.builder_api.source_parquet"
       ],
-      "phase": "live-read"
+      "phase": "approved-external-adapter"
     },
     "bridge-consumer": {
       "command": "python plan.py construct-native bridge-consumer --input consumer.request.json --out consumer.json",
@@ -340,22 +340,22 @@
       "phase": "local"
     },
     "table-initialize": {
-      "command": "python plan.py builder-api powertable-initialize --config builder.json --input initialize.request.json --run run --label table",
-      "description": "Initialize the supported existing-table source directly; the complete ALM path is also available.",
+      "command": null,
+      "description": "Initialize the supported existing-table source directly; the complete ALM path is also available. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "payload; actual destination source/visual identity returned by service.",
       "symbols": [
         "runtime.builder_api.initialize_powertable"
       ],
-      "phase": "live-write"
+      "phase": "approved-external-adapter"
     },
     "table-schema": {
-      "command": "python plan.py builder-api powertable-schema --config builder.json --input schema.request.json --run run --label schema",
-      "description": "Read the initialized source schema.",
+      "command": null,
+      "description": "Read the initialized source schema. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "source_id from destination.",
       "symbols": [
         "runtime.builder_api.powertable_schema"
       ],
-      "phase": "live-read"
+      "phase": "approved-external-adapter"
     },
     "table-rows": {
       "command": "python plan.py construct-native powertable-rows --input rows.request.json --out rows.payload.json",
@@ -367,13 +367,13 @@
       "phase": "local"
     },
     "table-save": {
-      "command": "python plan.py builder-api powertable-save --config builder.json --input save.request.json --run run --label rows",
-      "description": "Submit authorized physical row changes; terminal jobs and physical readback are separate.",
+      "command": null,
+      "description": "Submit authorized physical row changes; terminal jobs and physical readback are separate. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "source_id, payload, version, route_shape.",
       "symbols": [
         "runtime.builder_api.save_powertable"
       ],
-      "phase": "live-write"
+      "phase": "approved-external-adapter"
     },
     "intelligence": {
       "command": "python plan.py build --model current-model.json --spec dashboard.json --out draft",
@@ -397,13 +397,13 @@
       "phase": "local"
     },
     "place": {
-      "command": "python plan.py native place --config destination.json --input placement.request.json --run run --label place",
-      "description": "Place a visual with fresh ETags and page-local geometry.",
+      "command": null,
+      "description": "Place a visual with fresh ETags and page-local geometry. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "entityId, visualId, rectangle and optional gap. Preserve source geometry for embeds.",
       "symbols": [
         "runtime.layout.place_native"
       ],
-      "phase": "live-write"
+      "phase": "approved-external-adapter"
     },
     "home": {
       "command": "python plan.py native home --config destination.json --input home.request.json --run run --label home",
@@ -417,31 +417,31 @@
       "phase": "live-write"
     },
     "home-priority": {
-      "command": "python plan.py builder-api home-priority --config builder.json --input priority.request.json --run run --label priority",
-      "description": "Set current Home role-layout order.",
+      "command": null,
+      "description": "Set current Home role-layout order. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "orders; actual role IDs. This does not grant access.",
       "symbols": [
         "runtime.home_api.set_priorities"
       ],
-      "phase": "live-write"
+      "phase": "approved-external-adapter"
     },
     "home-effective": {
-      "command": "python plan.py builder-api home-effective --config builder.json --input empty.json --run run --label effective",
-      "description": "Read effective Home selection for the current user.",
+      "command": null,
+      "description": "Read effective Home selection for the current user. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "Empty JSON object and authorized current profile.",
       "symbols": [
         "runtime.home_api.effective_home"
       ],
-      "phase": "live-read"
+      "phase": "approved-external-adapter"
     },
     "bookmark": {
-      "command": "python plan.py builder-api bookmark-upsert --config builder.json --input bookmark.request.json --run run --label bookmark",
-      "description": "Persist a complete known public bookmark capture with current ETags.",
+      "command": null,
+      "description": "Persist a complete known public bookmark capture with current ETags. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "slug, capture. Full capture-options construction and restore/application remain incomplete.",
       "symbols": [
         "runtime.builder_api.upsert_bookmark"
       ],
-      "phase": "live-write"
+      "phase": "approved-external-adapter"
     },
     "navigator": {
       "command": "python plan.py construct-native navigator --input navigator.request.json --out navigator.json",
@@ -455,13 +455,13 @@
       "phase": "local"
     },
     "navigator-create": {
-      "command": "python plan.py builder-api navigator-create --config builder.json --input navigator-create.request.json --run run --label navigator",
-      "description": "Create and place the Navigator using current target catalogs and ETags.",
+      "command": null,
+      "description": "Create and place the Navigator using current target catalogs and ETags. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "entity_id, visual_guid, navigator_state, rectangle, pages, bookmarks; optional gap.",
       "symbols": [
         "runtime.navigator_api.create"
       ],
-      "phase": "live-write"
+      "phase": "approved-external-adapter"
     },
     "bridge-construct-query": {
       "command": "python plan.py construct-bridge query --input bridge.request.json --out bridge.json",
@@ -871,13 +871,13 @@
       "phase": "local"
     },
     "bookmark-read": {
-      "command": "python plan.py builder-api bookmark-read --config target.json --input bookmark.json --run run --label read-bookmark",
-      "description": "Read the native public capture by exact slug, retaining runtime measure identities.",
+      "command": null,
+      "description": "Read the native public capture by exact slug, retaining runtime measure identities. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "Current slug and artifact-scoped authenticated client.",
       "symbols": [
         "runtime.builder_api.read_bookmark"
       ],
-      "phase": "live-read"
+      "phase": "approved-external-adapter"
     },
     "home-role": {
       "command": "python plan.py builder-api home-role --config target.json --input role.json --run run --label read-home",
@@ -889,13 +889,13 @@
       "phase": "live-read"
     },
     "powertable-schema": {
-      "command": "python plan.py builder-api powertable-schema --config target.json --input source.json --run run --label read-schema",
-      "description": "Read PowerTable details and physical schema independently, with explicit component status.",
+      "command": null,
+      "description": "Read PowerTable details and physical schema independently, with explicit component status. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "inputs": "Current native source_id from the intended visual; source record GUID is not interchangeable.",
       "symbols": [
         "runtime.builder_api.powertable_schema"
       ],
-      "phase": "live-read"
+      "phase": "approved-external-adapter"
     },
     "planning-rule-save": {
       "command": null,
@@ -954,12 +954,12 @@
       "enabled": true
     },
     "anchor-save": {
-      "command": "python plan.py builder-api anchor-apply --config CONFIG --input REQUEST --run RUN --label LABEL",
-      "description": "Save current-owner anchors through the existing ETag properties batch route; no value writes or runtime test.",
+      "command": null,
+      "description": "Save current-owner anchors through the existing ETag properties batch route; no value writes or runtime test. Current CLI: unavailable; invoke the listed callable only through an explicitly approved external profile",
       "symbols": [
         "runtime.anchor_measures.save_anchors"
       ],
-      "phase": "native-save",
+      "phase": "approved-external-adapter",
       "inputs": "Authorized application session; entity_id, actual nonembedded visual_id, requests; optional expose_entry_totals. Reads current owner itself.",
       "enabled": true
     }
@@ -3445,6 +3445,7 @@
       "name": "Intelligence charts and dashboards",
       "coverage": "integrated",
       "businessRequests": [
+        "Discover, design, author or maintain Intelligence Sheets using the bundled mode guides and visual feature catalog.",
         "Every Intelligence dashboard must have a visible Page Navigator by default, even when the prompt omits navigation.",
         "Package a forecast in a dashboard with KPIs, slicers and Actuals comparison charts.",
         "Use the correct DAX, sheet or query measure source and align its IDs/types across assignments and filters.",
@@ -3453,6 +3454,36 @@
         "Show assigned measures in the filter pane as All without preset restrictions; use Auto number formatting and keep requested Year selections on the Year dimension only."
       ],
       "guides": [
+        {
+          "file": "intelligence/index.md",
+          "heading": null,
+          "command": "python plan.py reference intelligence/index.md"
+        },
+        {
+          "file": "intelligence/discovery.md",
+          "heading": null,
+          "command": "python plan.py reference intelligence/discovery.md"
+        },
+        {
+          "file": "intelligence/design.md",
+          "heading": null,
+          "command": "python plan.py reference intelligence/design.md"
+        },
+        {
+          "file": "intelligence/authoring.md",
+          "heading": null,
+          "command": "python plan.py reference intelligence/authoring.md"
+        },
+        {
+          "file": "intelligence/management.md",
+          "heading": null,
+          "command": "python plan.py reference intelligence/management.md"
+        },
+        {
+          "file": "intelligence/feature-master-list.md",
+          "heading": null,
+          "command": "python plan.py reference intelligence/feature-master-list.md"
+        },
         {
           "file": "forecast-time-intelligence.md",
           "heading": null,
@@ -3528,8 +3559,13 @@
         "planning-hierarchy-icons"
       ],
       "prerequisites": "Current semantic/query fields, source owners, meaningful comparisons and complete KPI/chart state.",
-      "limitations": "Column charts, KPI cards, slicers, text and embeds are supported. Forecast comparison charts use the separate review phase; advanced chart families are not all compiled.",
+      "limitations": "Column charts, KPI cards, slicers, text and embeds are supported. Forecast comparison charts use the separate review phase; advanced chart families are not all compiled. Detailed Intelligence guides do not add factories or override current application defaults, source-aware bindings or API-only execution; historical standalone scripts and semantic-model-only release gates are not the integrated contract.",
       "aliases": [
+        "Intelligence Sheets",
+        "Intelligence discovery",
+        "Intelligence visual design",
+        "Intelligence authoring",
+        "Intelligence management",
         "dashboard",
         "charts",
         "visuals",

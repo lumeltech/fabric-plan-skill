@@ -18,13 +18,13 @@ Treat InfoBridge as a **general sheet-data transformation and delivery utility**
 
 Use direct From Sheets/From Queries consumption when the existing output already fits. Use InfoBridge when data needs shaping, aggregation, enrichment, conditional calculation or combination before another sheet consumes it. Keep the transformation in InfoBridge when that satisfies the request; an external SQL table or writeback cycle is not inherently required.
 
-Separate source storage, connection route, transformation and consumer. An employee-level salary plan can feed a region-level finance view without SQL writeback: Planning sheet -> InfoBridge source -> Pivot to Region Ãƒâ€” Month -> add account classification -> normalized contribution -> Append -> receiving Planning values. Editable FX/reference data can remain in PowerTable and enter InfoBridge as an EDITABLE source, then Join to the planning output. A PowerTable database lookup column is a different feature from this InfoBridge Join.
+Separate source storage, connection route, transformation and consumer. An employee-level salary plan can feed a region-level finance view without SQL writeback: Planning sheet -> InfoBridge source -> Pivot to Region x Month -> add account classification -> normalized contribution -> Append -> receiving Planning values. Editable FX/reference data can remain in PowerTable and enter InfoBridge as an EDITABLE source, then Join to the planning output. A PowerTable database lookup column is a different feature from this InfoBridge Join.
 
 Choose the operation by intended result:
 
 | Need | Operation | Meaning |
 |---|---|---|
-| Reduce Employee/Department detail to Region Ãƒâ€” Month | Pivot Table, step 50 | Select row/column roles and explicit measure aggregations; removing a dimension alone is not aggregation. |
+| Reduce Employee/Department detail to Region x Month | Pivot Table, step 50 | Select row/column roles and explicit measure aggregations; removing a dimension alone is not aggregation. |
 | Calculate an amount, conditional label or other expression result | Add Measure, 130 | SQL-expression result, such as `"Adjusted Pay" - "Base Pay"` or CASE returning high/low text; the operation name does not force a numeric type. |
 | Derive a classification or grouping | Add Dimension, 170 | SQL expression, including a constant or conditional CASE; single quotes are string literals. |
 | Limit source rows to a region, scenario or slice | Filter Rows, 180 | Array of predicates with `Where`, subsequent `And` or `OR`. |
@@ -180,11 +180,11 @@ adds financial formulas.
 
 | Contribution | Detailed source grain | Pivot retained grain | P&L classifications | Nonzero contribution measures |
 |---|---|---|---|---|
-| Workforce | Region Ãƒâ€” Department Ãƒâ€” Employee Ãƒâ€” Scenario Ãƒâ€” Month | Region Ãƒâ€” Scenario Ãƒâ€” Month; SUM Compensation USD | Add PNLGroup = Compensation and AccountName = Compensation | Plan Compensation = Compensation USD |
-| Operating expense | Region Ãƒâ€” PNLGroup Ãƒâ€” Account Ãƒâ€” Department Ãƒâ€” Scenario Ãƒâ€” Month | PNLGroup Ãƒâ€” Account Ãƒâ€” Region Ãƒâ€” Scenario Ãƒâ€” Month; SUM Expense USD | Already present: retain PNLGroup and AccountName; filter to Other Opex OR Depreciation | Plan Other Opex and Plan Depreciation use CASE on PNLGroup |
-| Revenue | Region Ãƒâ€” Channel Ãƒâ€” Category Ãƒâ€” Product Ãƒâ€” Month, plus resolved Scenario context | Region Ãƒâ€” Scenario Ãƒâ€” Month; SUM quantity, gross and net amounts | Add Revenue / Gross Revenue | Plan Gross Revenue = Gross; Plan Net Revenue = Gross; Plan Units = Quantity |
-| Supply cost | Region Ãƒâ€” Channel Ãƒâ€” Category Ãƒâ€” Product Ãƒâ€” Scenario Ãƒâ€” Month | Region Ãƒâ€” Scenario Ãƒâ€” Month; SUM Forecast COGS USD | Add Direct Cost / Cost of Goods Sold | Plan COGS = Forecast COGS USD |
-| Revenue discounts | Same revenue source, independent branch | Region Ãƒâ€” Scenario Ãƒâ€” Month; SUM quantity, gross and net amounts | Add Revenue / Discounts | Plan Net Revenue = Net minus Gross |
+| Workforce | Region x Department x Employee x Scenario x Month | Region x Scenario x Month; SUM Compensation USD | Add PNLGroup = Compensation and AccountName = Compensation | Plan Compensation = Compensation USD |
+| Operating expense | Region x PNLGroup x Account x Department x Scenario x Month | PNLGroup x Account x Region x Scenario x Month; SUM Expense USD | Already present: retain PNLGroup and AccountName; filter to Other Opex OR Depreciation | Plan Other Opex and Plan Depreciation use CASE on PNLGroup |
+| Revenue | Region x Channel x Category x Product x Month, plus resolved Scenario context | Region x Scenario x Month; SUM quantity, gross and net amounts | Add Revenue / Gross Revenue | Plan Gross Revenue = Gross; Plan Net Revenue = Gross; Plan Units = Quantity |
+| Supply cost | Region x Channel x Category x Product x Scenario x Month | Region x Scenario x Month; SUM Forecast COGS USD | Add Direct Cost / Cost of Goods Sold | Plan COGS = Forecast COGS USD |
+| Revenue discounts | Same revenue source, independent branch | Region x Scenario x Month; SUM quantity, gross and net amounts | Add Revenue / Discounts | Plan Net Revenue = Net minus Gross |
 
 Every branch emits all seven common measures; unrelated measures are intentional numeric zero contributions. Employee, Department, Product and Channel detail are absent from the final common grain. Account/PNLGroup **members can differ** across branches: Compensation and Cost of Goods Sold must remain different rows. What agrees is the dimension contract, type, reporting level, period/scenario interpretation and metric meaning, not identical member values or identical source field IDs. Expense already has finance classifications, so adding duplicate dimensions there would be wrong. Reorder its existing dimensions to the chosen canonical order when constructing a new normalized graph.
 

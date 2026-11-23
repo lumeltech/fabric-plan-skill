@@ -15,6 +15,23 @@ destination IDs come from the current request/model. These are not fixed templat
 or additional authorization. For every requested outcome, select a route from
 [module-routing.md](module-routing.md) or `python plan.py discover --module <ID>`.
 
+## Intelligence discovery, design and focused edits
+
+For a new Intelligence report or a visual-only change, start with
+`python plan.py discover --module INTELLIGENCE` and the
+[Intelligence index](intelligence/index.md). Select
+[discovery](intelligence/discovery.md) for requirements and field inventory,
+[design](intelligence/design.md) for visual decisions,
+[authoring](intelligence/authoring.md) for native parts, and
+[management](intelligence/management.md) for transport considerations.
+The [feature master list](intelligence/feature-master-list.md) routes to the
+specific Matrix, chart, KPI, slicer, table or canvas feature.
+
+Use [context-intelligence.md](context-intelligence.md) and the current
+[skill contract](../SKILL.md) for executable construction, mandatory application
+defaults, supported connected sources and deployment. Loading a feature guide
+does not establish an executable factory or authorize a live write.
+
 ## Rolling forecast and quarterly review dashboard
 
 Request: Region/Product rows, Year/Quarter/Month columns, sales actuals, rolling
@@ -28,7 +45,7 @@ charts. Embed both workbenches in Intelligence dashboards.
 | Monthly Forecast | F09 forecast-authoring | Build Native actuals plus Forecast; closed actuals, exact editable open formula; supported actual date hierarchy. |
 | Quarterly review grid | F01/F02 | Build the second owner with Region/Product rows and Year/Quarter columns and its actuals. Do not create a second independent Forecast. |
 | Charts and embeds | INTELLIGENCE/F27 | Build prepared column charts, both source owners and dashboards. Import/provision base application before resolving native source/target identities. |
-| From Sheets Forecast | F19 forecast-review-execution | Separate `plan.py forecast-review` phase resolves the existing source column and registers its numeric SUM consumer at compatible subset grain. |
+| From Sheets Forecast | F19 forecast-review-execution | Approved external-adapter phase calls `runtime.forecast_review.quarterly_review` to resolve the source column and register its numeric SUM consumer at compatible subset grain. |
 | Quarterly commentary | F05 | Same review phase creates a LongText visual measure, `visual_column=false`, with the quarter grain. |
 | Variance and negative color | FORMULAS/F15 | Same phase creates Forecast-minus-Actuals and applies the specific negative-variance rule. |
 | Variance charts versus actuals | INTELLIGENCE | Same phase binds prepared comparison charts; ordinary visual filters include all assignments. |
@@ -39,7 +56,7 @@ python plan.py discover --module F09
 python plan.py discover --module F19
 python plan.py reference forecast-review-execution.md
 python plan.py provision --config destination.json --model current-model.json --spec application.json --run base-run
-python plan.py forecast-review --config destination.json --input review.request.json --run review-run
+# Invoke runtime.forecast_review.quarterly_review only through an approved external adapter.
 ```
 
 Adapt `examples/forecast-review.request.json` for review.request.json; retain the
@@ -61,7 +78,8 @@ Request: use sales quantities from Region/Product/Channel in Region/Product cost
 planning. Choose F19 direct From Sheets if source/destination dimensions and SUM
 semantics are compatible. Query `discover --module F19` and inspect
 `runtime.forecast_review.from_sheet_assignment`; the named forecast-review command
-is a specific composed workflow, not a universal direct-link CLI.
+is intentionally not a CLI route. The callable is a specific composed workflow,
+not a universal direct-link factory.
 
 If workforce needs a cost-center mapping, choose F18 Join then aggregation, or
 LOOKUP for a scalar rate retrieval only. Use `construct-bridge planning-source`,
@@ -93,10 +111,11 @@ eligibility remain at their intended grain. Use F05 typed inputs, RULES allocati
 F30 formula eligibility and FORMULAS calculated outputs.
 
 1. `construct-native input` builds each selected input's complete native payload.
-2. `builder-api column-create` resolves the created record; complete any async job.
-3. `builder-api column-register` supplies visibility/aggregation/format companions.
+2. An approved external adapter resolves the created record and completes its
+   async job; the current CLI does not expose this workload route.
+3. The same approved adapter supplies visibility/aggregation/format companions.
 4. `construct-native rule` builds the supported rule branch and selectors.
-5. `builder-api rule-create` requires the verified engine mount/profile. Do not
+5. The rule callable requires the verified engine mount/profile. Do not
    confuse this with application column routes or treat submission as execution.
 
 Weighted allocation is distinct from Forecast's numeric distribute-parent toggle.

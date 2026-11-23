@@ -1,0 +1,705 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/plan/definition/PlanProperties/1.0.0/schema.json",
+  "properties": {
+    "adhocPresets": [],
+    "dataStreamerConfig": {
+      "enabled": false
+    },
+    "drillThroughConfig": {
+      "f0000000-0000-4000-8000-000000000071": {
+        "filterConfig": [
+          {
+            "hide": false,
+            "locked": false
+          },
+          {
+            "hide": false,
+            "locked": false
+          },
+          {
+            "hide": false,
+            "locked": false
+          },
+          {
+            "hide": false,
+            "locked": false
+          },
+          {
+            "hide": false,
+            "locked": false
+          },
+          {
+            "hide": false,
+            "locked": false
+          },
+          {
+            "hide": false,
+            "locked": false
+          },
+          {
+            "hide": false,
+            "locked": false
+          },
+          {
+            "hide": false,
+            "locked": false
+          },
+          {
+            "hide": false,
+            "locked": false
+          },
+          {
+            "hide": false,
+            "locked": false
+          },
+          {
+            "hide": false,
+            "locked": false
+          },
+          {
+            "hide": false,
+            "locked": false
+          }
+        ],
+        "filters": [
+          {
+            "columnIds": [
+              "[Dim] Date[Month]"
+            ],
+            "columnNames": [
+              "Month"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Date"
+            ],
+            "valuesFilter": []
+          },
+          {
+            "columnIds": [
+              "[Dim] Date[Quarter]"
+            ],
+            "columnNames": [
+              "Quarter"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Date"
+            ],
+            "valuesFilter": []
+          },
+          {
+            "columnIds": [
+              "[Dim] Date[Year]"
+            ],
+            "columnNames": [
+              "Year"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Date"
+            ],
+            "valuesFilter": []
+          },
+          {
+            "columnIds": [
+              "[Dim] Brand[Brand Name]"
+            ],
+            "columnNames": [
+              "Brand Name"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Brand"
+            ],
+            "valuesFilter": []
+          },
+          {
+            "columnIds": [
+              "[Dim] Account Tier[Account Name]"
+            ],
+            "columnNames": [
+              "Account Name"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Account Tier"
+            ],
+            "valuesFilter": []
+          },
+          {
+            "columnIds": [
+              "[Dim] Account Tier[Account Tier]"
+            ],
+            "columnNames": [
+              "Account Tier"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Account Tier"
+            ],
+            "valuesFilter": []
+          },
+          {
+            "columnIds": [
+              "[Dim] Account Tier[Account Type]"
+            ],
+            "columnNames": [
+              "Account Type"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Account Tier"
+            ],
+            "valuesFilter": []
+          },
+          {
+            "columnIds": [
+              "[Dim] Product[Brand Name]"
+            ],
+            "columnNames": [
+              "Brand Name"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Product"
+            ],
+            "valuesFilter": []
+          },
+          {
+            "columnIds": [
+              "[Dim] Product[Therapeutic Area]"
+            ],
+            "columnNames": [
+              "Therapeutic Area"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Product"
+            ],
+            "valuesFilter": []
+          },
+          {
+            "columnIds": [
+              "[Dim] Product[SKU]"
+            ],
+            "columnNames": [
+              "SKU"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Product"
+            ],
+            "valuesFilter": []
+          },
+          {
+            "columnIds": [
+              "[Dim] Sub Region[Country]"
+            ],
+            "columnNames": [
+              "Country"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Sub Region"
+            ],
+            "valuesFilter": []
+          },
+          {
+            "columnIds": [
+              "[Dim] Sub Region[Sub Region]"
+            ],
+            "columnNames": [
+              "Sub Region"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Sub Region"
+            ],
+            "valuesFilter": []
+          },
+          {
+            "columnIds": [
+              "[Dim] Sub Region[Region Group]"
+            ],
+            "columnNames": [
+              "Region Group"
+            ],
+            "columnType": [
+              "Column"
+            ],
+            "dataType": [
+              "string"
+            ],
+            "dateTimeFilter": {
+              "duration": null,
+              "includeToday": true,
+              "period": "HOURS",
+              "relativeDateFilter": "IS_IN_THE_LAST"
+            },
+            "filterType": "VALUES",
+            "isDefaultFilter": false,
+            "isDefaultMeasureFilter": false,
+            "rangeFilter": [
+              {
+                "from": null,
+                "fromCondition": "CONTAINS",
+                "logicalOperator": "or",
+                "to": null,
+                "toCondition": "CONTAINS"
+              }
+            ],
+            "sourceType": [
+              "PowerBI"
+            ],
+            "tableNames": [
+              "[Dim] Sub Region"
+            ],
+            "valuesFilter": []
+          }
+        ],
+        "keepAllFilters": true
+      }
+    },
+    "entityAdditionalProps": {},
+    "favoriteCharts": [],
+    "homeLayout": {
+      "roles": []
+    },
+    "pageGroupingMeta": {
+      "pageGroupMapping": {},
+      "pageGroups": []
+    },
+    "reportPageTooltipEntities": [],
+    "syncSlicerConfig": [],
+    "syncVisualsState": {},
+    "theme": {
+      "appliedThemes": {
+        "1": {
+          "type": 3
+        },
+        "2": {
+          "type": 3
+        },
+        "3": {
+          "type": 3
+        },
+        "4": {
+          "type": 3
+        },
+        "5": {
+          "type": 3
+        },
+        "6": {
+          "type": 3
+        }
+      },
+      "type": 3
+    },
+    "timeIntervalMapping": [],
+    "workloadLevelFilterAssignments": [
+      {
+        "configuration": {
+          "dateFormat": "defaultFormat",
+          "filterMode": "advanced",
+          "filterOperator": "isOnOrBefore",
+          "fiscalStartMonth": 0,
+          "hide": false,
+          "isExpanded": true,
+          "isSliderAndChartsEnabled": true,
+          "locked": false,
+          "name": "Date",
+          "paneWidth": 200,
+          "relativeDate": {
+            "period": "",
+            "type": "",
+            "value": 1
+          },
+          "selectAll": true,
+          "selectedPreset": [
+            "date-TODAY"
+          ],
+          "sort": [
+            {
+              "columnId": "[Dim] Date[Date]",
+              "columnName": "Date",
+              "direction": "ASC",
+              "id": "[Dim] Date[Date]"
+            }
+          ],
+          "toolBarTrigger": false,
+          "topN": {
+            "displayOthers": true,
+            "otherLabel": "Others",
+            "rankMeasure": "",
+            "rankMeasureLabel": "",
+            "rankMode": "TOP",
+            "rankType": "value",
+            "rankValue": 5
+          },
+          "visualType": "DATE"
+        },
+        "filter": [],
+        "filterLevel": "global",
+        "id": "filter_1788334289471_kk9qcbrwv",
+        "pivotAssignments": [
+          {
+            "bucketId": "Category",
+            "columnName": "Date",
+            "columnType": "Column",
+            "contents": "",
+            "dataRoleType": "Grouping",
+            "dataType": "DateTime",
+            "formatString": null,
+            "groupLabel": "Date",
+            "id": "[Dim] Date[Date]",
+            "isFlatHierarchy": false,
+            "isHierarchyItemInMeasure": false,
+            "name": "Date",
+            "order": 0,
+            "sourceId": "[Dim] Date[Date]",
+            "sourceType": "PowerBI",
+            "tableName": "[Dim] Date"
+          }
+        ],
+        "position": "RIGHT"
+      }
+    ],
+    "workloadLevelQueryFilterAssignments": [],
+    "workloadLevelVariables": [],
+    "workloadModeConfig": {
+      "EDIT": {
+        "showBookmarksPane": false,
+        "showCommentsPane": false,
+        "showDataPane": true,
+        "showElementsPane": true,
+        "showFieldsPane": true,
+        "showFilterPane": true,
+        "showLumelAIPane": false,
+        "showPersonalizePane": false,
+        "showVariablesPane": false
+      },
+      "READ": {
+        "showBookmarksPane": false,
+        "showCommentsPane": false,
+        "showDataPane": false,
+        "showFilterPane": true,
+        "showLumelAIPane": false,
+        "showPersonalizePane": false,
+        "showVariablesPane": false
+      }
+    }
+  }
+}

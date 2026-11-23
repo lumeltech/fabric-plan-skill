@@ -1,0 +1,1212 @@
+{
+  "Design Brief": {
+    "generated_by": "fabric-plan-intelligence",
+    "contract_version": 1,
+    "mode": "greenfield",
+    "approval": "explicit user build request 2026-11-16",
+    "report_name": "Sales Performance - Executive Summary-AI Report 16Nov",
+    "session_theme": {
+      "profile_id": "f0000000-0000-4000-8000-0000000000b0",
+      "revision": 1,
+      "origin": "user_supplied",
+      "design_source": "user-attached executive-summary reference image",
+      "approval_state": "approved",
+      "palette": {
+        "canvas": "#ECEFF6",
+        "wallpaper": "#D6D8DD",
+        "surface": "#FFFFFF",
+        "card": "#FFFFFF",
+        "text": "#303030",
+        "muted": "#555555",
+        "border": "#D4D4D4",
+        "actual": "#CADAFD",
+        "prior": "#C5C7C6",
+        "tick": "#303030",
+        "adverse": "#E15759",
+        "badge": "#BEE9DE",
+        "positiveText": "#176B57",
+        "kpiNumberPanel": "#F1F2FB"
+      },
+      "typography": {
+        "family": "Arial",
+        "title": 20,
+        "section": 12,
+        "body": 11,
+        "kpi": 27
+      },
+      "components": {
+        "corners": "square",
+        "shadow": "none",
+        "border": "1px #D4D4D4",
+        "kpi": "full pale-purple number-side background, vertically centered and left-aligned title/value/prior-year text, white monthly sparkline, centered variance text inside the mint PY badge with unchanged geometry and styling",
+        "small_multiples": "pale-blue actual lines, medium-gray #969696 prior-year lines at 1.5px, point data labels off for both measures; axis ticks, titles, legends and tooltips retained",
+        "analysis_background_panels": "three continuous white rectangles with thin gray borders at full existing bounds; outer visual and native shape drawing padding disabled and zeroed; foreground layout retains at least 8px inset"
+      },
+      "navigation": {
+        "model": "none",
+        "metric_switching": false
+      },
+      "branding": {
+        "logo": "omitted",
+        "footer": "data coverage and comparison help"
+      },
+      "inspiration": {
+        "source": "user reference image",
+        "departure": "1600x900; no tabs; Year only; Units and Channel"
+      },
+      "page_layouts": {
+        "overview": {
+          "width": 1600,
+          "height": 900,
+          "placements": [
+            {
+              "id": "f0000000-0000-4000-8000-000000000098",
+              "local_id": "1",
+              "name": "Segment analysis panel",
+              "family": "BI_SHAPE",
+              "rect": [
+                504,
+                152,
+                1056,
+                216
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000e2",
+              "local_id": "2",
+              "name": "Category analysis panel",
+              "family": "BI_SHAPE",
+              "rect": [
+                504,
+                380,
+                1056,
+                216
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000e8",
+              "local_id": "3",
+              "name": "Regional and channel analysis panel",
+              "family": "BI_SHAPE",
+              "rect": [
+                504,
+                608,
+                1056,
+                216
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000a3",
+              "local_id": "4",
+              "name": "COMMERCIAL PERFORMANCE - EXECUTIVE OVERVIEW",
+              "family": "BI_TEXT",
+              "rect": [
+                40,
+                35,
+                1220,
+                38
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000c1",
+              "local_id": "5",
+              "name": "Full-year performance compared with prior year",
+              "family": "BI_TEXT",
+              "rect": [
+                40,
+                73,
+                1100,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000de",
+              "local_id": "6",
+              "name": "Current year     |     Prior year     |     Red indicates performance ",
+              "family": "BI_TEXT",
+              "rect": [
+                40,
+                120,
+                1150,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000dc",
+              "local_id": "7",
+              "name": "Year - single selection, default 2025",
+              "family": "SUPER_FILTER",
+              "rect": [
+                1360,
+                30,
+                200,
+                88
+              ],
+              "features": [
+                "SF-FACET-01"
+              ],
+              "field_bindings": {
+                "category": [
+                  "DimDate[Year]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-00000000009c",
+              "local_id": "8",
+              "name": "NET SALES",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                40,
+                152,
+                448,
+                162
+              ],
+              "features": [
+                "KPI-CARD-01",
+                "KPI-VAR-01",
+                "KPI-CHART-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimDate[Month]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "PY": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000cb",
+              "local_id": "9",
+              "name": "GROSS PROFIT",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                40,
+                322,
+                448,
+                162
+              ],
+              "features": [
+                "KPI-CARD-01",
+                "KPI-VAR-01",
+                "KPI-CHART-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimDate[Month]"
+                ],
+                "AC": [
+                  "_Measures[Gross Profit]"
+                ],
+                "PY": [
+                  "_Measures[PY Gross Margin]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000b9",
+              "local_id": "10",
+              "name": "TOTAL ORDERS",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                40,
+                492,
+                448,
+                162
+              ],
+              "features": [
+                "KPI-CARD-01",
+                "KPI-VAR-01",
+                "KPI-CHART-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimDate[Month]"
+                ],
+                "AC": [
+                  "_Measures[Total Orders]"
+                ],
+                "PY": [
+                  "_Measures[PY Total Orders]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000c2",
+              "local_id": "11",
+              "name": "UNITS SOLD",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                40,
+                662,
+                448,
+                162
+              ],
+              "features": [
+                "KPI-CARD-01",
+                "KPI-VAR-01",
+                "KPI-CHART-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimDate[Month]"
+                ],
+                "AC": [
+                  "_Measures[Quantity Sold]"
+                ],
+                "PY": [
+                  "_Measures[PY Quantity Sold]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000db",
+              "local_id": "12",
+              "name": "CUSTOMER SEGMENT PERFORMANCE  |  Net Sales vs. Prior Year",
+              "family": "BI_TEXT",
+              "rect": [
+                512,
+                160,
+                1040,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {},
+              "small_multiples_caption": "Top 3 Segment Trends"
+            },
+            {
+              "id": "f0000000-0000-4000-8000-000000000088",
+              "local_id": "13",
+              "name": "Segment sales vs prior year",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                512,
+                196,
+                320,
+                164
+              ],
+              "features": [
+                "CH-LIB-01",
+                "CH-DEV-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimCustomer[CustomerSegment]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "comparison": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000aa",
+              "local_id": "14",
+              "name": "Top 3 segments by annual Net Sales",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                844,
+                196,
+                708,
+                164
+              ],
+              "features": [
+                "CH-LIB-03",
+                "CH-MULT-01",
+                "CV-FILT-01",
+                "CH-SORT-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimDate[Month]"
+                ],
+                "row": [
+                  "DimCustomer[CustomerSegment]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "PY": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000d9",
+              "local_id": "15",
+              "name": "TOP 5 PRODUCT CATEGORIES  |  Net Sales vs. Prior Year",
+              "family": "BI_TEXT",
+              "rect": [
+                512,
+                388,
+                1040,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {},
+              "small_multiples_caption": "Top 3 Category Trends"
+            },
+            {
+              "id": "f0000000-0000-4000-8000-00000000008b",
+              "local_id": "16",
+              "name": "Top 5 category sales vs prior year",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                512,
+                424,
+                320,
+                164
+              ],
+              "features": [
+                "CH-LIB-01",
+                "CH-DEV-01",
+                "CV-FILT-01",
+                "CH-SORT-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimProduct[Category]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "comparison": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-000000000097",
+              "local_id": "17",
+              "name": "Top 3 categories by annual Net Sales",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                844,
+                424,
+                708,
+                164
+              ],
+              "features": [
+                "CH-LIB-03",
+                "CH-MULT-01",
+                "CV-FILT-01",
+                "CH-SORT-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimDate[Month]"
+                ],
+                "row": [
+                  "DimProduct[Category]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "PY": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000c5",
+              "local_id": "18",
+              "name": "REGIONAL CONTRIBUTION",
+              "family": "BI_TEXT",
+              "rect": [
+                512,
+                616,
+                338,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000b7",
+              "local_id": "19",
+              "name": "TOP 5 STATES",
+              "family": "BI_TEXT",
+              "rect": [
+                862,
+                616,
+                338,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-00000000008c",
+              "local_id": "20",
+              "name": "CHANNEL PERFORMANCE",
+              "family": "BI_TEXT",
+              "rect": [
+                1212,
+                616,
+                340,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000eb",
+              "local_id": "21",
+              "name": "Regional sales vs prior year",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                512,
+                652,
+                338,
+                164
+              ],
+              "features": [
+                "CH-LIB-01",
+                "CH-DEV-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimRegion[RegionName]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "comparison": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000b1",
+              "local_id": "22",
+              "name": "Top 5 state sales vs prior year",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                862,
+                652,
+                338,
+                164
+              ],
+              "features": [
+                "CH-LIB-01",
+                "CH-DEV-01",
+                "CV-FILT-01",
+                "CH-SORT-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimCustomer[State]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "comparison": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000ba",
+              "local_id": "23",
+              "name": "Channel sales vs prior year",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                1212,
+                652,
+                340,
+                164
+              ],
+              "features": [
+                "CH-LIB-01",
+                "CH-DEV-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimChannel[ChannelName]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "comparison": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-000000000086",
+              "local_id": "24",
+              "name": "$ |  Data coverage: 2024-2025  |  Top-N charts show subsets; KPI to",
+              "family": "BI_TEXT",
+              "rect": [
+                40,
+                834,
+                1430,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000ea",
+              "local_id": "25",
+              "name": "Help: choose one Year. Info: comparisons use the same period one year ",
+              "family": "BI_TEXT",
+              "rect": [
+                40,
+                868,
+                1500,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            }
+          ]
+        }
+      },
+      "help_info": {
+        "style": "footer guidance text",
+        "interaction": "static readable guidance; no inert links"
+      },
+      "ibcs": false,
+      "freshness": "User-supplied reference, no random theme"
+    },
+    "design_identity": {
+      "tone": "compact executive",
+      "signature": "reference-matched split KPI rail and pale comparison grid",
+      "ibcs": false
+    },
+    "navigation_model": "none",
+    "sheets": [
+      {
+        "name": "Executive Overview",
+        "archetype": "Custom",
+        "role": "landing",
+        "layout_variant": "reference-matched-16x9",
+        "super_filter_layout": {
+          "position": "top-right",
+          "region_ids": [
+            "year"
+          ],
+          "overflow_behavior": "dropdown, verify expanded list"
+        },
+        "layout_contract": {
+          "canvas": {
+            "type": "CUSTOM",
+            "width": 1600,
+            "height": 900
+          },
+          "placements": [
+            {
+              "id": "f0000000-0000-4000-8000-000000000098",
+              "local_id": "1",
+              "name": "Segment analysis panel",
+              "family": "BI_SHAPE",
+              "rect": [
+                504,
+                152,
+                1056,
+                216
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000e2",
+              "local_id": "2",
+              "name": "Category analysis panel",
+              "family": "BI_SHAPE",
+              "rect": [
+                504,
+                380,
+                1056,
+                216
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000e8",
+              "local_id": "3",
+              "name": "Regional and channel analysis panel",
+              "family": "BI_SHAPE",
+              "rect": [
+                504,
+                608,
+                1056,
+                216
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000a3",
+              "local_id": "4",
+              "name": "COMMERCIAL PERFORMANCE - EXECUTIVE OVERVIEW",
+              "family": "BI_TEXT",
+              "rect": [
+                40,
+                35,
+                1220,
+                38
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000c1",
+              "local_id": "5",
+              "name": "Full-year performance compared with prior year",
+              "family": "BI_TEXT",
+              "rect": [
+                40,
+                73,
+                1100,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000de",
+              "local_id": "6",
+              "name": "Current year     |     Prior year     |     Red indicates performance ",
+              "family": "BI_TEXT",
+              "rect": [
+                40,
+                120,
+                1150,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000dc",
+              "local_id": "7",
+              "name": "Year - single selection, default 2025",
+              "family": "SUPER_FILTER",
+              "rect": [
+                1360,
+                30,
+                200,
+                88
+              ],
+              "features": [
+                "SF-FACET-01"
+              ],
+              "field_bindings": {
+                "category": [
+                  "DimDate[Year]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-00000000009c",
+              "local_id": "8",
+              "name": "NET SALES",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                40,
+                152,
+                448,
+                162
+              ],
+              "features": [
+                "KPI-CARD-01",
+                "KPI-VAR-01",
+                "KPI-CHART-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimDate[Month]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "PY": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000cb",
+              "local_id": "9",
+              "name": "GROSS PROFIT",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                40,
+                322,
+                448,
+                162
+              ],
+              "features": [
+                "KPI-CARD-01",
+                "KPI-VAR-01",
+                "KPI-CHART-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimDate[Month]"
+                ],
+                "AC": [
+                  "_Measures[Gross Profit]"
+                ],
+                "PY": [
+                  "_Measures[PY Gross Margin]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000b9",
+              "local_id": "10",
+              "name": "TOTAL ORDERS",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                40,
+                492,
+                448,
+                162
+              ],
+              "features": [
+                "KPI-CARD-01",
+                "KPI-VAR-01",
+                "KPI-CHART-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimDate[Month]"
+                ],
+                "AC": [
+                  "_Measures[Total Orders]"
+                ],
+                "PY": [
+                  "_Measures[PY Total Orders]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000c2",
+              "local_id": "11",
+              "name": "UNITS SOLD",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                40,
+                662,
+                448,
+                162
+              ],
+              "features": [
+                "KPI-CARD-01",
+                "KPI-VAR-01",
+                "KPI-CHART-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimDate[Month]"
+                ],
+                "AC": [
+                  "_Measures[Quantity Sold]"
+                ],
+                "PY": [
+                  "_Measures[PY Quantity Sold]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000db",
+              "local_id": "12",
+              "name": "CUSTOMER SEGMENT PERFORMANCE  |  Net Sales vs. Prior Year",
+              "family": "BI_TEXT",
+              "rect": [
+                512,
+                160,
+                1040,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {},
+              "small_multiples_caption": "Top 3 Segment Trends"
+            },
+            {
+              "id": "f0000000-0000-4000-8000-000000000088",
+              "local_id": "13",
+              "name": "Segment sales vs prior year",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                512,
+                196,
+                320,
+                164
+              ],
+              "features": [
+                "CH-LIB-01",
+                "CH-DEV-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimCustomer[CustomerSegment]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "comparison": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000aa",
+              "local_id": "14",
+              "name": "Top 3 segments by annual Net Sales",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                844,
+                196,
+                708,
+                164
+              ],
+              "features": [
+                "CH-LIB-03",
+                "CH-MULT-01",
+                "CV-FILT-01",
+                "CH-SORT-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimDate[Month]"
+                ],
+                "row": [
+                  "DimCustomer[CustomerSegment]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "PY": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000d9",
+              "local_id": "15",
+              "name": "TOP 5 PRODUCT CATEGORIES  |  Net Sales vs. Prior Year",
+              "family": "BI_TEXT",
+              "rect": [
+                512,
+                388,
+                1040,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {},
+              "small_multiples_caption": "Top 3 Category Trends"
+            },
+            {
+              "id": "f0000000-0000-4000-8000-00000000008b",
+              "local_id": "16",
+              "name": "Top 5 category sales vs prior year",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                512,
+                424,
+                320,
+                164
+              ],
+              "features": [
+                "CH-LIB-01",
+                "CH-DEV-01",
+                "CV-FILT-01",
+                "CH-SORT-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimProduct[Category]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "comparison": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-000000000097",
+              "local_id": "17",
+              "name": "Top 3 categories by annual Net Sales",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                844,
+                424,
+                708,
+                164
+              ],
+              "features": [
+                "CH-LIB-03",
+                "CH-MULT-01",
+                "CV-FILT-01",
+                "CH-SORT-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimDate[Month]"
+                ],
+                "row": [
+                  "DimProduct[Category]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "PY": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000c5",
+              "local_id": "18",
+              "name": "REGIONAL CONTRIBUTION",
+              "family": "BI_TEXT",
+              "rect": [
+                512,
+                616,
+                338,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000b7",
+              "local_id": "19",
+              "name": "TOP 5 STATES",
+              "family": "BI_TEXT",
+              "rect": [
+                862,
+                616,
+                338,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-00000000008c",
+              "local_id": "20",
+              "name": "CHANNEL PERFORMANCE",
+              "family": "BI_TEXT",
+              "rect": [
+                1212,
+                616,
+                340,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000eb",
+              "local_id": "21",
+              "name": "Regional sales vs prior year",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                512,
+                652,
+                338,
+                164
+              ],
+              "features": [
+                "CH-LIB-01",
+                "CH-DEV-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimRegion[RegionName]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "comparison": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000b1",
+              "local_id": "22",
+              "name": "Top 5 state sales vs prior year",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                862,
+                652,
+                338,
+                164
+              ],
+              "features": [
+                "CH-LIB-01",
+                "CH-DEV-01",
+                "CV-FILT-01",
+                "CH-SORT-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimCustomer[State]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "comparison": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000ba",
+              "local_id": "23",
+              "name": "Channel sales vs prior year",
+              "family": "ANALYTICS_PLUS",
+              "rect": [
+                1212,
+                652,
+                340,
+                164
+              ],
+              "features": [
+                "CH-LIB-01",
+                "CH-DEV-01"
+              ],
+              "field_bindings": {
+                "axis": [
+                  "DimChannel[ChannelName]"
+                ],
+                "AC": [
+                  "_Measures[Net Sales]"
+                ],
+                "comparison": [
+                  "_Measures[PY Net Sales]"
+                ]
+              }
+            },
+            {
+              "id": "f0000000-0000-4000-8000-000000000086",
+              "local_id": "24",
+              "name": "$ |  Data coverage: 2024-2025  |  Top-N charts show subsets; KPI to",
+              "family": "BI_TEXT",
+              "rect": [
+                40,
+                834,
+                1430,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            },
+            {
+              "id": "f0000000-0000-4000-8000-0000000000ea",
+              "local_id": "25",
+              "name": "Help: choose one Year. Info: comparisons use the same period one year ",
+              "family": "BI_TEXT",
+              "rect": [
+                40,
+                868,
+                1500,
+                32
+              ],
+              "features": [
+                "CV-ELEM-01"
+              ],
+              "field_bindings": {}
+            }
+          ]
+        },
+        "space_audit": {
+          "unplaced_regions": [],
+          "rationale": "Intentional outer gutters and removed tabs; three right-hand panels and four KPI cards"
+        }
+      }
+    ],
+    "metric_contract": "annual headlines, monthly AC/PY history, Year single-select default 2025",
+    "model_changes": "none",
+    "currency_display": {
+      "currency": "USD",
+      "symbol": "$",
+      "conversion": "none; original numeric values retained",
+      "scope": "report formatting only; semantic model unchanged"
+    },
+    "layout_refinement": {
+      "kpi_gap_px": 8,
+      "column_gap_px": 16,
+      "analysis_row_gap_px": 12,
+      "analysis_inner_gap_px": 12,
+      "analysis_panel_inset_px": 8
+    }
+  }
+}

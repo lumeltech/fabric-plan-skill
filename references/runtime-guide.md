@@ -62,7 +62,12 @@
 > provisioning, separate phases and actual gaps. Preserve the latest targeted
 > fixes; historical coverage statements below are release-scoped.
 
-> Executable Forecast review update: use [forecast-review-execution.md](forecast-review-execution.md) and `plan.py forecast-review` for From Sheets SUM, quarterly commentary/variance, negative formatting and comparison charts. This separate post-import phase is bundled; do not treat a convenience-provisioner omission as missing capability. Forecast defaults inherit a working reference, otherwise UTC and distribute-to-children=true.
+> Forecast review update: use
+> [forecast-review-execution.md](forecast-review-execution.md) and the
+> `runtime.forecast_review` callables through an approved external adapter. The
+> separate workload phase is bundled but has no current CLI route. Report it as
+> unavailable if the adapter profile is unavailable. Forecast defaults inherit a
+> working reference, otherwise UTC and distribute-to-children=true.
 
 > Current Forecast policy: forecasting requests use native Forecast with closed periods linked to actuals. Unspecified open defaults use None/Blank; explicit formula or measure defaults remain editable. Read `forecast-authoring.md` and use `runtime/forecast.py` through the composed constructor.
 
@@ -73,6 +78,15 @@
 > Active Context/Intelligence construction addendum: read `references/context-intelligence.md`. External Context stays outside the grid and passes the selected scope into Planning; ordinary semantic slicers are separate. The executable constructor now covers Context, slicers, cards, text and page-local embedded geometry. Scenario rows and grid-only dashboards are not equivalent substitutes. Preserve feature-level omissions and separate saved-state checks from behavior verification.
 
 # API-only Fabric Plan construction
+
+The [Intelligence index](intelligence/index.md) routes detailed
+[discovery](intelligence/discovery.md), [design](intelligence/design.md),
+[authoring](intelligence/authoring.md) and
+[management](intelligence/management.md) guidance. Use those references for
+feature decisions and native-part context, then execute through this runtime
+and the latest [skill contract](../SKILL.md). Retained standalone `scripts/`
+commands are not bundled runtime dependencies; use `plan.py discover --module
+INTELLIGENCE` for supported commands and limits.
 
 The single SKILL.md bundles this runtime, its pinned dependencies, schemas, tests and the original detailed business/property guides. Extract locally and work entirely through HTTPS APIs. Do not use native UI steps, browser automation, source checkouts, previous reports or user-written JSON repairs. Historical UI instructions in preserved references explain product behavior; they are not an execution fallback.
 
@@ -189,11 +203,11 @@ Plan definition carries the grid measures.
 ```text
 python plan.py native home --config target-config.json --input home-request.json --run run/home --label home
 # The public definition carries direct visual rectangles and page-local embedded matrix placement.
-python plan.py native pivot --config target-config.json --input pivot-request.json --run run/pivot --label summary-view
+# Saved Pivot activation requires an approved external adapter; no current CLI route.
 ```
 
 Service request inputs are generated from the current registry: Home
-`{roleId,layout,order,show?}`; placement
+`{roleId,layout,order,show?}`; approved external placement
 `{entityId,visualId,rectangle:{x,y,width,height},gap?}`; and Pivot
 `{entityId,visualId,pivotId}`. `pivotId:null` selects All. A persisted-property
 result does not claim that a controller fired or that an engine calculation ran.

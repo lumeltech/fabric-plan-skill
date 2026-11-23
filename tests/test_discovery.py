@@ -57,6 +57,30 @@ class DiscoveryTests(unittest.TestCase):
             result=subprocess.run([sys.executable,str(ROOT/'plan.py'),*prefix,'--help'],capture_output=True,text=True,cwd=ROOT)
             self.assertEqual(result.returncode,0,(prefix,result.stderr))
 
+    def test_callable_only_native_routes_are_not_advertised_as_cli_commands(self):
+        catalog_data=catalog()
+        blocked={'column-create','column-register','forecast-review','pivot','rule-create',
+                 'bridge-query','bridge-inventory','bridge-reload','bridge-poll','bridge-stream',
+                 'table-initialize','table-schema','table-save','place','home-priority',
+                 'home-effective','bookmark','navigator-create','bookmark-read',
+                 'powertable-schema','anchor-save'}
+        self.assertEqual(catalog_data['release'],'v50')
+        for action in blocked:
+            self.assertIsNone(catalog_data['actions'][action]['command'],action)
+            self.assertEqual(catalog_data['actions'][action]['phase'],'approved-external-adapter',action)
+            self.assertTrue(catalog_data['actions'][action]['symbols'],action)
+        rendered=render(discover(module='INTELLIGENCE'))
+        self.assertNotIn('python plan.py forecast-review',rendered)
+        self.assertNotIn('python plan.py native place',rendered)
+
+    def test_current_skill_and_core_references_have_clean_encoding(self):
+        suspects=('Ã','â€','Â','Æ’')
+        paths=[ROOT/'SKILL.md',*(ROOT/'references').glob('*.md')]
+        for path in paths:
+            text=path.read_text(encoding='utf-8')
+            for marker in suspects:
+                self.assertNotIn(marker,text,f'{path.relative_to(ROOT)} contains {marker!r}')
+
     def test_business_search_and_guide_only_limits(self):
         for query,expected in [('rolling forecast','F09'),('quarterly commentary','F05'),
                                ('from sheets','F19'),('negative variance','F15'),
@@ -74,6 +98,42 @@ class DiscoveryTests(unittest.TestCase):
         self.assertEqual(result.returncode,0,result.stderr)
         data=json.loads(result.stdout)
         self.assertEqual(data['modules'][0]['operations'][0]['id'],'forecast-review')
+
+    def test_intelligence_mode_guides_are_discoverable_and_readable(self):
+        result=discover('Intelligence visual design')
+        route=next(m for m in result['modules'] if m['id']=='INTELLIGENCE')
+        guides={g['file']:g for g in route['guides']}
+        expected=['index','discovery','design','authoring','management','feature-master-list']
+        for name in expected:
+            path=f'intelligence/{name}.md'
+            self.assertIn(path,guides)
+            self.assertIn(guides[path]['command'],render(discover(module='INTELLIGENCE')))
+        result=subprocess.run(
+            [sys.executable,str(ROOT/'plan.py'),'reference','intelligence/index.md'],
+            capture_output=True,text=True,cwd=ROOT.parent)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('Intelligence reference index',result.stdout)
+        self.assertIn('features/matrix/_index.md',result.stdout)
+
+    def test_reference_rejects_noncanonical_and_hidden_paths(self):
+        import plan
+        for name in ['../SKILL.md','intelligence/../../SKILL.md',str(ROOT/'SKILL.md'),
+                     'intelligence\\index.md','intelligence/./index.md',
+                     'intelligence/.private.md','.']:
+            with self.subTest(name=name), patch.object(sys,'argv',['plan.py','reference',name]):
+                with self.assertRaises(ValueError):
+                    plan.main()
+
+    @unittest.skipIf(sys.platform=='win32','Symlink creation can require privileges on Windows')
+    def test_reference_rejects_symlink_outside_reference_root(self):
+        import plan
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); references=root/'references'; references.mkdir()
+            (root/'outside.md').write_text('Not a bundled reference',encoding='utf-8')
+            (references/'escape.md').symlink_to(root/'outside.md')
+            with patch.object(plan,'ROOT',root), patch.object(sys,'argv',['plan.py','reference','escape.md']):
+                with self.assertRaisesRegex(ValueError,'bundled reference path'):
+                    plan.main()
 
     def test_custom_time_axis_survives_scope_and_preflight(self):
         model=load(ROOT/'fixtures/model.json')

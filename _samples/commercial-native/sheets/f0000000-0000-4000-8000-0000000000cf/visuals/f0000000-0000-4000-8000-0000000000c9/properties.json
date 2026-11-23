@@ -1,0 +1,98 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/plan/definition/Planning/Properties/1.0.0/schema.json",
+  "properties": {
+    "advanceLookup": [],
+    "dimension": {
+      "height": 0.0401,
+      "width": 0.475
+    },
+    "layerProperties": {
+      "layerProperties": {
+        "groupIds": [],
+        "isHidden": false,
+        "name": "Demo data through Dec 2027; default Jan-Oct 2026. One currency at a time."
+      },
+      "order": 2
+    },
+    "originEntityId": "2",
+    "pivotAssignments": [],
+    "position": {
+      "x": 0.5042,
+      "y": 0.037
+    },
+    "preVisualId": "2",
+    "sortingConfig": [],
+    "splitByCategory": {
+      "pivotValueAssignments": [],
+      "splitByCategoryAssignments": [],
+      "splitByCategoryItems": [],
+      "splitByDelimiter": "-"
+    },
+    "superFilterAssignments": [],
+    "visualInteractions": {},
+    "visualState": {
+      "text": "{\"root\":{\"children\":[{\"children\":[{\"detail\":0,\"format\":0,\"mode\":\"normal\",\"style\":\"font-size: 13px;font-family: Segoe UI;color: #1F2937;line-height: 1.5;\",\"text\":\"Demo data through Dec 2027; default Jan-Oct 2026. One currency at a time.\",\"type\":\"text\",\"version\":1}],\"direction\":null,\"format\":\"left\",\"indent\":0,\"type\":\"paragraph\",\"version\":1,\"textFormat\":1,\"textStyle\":\"font-size: 13px;font-family: Segoe UI;color: #1F2937;line-height: 1.5;\"}],\"direction\":null,\"format\":\"\",\"indent\":0,\"type\":\"root\",\"version\":1,\"textFormat\":1,\"textStyle\":\"font-size: 24px;line-height: 1.5;\"}}"
+    },
+    "visualStyles": {
+      "background": {
+        "backgroundColor": "#ffffff00",
+        "isEnabled": true
+      },
+      "border": {
+        "color": "#DDDDDD",
+        "isEnabled": false,
+        "side": "all",
+        "width": 1
+      },
+      "cornerRadius": {
+        "isCustomCornerRadius": false,
+        "isEnabled": true,
+        "radiusBottomLeft": 0,
+        "radiusBottomRight": 0,
+        "radiusTopLeft": 0,
+        "radiusTopRight": 0
+      },
+      "isTooltipEnabled": true,
+      "padding": {
+        "bottomPadding": 0,
+        "isCustomPaddingSize": false,
+        "isEnabled": true,
+        "leftPadding": 0,
+        "rightPadding": 0,
+        "topPadding": 0
+      },
+      "rotation": {
+        "isEnabled": false,
+        "transform": 0
+      },
+      "shadow": {
+        "angle": 135,
+        "blur": 8,
+        "color": "#0000003f",
+        "distance": 10,
+        "isEnabled": false,
+        "opacity": 100,
+        "placement": "outer",
+        "side": "bottom",
+        "width": 0
+      },
+      "showHelperTooltips": true,
+      "showSelectedSeriesInTooltip": false,
+      "tooltipPageId": "auto",
+      "tooltipStyle": {
+        "backgroundColor": "#FFFFFF",
+        "bold": false,
+        "fontFamily": "Segoe UI",
+        "fontSize": 12,
+        "italic": false,
+        "labelColor": "#252423",
+        "underline": false,
+        "valueColor": "#252423"
+      },
+      "tooltipType": "default",
+      "varianceInTooltip": true,
+      "varianceTooltipType": "both"
+    },
+    "visualType": 202
+  }
+}

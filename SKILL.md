@@ -10,21 +10,161 @@ offline tests. No capsule extraction, Codex-specific tool, source checkout or ol
 report is needed. Use Python 3.11+; Node 24+ is needed by the applicable compressed
 payload/HTTPS adapters. Start with `plan.py discover`, then read selected guides.
 
+## Current contract and precedence
+
+This file is the current operating contract. The versioned sections below are
+supporting history and feature evidence; their version ordering is not the
+authority. When wording conflicts, use the current order below:
+
+1. This section, the authoring/publication/transport matrices, the mandatory
+   delivery gates and the essential invariants.
+2. `plan.py discover`, `references/module-routing.json`, the selected topical
+   guides and the implementation they reference.
+3. Dated release notes and historical evidence.
+
+### Application profiles
+
+| Profile | When it applies | Required behavior |
+|---|---|---|
+| New complete application | User asks to create a complete Plan application | Apply the full application baseline: Arial, native Home, Intelligence dashboard coverage, Page Navigators and the complete requested business scope. |
+| Extension | User asks to add a feature or module to an existing application | Add only the requested and dependent surfaces; preserve unrelated state and rerun affected baselines and delivery gates. |
+| Scoped repair | User asks to fix one existing behavior, visual or property | Preserve the rest, avoid unrelated expansion and verify only the affected and safety-critical surfaces. Full new-application defaults do not authorize unrelated writes. |
+| Read-only/reference | User asks for inspection, design, audit or a reference deliverable | Do not mutate a live artifact. Package or hand off only the explicitly requested output. |
+
+Record the selected profile before planning. Do not relabel a scoped repair as a
+new complete application or silently narrow a new complete application.
+
+### Transport and execution boundary
+
+| Route | Current role | Authoritative execution |
+|---|---|---|
+| Public Plan definition | Default creation, export, update, geometry, visibility, definitions and readback | `plan.py build`, `provision`, `api`, `decode`, `encode`, validators and documented local helpers |
+| Native Home | Role-specific Home layout and visibility work permitted after explicit authorization | `plan.py native home` and the integrated Home save/readback phases |
+| Approved external service adapter | Native column, rule, bookmark, Navigator, PowerTable, InfoBridge, placement or forecast-review work whose route is outside the public definition | Invoke the named Python callable only with an organization-approved profile; not a shipped CLI command |
+| Unavailable contract | Any route without a documented public factory or approved adapter profile | Do not invent an endpoint or UI fallback. Prepare independent work, record the gap and return `mutation: none` unless the user explicitly approves revised scope |
+
+The presence of a parser choice or runtime module is not a route unless its
+command passes the active `plan.py` guard. `plan.py discover` must show only
+reachable CLI commands; callable-only phases identify their Python symbols.
+
+## Packaging and publication boundary
+
+Treat the local project tree, the skill distribution bundle and the published
+Fabric Plan as separate deliverables.
+
+- **Publishing a report:** publish only the validated Plan definition and its
+  required report assets through the documented Fabric workflow. Never upload
+  or attach the repository folder or `_build/` as part of the report.
+- **Sharing the reusable skill:** package the skill instructions and only the
+  references, scripts, assets and native samples needed to use it. Exclude
+  `_build/`, `_brief/`, `_samples/`, generated caches such as `__pycache__/` and
+  task-specific outputs by default. Include a particular build artifact only
+  when the user requests it or a documented dependency requires it.
+- **Before packaging:** verify the bundle's file list against the allowlist
+  below; confirm required relative reference paths and native-sample paths still
+  resolve; then report excluded generated/work-in-progress content. If an
+  excluded sample is a documented dependency of an included guide or workflow,
+  include only that reviewed dependency at its expected relative path and record
+  the exception. Never ship a broken required reference or include an entire
+  workspace just to satisfy one dependency.
+
+### Skill-bundle allowlist
+
+- Root instructions and entry point: `SKILL.md`, `plan.py`, `README.md` and
+  `LICENSE`; include `.gitignore` only when present and needed.
+- Required runtime resources: `runtime/`, `references/`, `schemas/`, `tools/`
+  and `vendor/`, including required licenses and transitive dependencies.
+- Only the `examples/`, `fixtures/`, `tests/`, approved assets and reviewed
+  native samples needed by the included instructions, workflows or checks.
+  Directory membership alone does not approve every file for distribution.
+
+| Local directory | Purpose and distribution rule |
+|---|---|
+| [assets/](assets/) | Design templates, themes and evidence resources. Include only required, reviewed reusable assets; do not treat this directory as permission to publish every asset with a report. |
+| [_samples/](_samples/) | Native export/reference samples. Exclude by default; include particular sanitized samples only when requested or required by a documented dependency. Preserve required sheet/visual paths and filenames. |
+| [_brief/](_brief/) | Task-specific requirements, field registries and design contracts. Local working material, excluded by default; keep new task briefs outside the installed skill. |
+| [_build/](_build/) | Local workspace for generated definitions, validation evidence and readbacks, not a report dependency or default skill-bundle content. Keep new task outputs outside the installed skill. |
+
+Review any explicitly included output or sample for credentials, live target
+identities and confidential business data. Synthetic GUIDs alone do not make an
+export safe to share. This instruction defines the packaging boundary; it does
+not authorize a report publication, upload or release.
+
+## Intelligence reference routing
+
+For Intelligence work, run `python plan.py discover --module INTELLIGENCE`
+and open the [Intelligence index](references/intelligence/index.md). Select
+only the mode and feature files needed for the current request:
+
+| Need | Intelligence guide |
+|---|---|
+| Model-backed report requirements and field inventory | [Discovery](references/intelligence/discovery.md), then its linked continuation |
+| Visual choice, layout, accessibility and design brief | [Design](references/intelligence/design.md) |
+| Native definition parts, visual configuration and focused edits | [Authoring](references/intelligence/authoring.md), then its linked continuation |
+| Export, publish, update and readback considerations | [Management](references/intelligence/management.md), then its linked continuation |
+| A missing semantic-model measure | [Model measures](references/intelligence/model-measures.md), only with explicit model-write permission |
+| Matrix, charts, KPI, slicers, tables and canvas features | [Feature master list](references/intelligence/feature-master-list.md), then the relevant area index and feature file |
+
+These are bundled Intelligence references, not a separate skill or execution
+toolchain. The latest application defaults, source-aware bindings and deployment
+rules in this file remain authoritative. Use the shipped `plan.py` routes and
+bundled runtime instead of historical `scripts/` commands in retained guides.
+Keep task briefs, decoded definitions and operation journals outside the skill
+root. The [module boundaries](references/intelligence/core/module-boundaries.md)
+explain ownership; they do not disable supported Planning embeds, From Sheets or
+InfoBridge bindings. Feature IDs are Intelligence-local; qualify them as
+`intelligence:<ID>` in cross-module records. Native `encoding` status and
+`[saved]` / `[confirmed]` / `[open]` evidence retain their existing meaning and
+do not establish runtime acceptance.
+
 ## Semantic model discovery (v47)
 
-Run `python plan.py usecase model --config destination.json --run runs/model` to discover the configured semantic model through the public Fabric API. This standalone command requests TMDL and writes the field catalog to `runs/model/current-model.json`. It takes the destination config and run directory alone.
+Run `python plan.py usecase model --config destination.json --run runs/model`
+to discover the configured semantic model through the public Fabric API.
+The command requests the model's Tabular Model Definition Language (TMDL)
+representation, reads the supported table declarations, and normalizes the
+current measures/columns into the field catalog at
+`runs/model/current-model.json`. It writes the raw model definition beside that
+catalog. This standalone command takes only the destination config and run
+directory.
 
 ## New report deployment and embedded sheet visibility (v48)
 
-Use `plan.py provision` for standard reports. In the initial public `POST /v1/workspaces/{workspaceId}/plans`, set `definition.json` â†’ `sheets[].isHidden` to `true` on each Planning sheet whose grid is embedded in a visible Intelligence dashboard. Keep its dashboard visible and use it as the Explorer and Home destination. A Planning sheet without a visible embed stays visible by default. Keep business PowerTables visible and enable Home in the submitted plan properties.
+Use `plan.py provision` for standard reports. In the initial public
+`POST /v1/workspaces/{workspaceId}/plans`, set
+`definition.json` -> `sheets[].isHidden` to `true` on each Planning sheet whose
+grid is embedded in a visible Intelligence dashboard. Keep its dashboard visible
+and use it as the Explorer and Home destination. A Planning sheet without a
+visible embed stays visible by default. Keep business PowerTables visible and
+enable Home in the submitted plan properties.
 
-Apply this default in multi-sheet and custom recipes too. A request for a Home card for each planning activity points to each activityâ€™s dashboard. Preserve the ownerâ€™s sheet ID and grid ID for editing, formulas and From Sheets links. Carry the visibility flags through subsequent definition updates and handoffs.
+Apply this default in multi-sheet and custom recipes too. A request for a Home
+card for each planning activity points to each activity's dashboard. Preserve
+the owner's sheet ID and grid ID for editing, formulas and From Sheets links.
+Carry the visibility flags through subsequent definition updates and handoffs.
 
 ### v50 API contract for every deployment
 
-Author the canvas, direct visual rectangles, navigation, visibility and embedded matrix placement in the public Plan definition. During fresh builds the runtime declares Planning sheets and their direct visuals first. It calculates the numeric string origin entity ID and visual ID from their respective declaration sequences and uses that pair in each dashboard’s sheet.properties.reactiveVisualProperties entry. Reuse the pair when dashboards share a matrix and write each page’s own position and dimension. Keep GUIDs for the source sheet, visual declarations, part paths and connected measure bindings.
+Author the canvas, direct visual rectangles, navigation, visibility and
+embedded matrix placement in the public Plan definition. During fresh builds,
+the runtime declares Planning sheets and their direct visuals first and derives
+the numeric string origin entity ID and visual ID only from that generated
+declaration sequence. Use that pair in each dashboard's
+`sheet.properties.reactiveVisualProperties` entry and reuse it when dashboards
+share a matrix, while writing each page's own position and dimension. This
+order-based calculation is the sole fresh-build exception; it is not permission
+to infer identities for an existing or imported destination. Keep GUIDs for the
+source sheet, visual declarations, part paths and connected measure bindings.
 
-Use native workload calls only for role-specific Home layout. For existing Plans, preserve the destination’s saved placement IDs when updating geometry through the public definition. For imports with unknown allocation order, obtain the mapping from that destination before changing placement. A public export verifies the saved definition. Verify visible placement in Reading mode. In the MSIT Mid Market validation, a GUID-keyed override survived export while the matrix rendered over the header.
+Use native workload calls only for role-specific Home layout through the shipped
+route. Other workload operations are not CLI capabilities; they require an
+explicitly approved external adapter profile or remain unavailable. For existing
+Plans, preserve the destination's saved placement IDs when updating geometry
+through the public definition. For imports with unknown allocation order, obtain
+the mapping from that destination before changing placement. A public export
+verifies the saved definition. Verify visible placement in Reading mode. In the
+MSIT Mid Market validation, a GUID-keyed override survived export while the
+matrix rendered over the header.
 
 ## Size Intelligence dashboards for the Reading view
 
@@ -32,13 +172,22 @@ When the prompt leaves layout open, use the builder's left-rail layout. Put the 
 
 For each dashboard, identify the primary work area and size the matrix for readable rows and periods. Fit every adjacent chart and filter column to the same content baseline. Reserve space for fixed headers and navigation, subtract the gutters, and allocate the remaining height across the flexible containers in that column. Give comparable charts equal heights. Give comparable slicers equal space and allow a slicer with more choices a larger share. Use `runtime.stack_layout.fit_stack(top, bottom, gap, weights)` to calculate positions and heights together so rounding preserves the final edge.
 
-Use the drawable width and height inside the Reading view, excluding open panes, toolbar and zoom controls. With fit-to-width, the available height in canvas units is `canvas width Ã— drawable height / drawable width`. If a viewport is unavailable, state the assumed target aspect ratio. Recompute positions from the selected canvas and content on each page. For a matrix with content below it, reserve the lower visuals and their gutters before assigning its height.
+Use the drawable width and height inside the Reading view, excluding open
+panes, toolbar and zoom controls. With fit-to-width, the available height in
+canvas units is `canvas width x drawable height / drawable width`. If a viewport
+is unavailable, state the assumed target aspect ratio. Recompute positions from
+the selected canvas and content on each page. For a matrix with content below
+it, reserve the lower visuals and their gutters before assigning its height.
 
 In addition to checking bounds and overlaps, measure the bottom gap of **each column** against the target Reading viewport. When a matrix has additional pages, extend the page-local embedded matrix into the available space and refit the adjacent stacks. Check the final edge of the last chart, matrix and last slicer against the common baseline within one canvas unit. Apply the same principle across rows for horizontal layouts. Treat the geometry calculation as a prediction for the target viewport, and distinguish saved dimensions from observed row counts.
 
 Pass the measured drawable dimensions as dashboard `viewport` when available. For a custom design that should use extra height, describe its flexible rows in `layout.fitColumns`. The builder fits each declared column to the common bottom margin, retains fixed rows and gaps, and checks the final rectangles. Treat an explicitly specified fixed canvas as fixed. Keep the placement identities of an existing embedded matrix when changing its rectangle. See the custom column example in [Intelligence dashboard layouts](references/context-intelligence.md).
 
-Range Control Room is a regression example. A 2240 Ã— 960 page had a 24-unit bottom margin yet left roughly 400 screen pixels below its content in a 2523 Ã— 1491 drawable area. At that same width a 1320-unit canvas lets a matrix starting at y = 196 use 1100 units of height with a 24-unit bottom margin. These dimensions apply to this example.
+Range Control Room is a regression example. A 2240 x 960 page had a 24-unit
+bottom margin yet left roughly 400 screen pixels below its content in a
+2523 x 1491 drawable area. At that same width a 1320-unit canvas lets a matrix
+starting at y = 196 use 1100 units of height with a 24-unit bottom margin. These
+dimensions apply to this example.
 
 ## Current package property reconciliation
 
@@ -94,13 +243,17 @@ zero forecast-only movement. Read [actual-forecast-review.md](references/actual-
 ## Native chart typography completion (v40)
 
 The service can expand chart styles after import with non-Arial defaults, even
-when the authored definition uses Arial. For new applications, the bundled
-`finish_native_typography` phase reads current owned visuals, normalizes only
-documented font/style boundaries, saves with current ETags, and checks fresh
-readback. It runs after comparison construction and before navigation publication.
-Embedded planning visuals are handled through their owner. It preserves formulas,
-bindings and stored inputs; do not apply it during an unrelated scoped repair.
-Read [native-typography.md](references/native-typography.md). All v39 and earlier
+when the authored definition uses Arial. The public-definition path must author
+Arial and pass the offline application-default checks. A native
+`finish_native_typography` helper exists for an explicitly approved external
+service-adapter profile; it is not automatically invoked by `provision`,
+`usecase deploy`, or another shipped CLI route and is therefore not a default
+delivery claim. When that approved route is selected, it performs fresh reads,
+normalizes documented font/style boundaries, saves with current ETags, and checks
+readback without changing formulas, bindings or stored inputs. Do not apply it
+during an unrelated scoped repair. Read
+[native-typography.md](references/native-typography.md). Report native
+typography as pending when the approved phase was not run. All v39 and earlier
 OneLake, Context, navigator, aggregation and conditional-formatting fixes remain.
 
 ## Storage Context and connected consistency (v39)
@@ -358,14 +511,15 @@ checks do not inherit that runtime claim. The standalone two-sheet example at
 `examples/conditional-formatting/build.py` works from an isolated package copy.
 All latest defaults and fixes below remain in force.
 
-## Non-negotiable application defaults (v24)
+## Complete-application defaults (v24)
 
-Every Fabric Plan flow uses **Arial**, an **enabled native Home landing page**,
-**Intelligence dashboard coverage for every Planning sheet**, and a visible
-native **Page Navigator on every Intelligence dashboard**. These are
-mandatory from any prompt context. A two-sheet brief, screenshot recreation,
-reference JSON, simple use case, missing mention of Home/dashboard, quick deploy,
-or request to skip validation does not waive them. Do not infer an exemption.
+Every **new complete application** profile uses **Arial**, an **enabled native
+Home landing page**, **Intelligence dashboard coverage for every Planning
+sheet**, and a visible native **Page Navigator on every Intelligence dashboard**.
+A two-sheet brief, screenshot recreation, reference JSON, simple use case,
+missing mention of Home/dashboard, quick deploy, or request to skip validation
+does not waive these defaults in that profile. Apply preservation-first
+extension and scoped-repair profiles instead of expanding unrelated surfaces.
 
 - Use Arial for authored grids, measure/header overrides, rich text, Home text,
   slicers and chart text. A reference screenshot's different font is not a reason
@@ -397,16 +551,18 @@ request or scoped repair; distinguish repair completion from application complet
 
 ## Forecast hierarchy, visual columns and as-of controls (v23)
 
-For monthly Forecasts, prefer actual non-composite **Year ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Quarter ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Month**
-fields. Future-period extension Columns contain only a valid date hierarchy.
+For monthly Forecasts, prefer actual non-composite
+**Year -> Quarter -> Month** fields. Future-period extension Columns contain
+only a valid date hierarchy.
 Use Year/Quarter/Month/Week only with verified week parentage; otherwise preserve
 the model's valid weekly hierarchy. Record explicit composite-field exceptions.
 
 For one-time commentary, adjustments or QTD/MTD/YTD alongside that grid, evaluate
 **Visual Input Columns** or **Formula Visual Columns** appended once per row
 context. Preserve the primary time grain and resolve the input's storage context.
-For dynamic as-of controls, first evaluate **Intelligence slicer ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ DAX
-SELECTEDVALUE ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ exposed Planning measure ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Formula Visual Column**. Use a sheet
+For dynamic as-of controls, first evaluate
+**Intelligence slicer -> DAX SELECTEDVALUE -> exposed Planning measure ->
+Formula Visual Column**. Use a sheet
 parameter for sheet-local control or when the shared route is unsuitable. Keep
 the history needed for aggregation and resolve the year for month-name choices.
 
@@ -495,7 +651,8 @@ worked table, assumption, caveat and test scenario. Discover with
 outcome `balance-roll-forward` even when the prompt uses different wording.
 
 For roll-forwards expressed as measures, recommend **Measures in Rows plus a
-logical native Measure Model**: Opening ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ movement drivers ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ Closing ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ diagnostics.
+logical native Measure Model**:
+`Opening -> movement drivers -> Closing -> diagnostics`.
 Use current string IDs, `measure_tree`, expanded parents and consistent measure
 order. The local `roll-forward-presentation` helper preserves formulas, input and
 Forecast definitions, source identities, aggregation and storage mappings. Read
@@ -577,19 +734,29 @@ chat, a task-local script, old report IDs or an agent's recollection.
 
 For a matching case, inspect `usecase show` and run `usecase build` with the target model catalog. Author linked measures, commentary, formulas, chart bindings and geometry in the public definition, or start from a complete portable business definition on the same model. The specialized recipes with pending native extensions stop before creating an item. Only Home layout has a native save phase.
 
+`usecase deploy` currently supports only a recipe whose original definition is
+complete in the public route. The shipped five recipes contain required
+post-import `steps`, `quarterly`, or `comparisons`; deployment therefore stops
+before mutation until those features are authored through the approved public or
+external-adapter phases. Treat `usecase build` as construction evidence, not
+end-to-end deployment evidence, for those recipes.
+
 Reproduce the same business structure, calculations and presentation, with all
 latest fixes. Generate fresh IDs and timestamped names and use current model data.
 Do not promise byte/pixel-identical output or validated runtime behavior from an
 offline build. An explicit changed requirement takes precedence over the recipe.
 
-## Mandatory application baseline (v11)
+## Complete-application baseline (v11)
 
-Every new Fabric Plan application must include **all four**: source-role measure
-colors, rich-text Planning descriptions/legends, Intelligence dashboards with
-headers/slicers/charts/embedded Planning grids, and a **visible native Home landing
-page** with a business overview and sheet-navigation cards. These are required
-even when the business prompt does not enumerate them. Never silently omit a
-default or report complete delivery while its construction/save phase is missing.
+Every **new complete application** profile must include **all four**:
+source-role measure colors, rich-text Planning descriptions/legends,
+Intelligence dashboards with headers/slicers/charts/embedded Planning grids, and
+a **visible native Home landing page** with a business overview and sheet-navigation
+cards. These are required even when the business prompt does not enumerate them.
+Extension and scoped-repair profiles preserve those surfaces when in scope and
+do not expand unrelated application behavior. Never silently omit a requested
+baseline or report complete delivery while its construction/save phase is
+missing.
 
 For numeric Data Input and Forecast measures, read
 [numeric-input-constraints.md](references/numeric-input-constraints.md): AverageLeaf
@@ -833,17 +1000,16 @@ monthly requests to **Year -> Quarter -> Month**; keep business/non-date dimensi
 in Rows. Preserve valid Year-only/Year-Quarter or other supported requested grains;
 time-extension metadata is derived dynamically from the actual column levels.
 
-Read **[forecast-review-execution.md](references/forecast-review-execution.md)** for
-the shipped `plan.py forecast-review` and `forecast-repair` commands. The first
-adds direct From Sheets SUM consumption, quarterly text commentary, formula
-variance, negative-variance formatting and Forecast-versus-Actuals charts after
-base construction/import. It is a separate executable phase, not a missing
-constructor and not automatically handled by `provision`. Include this phase in
-the plan whenever requested; do not silently omit its dependent features.
-These operations use the same bundled Python/native application API adapters in
-Copilot and other agents, with no Codex tool dependency. Tenant authorization and
-build-compatible workload routes remain external prerequisites, not public REST
-guarantees. No new asset upload capability is required.
+Read **[forecast-review-execution.md](references/forecast-review-execution.md)**
+for the Forecast extension implementation. `forecast-repair` is a shipped local
+candidate command. `runtime.forecast_review` supplies the direct From Sheets
+SUM, quarterly text commentary, formula variance, negative formatting and
+comparison-chart phase, but the workload mutation has no current CLI command.
+Use the Python callable only
+through an explicitly approved external adapter profile; otherwise record the
+phase as unavailable and return `mutation: none` for an unchanged request that
+requires it. `provision` does not run the phase automatically. No new asset
+upload capability is required.
 
 Respect explicit requests to skip report validation. Required baseline/identity/
 ETag reads and async-operation completion are still needed for safe mutation;
@@ -946,9 +1112,10 @@ From the installed runtime, first use `plan.py discover` and `references/module-
 
 | Need | Bundled reference or tool |
 |---|---|
+| Intelligence mode guides, design topics and feature-level references | [Intelligence index](references/intelligence/index.md), [feature master list](references/intelligence/feature-master-list.md), `plan.py discover --module INTELLIGENCE` |
 | Every module: business request, guide, command, inputs and limits | `references/module-routing.md`, `references/module-routing.json`, `plan.py discover`, `references/routing-examples.md` |
 | External adapter compatibility and acceptance guide | `references/builder-integration.md` |
-| Typed-column/rule factories and API operations | `runtime/input_factories.py`, `runtime/rule_factories.py`, `runtime/builder_api.py`, `plan.py construct-native`, `plan.py builder-api` |
+| Typed-column/rule factories and local construction | `runtime/input_factories.py`, `runtime/rule_factories.py`, `plan.py construct-native`; workload writes are callable-only through an approved external adapter profile |
 | PowerTable encoding, new Navigator host and Home assets | `runtime/powertable_factory.py`, `runtime/navigator_api.py`, `runtime/assets_api.py` |
 | Native Forecast intent, complete records and defaults | `references/forecast-authoring.md`, `runtime/forecast.py`, `tests/test_forecast.py` |
 | Complete configured PowerTable ALM construction | `references/powertable-alm-construction.md`, `runtime/powertable_factory.py`, `tests/test_powertable_alm.py` |
@@ -965,7 +1132,7 @@ From the installed runtime, first use `plan.py discover` and `references/module-
 | Connected constructors, dimension ID descriptors, lookup columns and fallback policy | `references/connected-construction.md`, `runtime/dimension_mapping.py`, `runtime/table_columns.py`, `runtime/connected_components.py`, `runtime/scope.py` |
 | Saved definition owner/query/mapping audit | `runtime/definition_audit.py`, `plan.py audit-definition` |
 | Saved Pivots, native auth and definition readback | `runtime/pivots.py`, `runtime/session.py`, `runtime/readback.py` |
-| API-only provisioning with per-module fallback and coverage | `runtime/workflow.py`, `plan.py provision` |
+| Public-definition provisioning with complete-scope coverage | `runtime/workflow.py`, `plan.py provision` |
 | Compressed Home metadata, priority and visibility | `runtime/home_api.py`, `vendor/lzutf8/` |
 | Home, bookmarks, maintenance source and SQL metadata | `runtime/surfaces.py`, `runtime/native.py` |
 | Embedded geometry, ETags, preservation and readback | `runtime/layout.py`, `tools/visual-placement.cjs` |
@@ -983,14 +1150,32 @@ Use `python plan.py reference feature-contracts.md --list` to find headings and 
 
 ## End-to-end execution sequence
 
-1. Route every requested outcome through `plan.py discover`/`references/module-routing.md`, including separate phases; apply Model and workspace intake above, then translate the request into grain, columns/values, business inputs, formulas, time/scenario context, policy, dependencies and expected outcomes. Resolve current model/source metadata and actual endpoint/auth context.
-2. Build requested Planning sheets and source owners using the bundled API constructors. A missing module must not stop the whole application: attempt a supported alternative, use a conservative base presentation or omit that module, record the decision, then continue independent work. `prepare-scope` and `provision` produce a per-feature coverage ledger. Keep complete measure/format/aggregation/context registrations and stable input identities; never fabricate values for omitted dependencies or drop required controls while retaining unsafe edits/data exposure.
+1. Select the application profile, then route every requested outcome through
+   `plan.py discover`/`references/module-routing.json`, including separate
+   phases. Apply model/workspace intake, then translate the request into grain,
+   columns/values, business inputs, formulas, time/scenario context, policy,
+   dependencies and expected outcomes. Resolve current model/source metadata and
+   actual endpoint/auth context.
+2. Build requested Planning sheets and source owners using the bundled public
+   constructors. A missing module does not stop independent **local**
+   preparation: record the gap, construct other safe components and produce the
+   coverage ledger. It does stop mutation for the unchanged request.
+   `prepare-scope` is diagnostic and `provision` returns `mutation: none` for
+   incomplete original scope. Continue live only after a verified separate phase
+   closes the gap or the user explicitly approves revised scope. Keep complete
+   measure/format/aggregation/context registrations and stable input identities;
+   never fabricate values or retain unsafe edits.
 3. Compose direct links/lookups or InfoBridge at the right grain. For finance, aggregate source detail, retain/add the needed classifications, construct common contribution metrics and Append; do not recreate classifications already present. Normalize grain/names/types/context; use optional-measure union only by explicit policy. Track Year/date fields after each transform. Register output fields, measure selectors and execution-query references separately and resolve actual post-import identities.
 4. Use the bundled Home content/priority/visibility APIs. Use the new source-contract maintenance and multipart image adapters with explicit destination profiles and staged readback; never substitute UI steps or fake uploads. Keep roles/security, Home content, priority and visibility separate.
 5. Use `context` for external version selection and `dashboards` for rich native Intelligence composition. Include relevant labeled slicers, meaningful KPI cards, a banner and a broad lower Planning workbench; do not silently produce a grid-only page. Read `references/context-intelligence.md`. Compose from a fresh complete inventory with separate non-overlapping sections. Save actual embedded IDs in page-local overrides; preserve source owners. Construct saved Pivots through the bundled factory. Use the new Navigator host registration and public bookmark persistence adapters. Full snapshot capture and restore still require the missing contracts; do not call the dashboard complete without them.
 6. Validate exact parts and explicitly record native/public schema discrepancies. Create once or update a fresh baseline; poll Location/Retry-After to terminal status and result. Journal without secrets; reconcile uncertain submissions instead of duplicating items.
 7. Read imported grid configuration through the public definition. For dashboard geometry, navigation, Home and requested connected features, use their scoped operations. A separate request to exercise calculations, locks or propagation can use authorized test values.
-8. Return the native artifact link, decoded/transport JSON where requested, credential-free scripts, execution evidence and the coverage ledger. State supported results, alternatives, omitted features and unverified behavior separately. A useful partial deployment is permitted; keep working through all independent modules. A module-level construction gap alone is not a reason to withhold the application.
+8. Return the native artifact link, decoded/transport JSON where requested,
+   credential-free scripts, execution evidence and the coverage ledger. State
+   supported results, alternatives, omitted features and unverified behavior
+   separately. A live partial delivery is permitted only under an explicitly
+   approved revised scope. An unchanged incomplete request returns
+   `mutation: none`; independent local work can still be handed off.
 
 ## Readback normalization
 
@@ -1013,7 +1198,11 @@ continue independent modules.
 
 ## Essential invariants
 
-- Native u64 identities remain decimal strings; allocate custom IDs without collision and hash only the exact contracted external key. Never estimate runtime IDs from sheet/visual/column order.
+- Native u64 identities remain decimal strings; allocate custom IDs without
+  collision and hash only the exact contracted external key. The generated
+  declaration sequence may allocate fresh-build placement origin IDs as described
+  in the v50 public contract; never infer persisted, native, imported or existing
+  destination IDs from sheet/visual/column order.
 - Forecast requests use native Forecast: closed actuals, explicitly requested open defaults or None, and a supported date hierarchy.
 - A complete input/formula record needs companions and registrations. Missing activation is not repaired by fake cache/lease/success fields.
 - External Context uses `isContextDimension: true`, mirrored `visualState.embeddedSuperFilter` registrations and `visualState.filterContextSettings.filterContextStatus: true`. Keep Context off Rows/Columns, bind scoped inputs, and never seed old context hashes.

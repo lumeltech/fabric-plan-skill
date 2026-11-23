@@ -1,0 +1,96 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/plan/definition/Definition/1.0.0/schema.json",
+  "cube": {
+    "partitionRefIds": []
+  },
+  "semanticModelReference": {
+    "artifactId": 6688236,
+    "connectionId": "f0000000-0000-4000-8000-0000000000a7",
+    "datasetRelations": [
+      {
+        "dependentArtifactId": 6688236,
+        "settings": "Association"
+      }
+    ],
+    "directLakeMode": false,
+    "directQueryMode": false,
+    "recordGuid": "f0000000-0000-4000-8000-000000000001",
+    "semanticModelId": "f0000000-0000-4000-8000-0000000000da",
+    "semanticModelName": "Pharma_Industry_Intelligence_Demo",
+    "semanticModelWorkspaceId": "f0000000-0000-4000-8000-0000000000af",
+    "semanticModelWorkspaceName": "Planning-Demos",
+    "sourceType": "WORKLOAD",
+    "url": "https://app.powerbi.com/groups/f0000000-0000-4000-8000-0000000000af/datasets/f0000000-0000-4000-8000-0000000000da"
+  },
+  "sheets": [
+    {
+      "displayName": "Commercial Overview",
+      "isHidden": false,
+      "recordGuid": "f0000000-0000-4000-8000-0000000000cf",
+      "sheetType": "REPORTING",
+      "workloadItemEntityVisuals": [
+        {
+          "isEmbedded": false,
+          "visualId": "f0000000-0000-4000-8000-0000000000e0",
+          "visualType": "BI_TEXT"
+        },
+        {
+          "isEmbedded": false,
+          "visualId": "f0000000-0000-4000-8000-0000000000c9",
+          "visualType": "BI_TEXT"
+        },
+        {
+          "isEmbedded": false,
+          "visualId": "f0000000-0000-4000-8000-00000000007f",
+          "visualType": "ANALYTICS_PLUS"
+        },
+        {
+          "isEmbedded": false,
+          "visualId": "f0000000-0000-4000-8000-0000000000d6",
+          "visualType": "ANALYTICS_PLUS"
+        },
+        {
+          "isEmbedded": false,
+          "visualId": "f0000000-0000-4000-8000-00000000009a",
+          "visualType": "ANALYTICS_PLUS"
+        },
+        {
+          "isEmbedded": false,
+          "visualId": "f0000000-0000-4000-8000-0000000000c6",
+          "visualType": "ANALYTICS_PLUS"
+        },
+        {
+          "isEmbedded": false,
+          "visualId": "f0000000-0000-4000-8000-0000000000d3",
+          "visualType": "ANALYTICS_PLUS"
+        },
+        {
+          "isEmbedded": false,
+          "visualId": "f0000000-0000-4000-8000-0000000000ce",
+          "visualType": "INFORIVER"
+        },
+        {
+          "isEmbedded": false,
+          "visualId": "f0000000-0000-4000-8000-00000000009e",
+          "visualType": "SUPER_FILTER"
+        },
+        {
+          "isEmbedded": false,
+          "visualId": "f0000000-0000-4000-8000-00000000009b",
+          "visualType": "SUPER_FILTER"
+        },
+        {
+          "isEmbedded": false,
+          "visualId": "f0000000-0000-4000-8000-000000000080",
+          "visualType": "SUPER_FILTER"
+        },
+        {
+          "isEmbedded": false,
+          "visualId": "f0000000-0000-4000-8000-0000000000cd",
+          "visualType": "SUPER_FILTER"
+        }
+      ]
+    }
+  ],
+  "workloadItemName": "Pharma Commercial Intelligence"
+}

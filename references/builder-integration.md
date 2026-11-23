@@ -33,7 +33,11 @@ older comparison examples; original supplied documents remain preserved.
 > provisioning, separate phases and actual gaps. Preserve the latest targeted
 > fixes; historical coverage statements below are release-scoped.
 
-> Executable Forecast review update: use [forecast-review-execution.md](forecast-review-execution.md) and `plan.py forecast-review` for From Sheets SUM, quarterly commentary/variance, negative formatting and comparison charts. This separate post-import phase is bundled; do not treat a convenience-provisioner omission as missing capability. Forecast defaults inherit a working reference, otherwise UTC and distribute-to-children=true.
+> Forecast review update: use
+> [forecast-review-execution.md](forecast-review-execution.md) and the
+> `runtime.forecast_review` callables through an approved external adapter. The
+> phase is bundled but has no current CLI route. Forecast defaults inherit a
+> working reference, otherwise UTC and distribute-to-children=true.
 
 # Standalone builder contract integration
 
@@ -93,9 +97,7 @@ The agent authors command inputs from current business requirements and actual A
 
 ```text
 python plan.py construct-native input --input authored-input.json --out native-column.json
-python plan.py builder-api column-create --config destination-profile.json --input column-create-request.json --run run/columns --label salary-driver
-python plan.py builder-api bridge-reload --config destination-profile.json --input bridge-query.json --run run/bridge --label reload-workforce
-python plan.py builder-api bridge-poll --config destination-profile.json --input returned-jobs.json --run run/bridge --label verify-workforce
+# Invoke the listed builder_api callables through an approved external adapter.
 python plan.py native home --config destination-profile.json --input home-request.json --run run/home --label home
 ```
 

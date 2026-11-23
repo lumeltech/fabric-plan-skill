@@ -26,6 +26,14 @@
 
 ## Scope and Authority
 
+For Intelligence-specific design choices, use the
+[design mode guide](intelligence/design.md), its
+[design topic index](intelligence/index.md#design) and the
+[visual feature master list](intelligence/feature-master-list.md). Apply those
+details within the latest [skill contract](../SKILL.md), including mandatory
+Arial, Home and Page Navigators; historical examples do not override these
+application defaults or authorize model changes.
+
 Shared presentation and validation baseline for Fabric Plan creation and updates. This is the design reference for the [internal authoring contract](feature-contracts.md) and applicable AI schema guides, not a Fabric schema, application template or permission to change product code, model/data/security, connections or live artifacts.
 
 Derive the design from the current user's functional request, supplied semantic model and available data, verified platform/property contracts, and these shared standards. Do not inherit business pages, measures, flows, assumptions, identities or layouts from handoffs, demonstrations or unrelated history. No reference Plan is required for creation. Home, typography, classification and overview requirements below are explicit shared standards, not inherited business requirements.

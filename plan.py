@@ -2,7 +2,7 @@
 """Portable single-file skill runtime. All paths are explicit; no ambient repository."""
 import argparse,sys,copy,re,subprocess,os
 from pathlib import Path
-from runtime.codec import load,save,unpack,pack,parts,sha,dumps
+from runtime.codec import load,save,unpack,pack,parts,sha,dumps,safe_path
 from runtime.construct import build
 from runtime.validate import validate_plan,schema_report
 ROOT=Path(__file__).resolve().parent
@@ -51,8 +51,6 @@ def main():
     da=sp.add_parser('audit-definition'); da.add_argument('raw'); da.add_argument('--out',required=True)
     r=sp.add_parser('reference'); r.add_argument('name'); r.add_argument('--heading'); r.add_argument('--list',action='store_true')
     t=sp.add_parser('test')
-    fr=sp.add_parser('forecast-review',help='Apply From Sheets, quarterly commentary/variance, formatting and comparison charts after import')
-    fr.add_argument('--config',required=True);fr.add_argument('--input',required=True);fr.add_argument('--run',required=True)
     fre=sp.add_parser('forecast-repair',help='Prepare a scoped ALM update from a working reference sheet')
     fre.add_argument('--baseline',required=True);fre.add_argument('--input',required=True);fre.add_argument('--out',required=True)
     pt=sp.add_parser('repair-powertable-config',help='Local lookup/source metadata candidate; preserves editability, row actions and unrelated parts')
@@ -62,21 +60,19 @@ def main():
         bm=sp.add_parser(command,help='Local Planning-source lineage construction, graph check, or current query-output identity resolution')
         bm.add_argument('--input',required=True);bm.add_argument('--out',required=True)
     api=sp.add_parser('api'); api.add_argument('action',choices=['export','create','create-blank','update']); api.add_argument('--config',required=True); api.add_argument('--payload'); api.add_argument('--run',required=True); api.add_argument('--label',required=True)
-    n=sp.add_parser('native'); n.add_argument('action',choices=['home','place','pivot']); n.add_argument('--config',required=True); n.add_argument('--input',required=True); n.add_argument('--run',required=True); n.add_argument('--label',required=True)
+    n=sp.add_parser('native'); n.add_argument('action',metavar='home'); n.add_argument('--config',required=True); n.add_argument('--input',required=True); n.add_argument('--run',required=True); n.add_argument('--label',required=True)
     w=sp.add_parser('provision'); w.add_argument('--config',required=True); w.add_argument('--model',required=True); w.add_argument('--spec',required=True); w.add_argument('--run',required=True)
     ms=sp.add_parser('prepare-maintenance');ms.add_argument('--baseline',required=True);ms.add_argument('--requests',required=True);ms.add_argument('--out',required=True)
     ps=sp.add_parser('prepare-scope');ps.add_argument('--spec',required=True);ps.add_argument('--model');ps.add_argument('--out',required=True)
     cb=sp.add_parser('construct-native'); cb.add_argument('action',choices=['anchor','number-parameter','input','formula','cube-settings','rule','weighted-rule','powertable-source','powertable-rows','navigator','dimension-mapping','table-column','bridge-consumer','contribution','embedded-planning']); cb.add_argument('--input',required=True); cb.add_argument('--out',required=True)
-    ba=sp.add_parser('builder-api'); ba.add_argument('action',choices=['anchor-apply','bookmark-read','home-role','column-create','column-register','rule-create','bridge-inventory','bridge-query','bridge-reload','bridge-poll','bridge-stream','powertable-initialize','powertable-schema','powertable-save','bookmark-upsert','navigator-create','home-upload','home-priority','home-effective']); ba.add_argument('--config',required=True); ba.add_argument('--input',required=True); ba.add_argument('--run',required=True); ba.add_argument('--label',required=True)
+    ba=sp.add_parser('builder-api'); ba.add_argument('action',choices=['home-role']); ba.add_argument('--config',required=True); ba.add_argument('--input',required=True); ba.add_argument('--run',required=True); ba.add_argument('--label',required=True)
     for command in ('check-formula-syntax','repair-formula-equality','planning-time-axis','planning-time-column'):
         ti=sp.add_parser(command,help='Local native equality/date-axis/as-of VisualColumn helper; no live writes')
         ti.add_argument('--input',required=True);ti.add_argument('--out',required=True)
         if command=='planning-time-column':ti.add_argument('--baseline',required=True)
     args=p.parse_args()
     if hasattr(args,'label') and not re.fullmatch(r'[a-zA-Z0-9_.-]+',args.label): raise ValueError('Unsafe operation label')
-    if ((args.cmd=='native' and args.action!='home') or args.cmd=='forecast-review'
-        or (args.cmd=='builder-api' and args.action!='home-role')
-        or getattr(args,'native_feature_authoring',False)):
+    if (args.cmd=='native' and args.action!='home') or getattr(args,'native_feature_authoring',False):
         p.error('The runtime uses the public Plan definition for authoring. Native access is limited to Home layout.')
     # These helpers construct local candidates only; deployment remains explicit.
     if args.cmd in ('check-formula-syntax','repair-formula-equality'):
@@ -219,9 +215,11 @@ def main():
         from runtime.definition_audit import audit_definition
         save(args.out,audit_definition(load(args.raw)));print('Saved definition audit; runtime behavior remains separate.')
     elif args.cmd=='reference':
-        name=args.name
-        if '/' in name or '\\' in name or name.startswith('.'): raise ValueError('Use bundled reference filename')
-        text=(ROOT/'references'/name).read_text(encoding='utf-8-sig'); lines=text.splitlines()
+        name=safe_path(args.name)
+        references=(ROOT/'references').resolve(); path=(references/name).resolve()
+        if not name.parts or any(part.startswith('.') for part in name.parts) or not path.is_relative_to(references):
+            raise ValueError('Use bundled reference path')
+        text=path.read_text(encoding='utf-8-sig'); lines=text.splitlines()
         if args.list: print('\n'.join(f'{i+1}: {s}' for i,s in enumerate(lines) if s.startswith('#')))
         elif args.heading:
             starts=[i for i,s in enumerate(lines) if s.lstrip('# ').casefold()==args.heading.casefold() and s.startswith('#')]

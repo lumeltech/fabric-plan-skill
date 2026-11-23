@@ -1,0 +1,1062 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/plan/definition/Planning/Properties/1.0.0/schema.json",
+  "properties": {
+    "advanceLookup": [],
+    "chartType": "COLUMN_VERTICAL",
+    "dimension": {
+      "height": 0.3772,
+      "width": 0.9583
+    },
+    "groupMeasureAssignments": [],
+    "groupName": "",
+    "layerProperties": {
+      "layerProperties": {
+        "groupIds": [],
+        "isHidden": false,
+        "name": "Therapeutic area and brand performance"
+      },
+      "order": 12
+    },
+    "lockAspectRatio": false,
+    "mobileProperties": {},
+    "originEntityId": "12",
+    "pivotAssignments": [
+      {
+        "bucketId": "rows",
+        "columnName": "Therapeutic Area",
+        "columnType": "Column",
+        "contents": "",
+        "dataRoleType": "Grouping",
+        "dataType": "String",
+        "distinctValueCount": 5,
+        "formatString": "",
+        "id": "[Dim] Product[Therapeutic Area]",
+        "isFlatHierarchy": false,
+        "name": "Therapeutic Area",
+        "order": 0,
+        "sourceId": "[Dim] Product[Therapeutic Area]",
+        "sourceType": "PowerBI",
+        "tableName": "[Dim] Product"
+      },
+      {
+        "bucketId": "rows",
+        "columnName": "Brand Name",
+        "columnType": "Column",
+        "contents": "",
+        "dataRoleType": "Grouping",
+        "dataType": "String",
+        "distinctValueCount": 11,
+        "formatString": "",
+        "id": "[Dim] Product[Brand Name]",
+        "isFlatHierarchy": false,
+        "name": "Brand Name",
+        "order": 1,
+        "sourceId": "[Dim] Product[Brand Name]",
+        "sourceType": "PowerBI",
+        "tableName": "[Dim] Product"
+      },
+      {
+        "bucketId": "ameasure",
+        "columnName": "Actual Revenue",
+        "columnType": "Measure",
+        "contents": "",
+        "customName": "AC Revenue",
+        "dataRoleType": "Measure",
+        "dataType": "Double",
+        "distinctValueCount": 1,
+        "formatString": "$#,##0",
+        "id": "Measure[Actual Revenue]",
+        "isFlatHierarchy": false,
+        "isRenamed": true,
+        "measureGuid": "2055735705734354016",
+        "name": "Actual Revenue",
+        "order": 0,
+        "sourceId": "Measure[Actual Revenue]",
+        "sourceType": "PowerBI",
+        "tableName": "Measure"
+      },
+      {
+        "bucketId": "ameasure",
+        "columnName": "Plan Revenue",
+        "columnType": "Measure",
+        "contents": "",
+        "customName": "PL Rev",
+        "dataRoleType": "Measure",
+        "dataType": "Double",
+        "distinctValueCount": 1,
+        "formatString": "$#,##0",
+        "id": "Measure[Plan Revenue]",
+        "isFlatHierarchy": false,
+        "isRenamed": true,
+        "measureGuid": "9837477649726619647",
+        "name": "Plan Revenue",
+        "order": 1,
+        "sourceId": "Measure[Plan Revenue]",
+        "sourceType": "PowerBI",
+        "tableName": "Measure"
+      },
+      {
+        "bucketId": "ameasure",
+        "columnName": "Revenue Variance",
+        "columnType": "Measure",
+        "contents": "",
+        "customName": "Revenue Variance",
+        "dataRoleType": "Measure",
+        "dataType": "Double",
+        "distinctValueCount": 1,
+        "formatString": "#,##0.00",
+        "id": "Measure[Revenue Variance]",
+        "isFlatHierarchy": false,
+        "isRenamed": true,
+        "measureGuid": "4377659538859797569",
+        "name": "Revenue Variance",
+        "order": 2,
+        "sourceId": "Measure[Revenue Variance]",
+        "sourceType": "PowerBI",
+        "tableName": "Measure"
+      },
+      {
+        "bucketId": "ameasure",
+        "columnName": "Revenue Variance %",
+        "columnType": "Measure",
+        "contents": "",
+        "customName": "Revenue Variance %",
+        "dataRoleType": "Measure",
+        "dataType": "Double",
+        "distinctValueCount": 1,
+        "formatString": "0.0%",
+        "id": "Measure[Revenue Variance %]",
+        "isFlatHierarchy": false,
+        "measureGuid": "2781553457308065771",
+        "name": "Revenue Variance %",
+        "order": 3,
+        "sourceId": "Measure[Revenue Variance %]",
+        "sourceType": "PowerBI",
+        "tableName": "Measure"
+      },
+      {
+        "bucketId": "ameasure",
+        "columnName": "Actual Units",
+        "columnType": "Measure",
+        "contents": "",
+        "customName": "AC Unit",
+        "dataRoleType": "Measure",
+        "dataType": "Int64",
+        "distinctValueCount": 1,
+        "formatString": "#,##0",
+        "id": "Measure[Actual Units]",
+        "isFlatHierarchy": false,
+        "isRenamed": true,
+        "measureGuid": "5723560429973935394",
+        "name": "Actual Units",
+        "order": 4,
+        "sourceId": "Measure[Actual Units]",
+        "sourceType": "PowerBI",
+        "tableName": "Measure"
+      },
+      {
+        "bucketId": "ameasure",
+        "columnName": "Actual ASP",
+        "columnType": "Measure",
+        "contents": "",
+        "customName": "AC ASP",
+        "dataRoleType": "Measure",
+        "dataType": "Double",
+        "distinctValueCount": 1,
+        "formatString": "$#,##0.00",
+        "id": "Measure[Actual ASP]",
+        "isFlatHierarchy": false,
+        "isRenamed": true,
+        "measureGuid": "5781271643403264522",
+        "name": "Actual ASP",
+        "order": 5,
+        "sourceId": "Measure[Actual ASP]",
+        "sourceType": "PowerBI",
+        "tableName": "Measure"
+      }
+    ],
+    "position": {
+      "x": 0.0208,
+      "y": 0.5858
+    },
+    "preVisualId": "12",
+    "shapeType": "RECTANGLE",
+    "sortingConfig": [],
+    "splitByCategory": {
+      "pivotValueAssignments": [],
+      "splitByCategoryAssignments": [],
+      "splitByCategoryItems": [],
+      "splitByDelimiter": "-"
+    },
+    "superFilterAssignments": [],
+    "transformMeasure": "none",
+    "visualInteractions": {},
+    "visualState": {
+      "aggregation_config": {
+        "measure_aggregation": {
+          "2055735705734354016": {
+            "column": "None",
+            "row": "None"
+          },
+          "2781553457308065771": {
+            "column": "None",
+            "row": "None"
+          },
+          "4377659538859797569": {
+            "column": "None",
+            "row": "None"
+          },
+          "5723560429973935394": {
+            "column": "None",
+            "row": "None"
+          },
+          "5781271643403264522": {
+            "column": "None",
+            "row": "None"
+          },
+          "9837477649726619647": {
+            "column": "None",
+            "row": "None"
+          }
+        },
+        "row_dimension_aggregation": {},
+        "row_measure_aggregation": {},
+        "row_member_measure_aggregation": {}
+      },
+      "annotationBox": {
+        "border": {
+          "color": "#D1D1D1",
+          "isEnabled": true,
+          "side": "all",
+          "width": 1
+        },
+        "color": "#333333",
+        "cornerRadius": {
+          "isCustomCornerRadius": false,
+          "isEnabled": true,
+          "radiusBottomLeft": 0,
+          "radiusBottomRight": 0,
+          "radiusTopLeft": 0,
+          "radiusTopRight": 0
+        },
+        "enabled": false,
+        "fontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
+        "fontSize": 12,
+        "itemGap": 5,
+        "padding": {
+          "bottomPadding": 5,
+          "isCustomPaddingSize": false,
+          "isEnabled": true,
+          "leftPadding": 5,
+          "rightPadding": 5,
+          "topPadding": 5
+        },
+        "placement": "RIGHT",
+        "shadow": {
+          "angle": 135,
+          "blur": 8,
+          "color": "#E0E0E0",
+          "distance": 10,
+          "isEnabled": false,
+          "opacity": 70,
+          "placement": "outer",
+          "side": "bottom",
+          "width": 0
+        },
+        "size": 200,
+        "title": {
+          "color": "#333333",
+          "enabled": true,
+          "fontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
+          "fontSize": 12,
+          "showTitle": true,
+          "showValue": true,
+          "showVariance": true,
+          "valueRenderRole": "Responsive",
+          "varianceIconType": "triangle",
+          "varianceRenderRole": "Responsive",
+          "varianceType": "both"
+        }
+      },
+      "auto_fit_options": {
+        "autoFit": false,
+        "bestFit": false,
+        "lockColumnWidth": true,
+        "uniformColumnWidth": null,
+        "wrapCols": true
+      },
+      "cfProps": {},
+      "chartCustomTitle": {
+        "customTitle": {
+          "containerMeta": {
+            "height": 40,
+            "width": 837
+          },
+          "containerPosition": "top",
+          "elements": [
+            {
+              "align": "left",
+              "background": null,
+              "border": [],
+              "borderColor": "",
+              "borderRadius": "0px",
+              "borderWidth": "1px",
+              "containerBackground": null,
+              "content": "<p><b>Therapeutic area and brand performance</b></p>",
+              "dimension": {
+                "height": "30",
+                "width": "150"
+              },
+              "id": "left-col",
+              "layout": {
+                "h": 3,
+                "i": "left-col",
+                "static": false,
+                "w": 32,
+                "x": 0,
+                "y": 0
+              },
+              "marginBottom": "0px",
+              "marginLeft": "0px",
+              "marginRight": "0px",
+              "marginTop": "0px",
+              "position": {
+                "left": 0,
+                "top": 0
+              },
+              "shadowColor": "",
+              "shadowPosition": "",
+              "type": "DEFAULT_TITLE",
+              "verticalAlign": "MIDDLE"
+            }
+          ],
+          "layout": "left-col",
+          "layoutType": "CUSTOM"
+        },
+        "customTitleHeight": 40,
+        "measureTitle": "",
+        "primaryTitle": "",
+        "secondaryTitle": ""
+      },
+      "columnDimensions": [],
+      "columnMeta": {},
+      "columnTitleConfigs": [
+        {
+          "id": "8238374486369709813",
+          "levelId": "measuresTitle",
+          "value": "Var"
+        },
+        {
+          "id": "6390941348790046018",
+          "levelId": "measuresTitle",
+          "value": "Var%"
+        }
+      ],
+      "embeddedSuperFilter": {
+        "superFilterAssignments": [
+          {
+            "bucketId": "category",
+            "configuration": {
+              "dateFormat": "defaultFormat",
+              "filterMode": "basic",
+              "filterOperator": "is",
+              "fiscalStartMonth": 0,
+              "hide": false,
+              "isExpanded": false,
+              "locked": false,
+              "name": "Reporting period",
+              "paneWidth": 200,
+              "relativeDate": {
+                "includeToday": false,
+                "period": "",
+                "type": "",
+                "value": 0
+              },
+              "selectAll": true,
+              "selectedPreset": [],
+              "sort": [
+                {
+                  "columnId": "[Dim] Date[Date]",
+                  "columnName": "Date",
+                  "direction": "ASC",
+                  "id": "[Dim] Date[Date]"
+                }
+              ],
+              "toolBarTrigger": false,
+              "topN": {
+                "displayOthers": true,
+                "otherLabel": "Others",
+                "rankMeasure": "",
+                "rankMeasureLabel": "",
+                "rankMode": "TOP",
+                "rankType": "value",
+                "rankValue": 5
+              },
+              "visualType": "DATE"
+            },
+            "filter": [
+              {
+                "columnDataType": [
+                  "DateTime"
+                ],
+                "columnIds": [
+                  "[Dim] Date[Date]"
+                ],
+                "columnNames": [
+                  "Date"
+                ],
+                "columnType": [
+                  "Column"
+                ],
+                "dataType": [
+                  "date"
+                ],
+                "filterType": "RANGE",
+                "rangeFilter": [
+                  {
+                    "from": "2026-01-01 0:00:00",
+                    "fromCondition": "IS_ON_OR_AFTER",
+                    "logicalOperator": "and",
+                    "to": "2026-10-31 23:59:59",
+                    "toCondition": "IS_ON_OR_BEFORE"
+                  }
+                ],
+                "sourceType": [
+                  "PowerBI"
+                ],
+                "tableNames": [
+                  "[Dim] Date"
+                ]
+              }
+            ],
+            "filterLevel": "global",
+            "id": "filter_1793991449419_5af10510e",
+            "isDaxMeasure": false,
+            "isDefault": true,
+            "isDefaultMeasure": false,
+            "pivotAssignments": [
+              {
+                "bucketId": "category",
+                "columnName": "Date",
+                "columnType": "Column",
+                "contents": "",
+                "dataRoleType": "Grouping",
+                "dataType": "DateTime",
+                "distinctValueCount": 0,
+                "formatString": null,
+                "id": "[Dim] Date[Date]",
+                "isFlatHierarchy": false,
+                "isHierarchyItemInMeasure": false,
+                "name": "Date",
+                "order": 0,
+                "sourceId": "[Dim] Date[Date]",
+                "sourceType": "PowerBI",
+                "tableName": "[Dim] Date"
+              }
+            ],
+            "position": "RIGHT"
+          },
+          {
+            "bucketId": "category",
+            "configuration": {
+              "filterMode": "basic",
+              "filterOperator": "is",
+              "hide": false,
+              "isExpanded": false,
+              "locked": false,
+              "measureSearch": true,
+              "name": "Currency",
+              "paneWidth": 200,
+              "selectAll": false,
+              "sheetDataItemAggregationType": "sum",
+              "singleSelect": true,
+              "sort": [
+                {
+                  "columnId": "[Dim] Sub Region[Currency]",
+                  "columnName": "Currency",
+                  "direction": "ASC",
+                  "id": "[Dim] Sub Region[Currency]"
+                }
+              ],
+              "toolBarTrigger": false,
+              "topN": {
+                "displayOthers": true,
+                "otherLabel": "Others",
+                "rankMeasure": "",
+                "rankMeasureLabel": "",
+                "rankMode": "TOP",
+                "rankType": "value",
+                "rankValue": 5
+              },
+              "visualType": "FACET"
+            },
+            "filter": [
+              {
+                "columnDataType": [
+                  "String"
+                ],
+                "columnIds": [
+                  "[Dim] Sub Region[Currency]"
+                ],
+                "columnNames": [
+                  "Currency"
+                ],
+                "columnType": [
+                  "Column"
+                ],
+                "dataType": [
+                  "string"
+                ],
+                "filterType": "VALUES",
+                "sourceType": [
+                  "PowerBI"
+                ],
+                "tableNames": [
+                  "[Dim] Sub Region"
+                ],
+                "valuesFilter": [
+                  {
+                    "id": [
+                      "USD"
+                    ],
+                    "label": [
+                      "USD"
+                    ]
+                  }
+                ],
+                "valuesFilterApplicationType": "include"
+              }
+            ],
+            "filterLevel": "global",
+            "id": "filter_1793991449423_8870686d9",
+            "isDaxMeasure": false,
+            "isDefault": true,
+            "isDefaultMeasure": false,
+            "pivotAssignments": [
+              {
+                "bucketId": "category",
+                "columnName": "Currency",
+                "columnType": "Column",
+                "contents": "",
+                "dataRoleType": "Grouping",
+                "dataType": "String",
+                "distinctValueCount": 12,
+                "formatString": "",
+                "id": "[Dim] Sub Region[Currency]",
+                "isFlatHierarchy": false,
+                "name": "Currency",
+                "order": 1,
+                "sourceId": "[Dim] Sub Region[Currency]",
+                "sourceType": "PowerBI",
+                "tableName": "[Dim] Sub Region"
+              }
+            ],
+            "position": "RIGHT"
+          },
+          {
+            "bucketId": "category",
+            "configuration": {
+              "filterMode": "basic",
+              "filterOperator": "is",
+              "hide": false,
+              "isExpanded": false,
+              "locked": false,
+              "measureSearch": true,
+              "name": "Sub Region",
+              "paneWidth": 200,
+              "selectAll": true,
+              "sheetDataItemAggregationType": "sum",
+              "singleSelect": false,
+              "sort": [
+                {
+                  "columnId": "[Dim] Sub Region[Sub Region]",
+                  "columnName": "Sub Region",
+                  "direction": "ASC",
+                  "id": "[Dim] Sub Region[Sub Region]"
+                }
+              ],
+              "toolBarTrigger": false,
+              "topN": {
+                "displayOthers": true,
+                "otherLabel": "Others",
+                "rankMeasure": "",
+                "rankMeasureLabel": "",
+                "rankMode": "TOP",
+                "rankType": "value",
+                "rankValue": 5
+              },
+              "visualType": "FACET"
+            },
+            "filter": [],
+            "filterLevel": "global",
+            "id": "filter_1793991449427_c6205c546",
+            "isDaxMeasure": false,
+            "isDefault": true,
+            "isDefaultMeasure": false,
+            "pivotAssignments": [
+              {
+                "bucketId": "category",
+                "columnName": "Sub Region",
+                "columnType": "Column",
+                "contents": "",
+                "dataRoleType": "Grouping",
+                "dataType": "String",
+                "distinctValueCount": 12,
+                "formatString": "",
+                "id": "[Dim] Sub Region[Sub Region]",
+                "isFlatHierarchy": false,
+                "name": "Sub Region",
+                "order": 1,
+                "sourceId": "[Dim] Sub Region[Sub Region]",
+                "sourceType": "PowerBI",
+                "tableName": "[Dim] Sub Region"
+              }
+            ],
+            "position": "RIGHT"
+          },
+          {
+            "bucketId": "category",
+            "configuration": {
+              "filterMode": "basic",
+              "filterOperator": "is",
+              "hide": false,
+              "isExpanded": false,
+              "locked": false,
+              "measureSearch": true,
+              "name": "Therapeutic Area",
+              "paneWidth": 200,
+              "selectAll": true,
+              "sheetDataItemAggregationType": "sum",
+              "singleSelect": false,
+              "sort": [
+                {
+                  "columnId": "[Dim] Product[Therapeutic Area]",
+                  "columnName": "Therapeutic Area",
+                  "direction": "ASC",
+                  "id": "[Dim] Product[Therapeutic Area]"
+                }
+              ],
+              "toolBarTrigger": false,
+              "topN": {
+                "displayOthers": true,
+                "otherLabel": "Others",
+                "rankMeasure": "",
+                "rankMeasureLabel": "",
+                "rankMode": "TOP",
+                "rankType": "value",
+                "rankValue": 5
+              },
+              "visualType": "FACET"
+            },
+            "filter": [],
+            "filterLevel": "global",
+            "id": "filter_1793991449431_8b9dcbf6a",
+            "isDaxMeasure": false,
+            "isDefault": true,
+            "isDefaultMeasure": false,
+            "pivotAssignments": [
+              {
+                "bucketId": "category",
+                "columnName": "Therapeutic Area",
+                "columnType": "Column",
+                "contents": "",
+                "dataRoleType": "Grouping",
+                "dataType": "String",
+                "distinctValueCount": 12,
+                "formatString": "",
+                "id": "[Dim] Product[Therapeutic Area]",
+                "isFlatHierarchy": false,
+                "name": "Therapeutic Area",
+                "order": 1,
+                "sourceId": "[Dim] Product[Therapeutic Area]",
+                "sourceType": "PowerBI",
+                "tableName": "[Dim] Product"
+              }
+            ],
+            "position": "RIGHT"
+          }
+        ]
+      },
+      "filterContextHashMap": {
+        "8433db70f6": {
+          "[Dim] Date.Date": [
+            "ALL MEMBERS"
+          ]
+        }
+      },
+      "formatConfig": {},
+      "frequentColors": [
+        "#ff4400",
+        "#54cfd70d"
+      ],
+      "globalStyles": {
+        "blankColumnLabel": "(Blank)",
+        "blankRowLabel": "(Blank)",
+        "chartScale": "universal",
+        "columnHierarchyFontStyle": "normal",
+        "columnHierarchyFontWeight": "normal",
+        "fontFamily": "Segoe UI",
+        "fontSize": "13",
+        "fontStyle": "normal",
+        "fontWeight": "normal",
+        "headerFontColor": "#0F766E",
+        "headerFontSize": "14px",
+        "headerFormat": false,
+        "headerHeight": 36,
+        "headerLabelOrient": "initial",
+        "hierarchyFontStyle": "normal",
+        "hierarchyfontWeight": "bold",
+        "isHeightUpdatedManually": false,
+        "kpiFontSize": 45,
+        "migrationVersion": 1,
+        "rowHeight": 32,
+        "showRowLabelEditor": false,
+        "subTotalFontWeight": "semiBold",
+        "textColor": "#1F2937",
+        "variableColor": "#0078D4",
+        "varianceBarFont": 12
+      },
+      "gridStyles": {
+        "bottomSpace": 0,
+        "categoryLabelColor": "#DDDDDD",
+        "chartSpacing": true,
+        "columnSpacing": "off",
+        "columnSpacingValue": 5,
+        "compactSplitLine": true,
+        "compactSplitLineColor": "#CBD5E1",
+        "direction": "ltr",
+        "enableCategoryLabelColor": false,
+        "gridBackground": "#FFFFFF",
+        "gridBorderLineColor": "#A6A6A6",
+        "gridBorderLinePosition": null,
+        "gridBorderLineStyle": "solid",
+        "gridBorderLineWidth": 0,
+        "headerGridLines": true,
+        "horizontalMinorGridColor": "#E5E7EB",
+        "horizontalMinorGridLines": "solid",
+        "indentSpacing": 16,
+        "isLevelIndent": false,
+        "leftSpace": 0,
+        "lineStyleColor": "#666666",
+        "lineStyleFormat": "solid",
+        "majorGridColor": "#A6A6A6",
+        "majorGridLines": "off",
+        "migrationVersion": 1,
+        "rightSpace": 0,
+        "showColumnExpandCollapse": false,
+        "showExpandCollapse": true,
+        "showVAHighlight": true,
+        "titleAndChartSpace": 4,
+        "topSpace": 0,
+        "verticalMinorGridColor": "#F3F4F6",
+        "verticalMinorGridLines": "solid"
+      },
+      "headerLabelFormat": {
+        "measureHeader": {
+          "1": true,
+          "5": "#398692cb"
+        }
+      },
+      "jet_cfProps": {},
+      "manage_measures": [
+        {
+          "id": "2055735705734354016",
+          "label": "Actual Revenue",
+          "order": 0,
+          "visible": true
+        },
+        {
+          "id": "9837477649726619647",
+          "label": "Plan Revenue",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "4377659538859797569",
+          "label": "Revenue Variance",
+          "order": 2,
+          "visible": true
+        },
+        {
+          "id": "2781553457308065771",
+          "label": "Revenue Variance %",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "5723560429973935394",
+          "label": "Actual Units",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "5781271643403264522",
+          "label": "Actual ASP",
+          "order": 5,
+          "visible": true
+        }
+      ],
+      "measureAttributes": {},
+      "miscellaneous": {
+        "enableFooter": false,
+        "enableReadViewBookmarking": false,
+        "featureFlags": "",
+        "footerText": "inforiver.com",
+        "footerUrl": "https://inforiver.com/",
+        "hideOnReadMode": false,
+        "isUserChangedFooter": true,
+        "pinIcon": "solid",
+        "showInfoRiverLogo": true,
+        "showTooltip": true
+      },
+      "notes": {
+        "customIcon": "CIRCLE_FILL",
+        "footNote": {
+          "footNoteColumn": 3,
+          "footNoteHeight": 15
+        },
+        "indicator": {
+          "color": "#117865",
+          "indicatorPositions": [
+            "left",
+            "center"
+          ],
+          "indicatorType": "numbered",
+          "size": 16
+        },
+        "markerSettings": {
+          "color": "red",
+          "strokeType": "solid",
+          "strokeWidth": 2,
+          "style": "freestyle"
+        },
+        "noteCreateIndex": 0,
+        "notes": [],
+        "persistProperties": {
+          "bgColor": "rgba(255,255,255,0.9)",
+          "borderColor": "rgba(3,169,244,0.7)",
+          "displayOptions": "4",
+          "iconColor": "rgb(18, 120, 100)",
+          "iconSize": "14",
+          "indicatorIcon": "CIRCLE_FILL",
+          "lineColor": "rgba(3,169,244,0.7)"
+        },
+        "reportSummaryNote": null,
+        "show": true
+      },
+      "numberFormatting": {
+        "billions": "b",
+        "billionsFullText": "in Billions",
+        "billionsMediumText": "in b",
+        "customNullText": "",
+        "customZeroText": "",
+        "customizeScalingLabel": false,
+        "decimalSeperator": ".",
+        "dlCustomScalingFactor": "none",
+        "dlFlexibleScalingFactor": "auto",
+        "dlIBCSNoOfDecimal": 0,
+        "enableDataLabelFormatting": true,
+        "enablePrefixAsUnit": true,
+        "enableSuffixAsUnit": false,
+        "enabled": true,
+        "formatType": "flexible",
+        "ibcsformat": false,
+        "migrationVersion": 1,
+        "millions": "m",
+        "millionsFullText": "in Millions",
+        "millionsMediumText": "in m",
+        "negativeValueColor": "#FF000A",
+        "negativeValueFormat": "-x",
+        "neutralValueColor": "#B3B3B3",
+        "noOfDecimal": 2,
+        "noOfDecimalPercent": 2,
+        "positiveValueColor": "#82BA00",
+        "positiveValueFormat": "x",
+        "prefix": "",
+        "scalingFactor": "auto",
+        "scalingTextType": "Full",
+        "semanticFormatting": false,
+        "showDataLabel": true,
+        "showNegativeSign": false,
+        "showNullAs": "blank",
+        "showPercentageSymbol": false,
+        "showScalingUnit": true,
+        "showTooltipAsUnit": false,
+        "showTooltipDecimal": false,
+        "showZeroAs": "zero",
+        "suffix": "",
+        "thousandSeperator": ",",
+        "thousands": "k",
+        "thousandsFullText": "in Thousands",
+        "thousandsMediumText": "in k",
+        "tooltipDecimal": "1",
+        "trillion": "t",
+        "trillionFullText": "in Trillions",
+        "trillionMediumText": "in t"
+      },
+      "page_config": {
+        "column_break": null,
+        "pagination_type": null,
+        "view": "Browser"
+      },
+      "pagination": {
+        "autoRowCount": "hide",
+        "currentPageNumber": 0,
+        "enable": false,
+        "pageNo": 0,
+        "pageRowCount": 10,
+        "paginationHeight": 20,
+        "view": "browser"
+      },
+      "ranking_config": {
+        "exemptions": {},
+        "others_title": "Others",
+        "rank_rules": [],
+        "show_category_suffix": false,
+        "show_others": true
+      },
+      "recentColors": [
+        "#ff4400",
+        "#398692cb",
+        "#54cfd70d",
+        "#377D22",
+        "#A60000"
+      ],
+      "rowDimensions": [
+        {
+          "externalKey": "[Dim] Product[Therapeutic Area]",
+          "id": "12533880539426215296",
+          "isNative": true,
+          "label": "Therapeutic Area"
+        },
+        {
+          "externalKey": "[Dim] Product[Brand Name]",
+          "id": "2300295534139098796",
+          "isNative": true,
+          "label": "Brand Name"
+        }
+      ],
+      "row_height_config": {
+        "custom_row_height": {},
+        "default_row_height": 32,
+        "row_level_height": [],
+        "sub_total_row_height": 32
+      },
+      "themeColors": {
+        "chartTheme": "trafficlights",
+        "enableRowHover": "rowAlternate",
+        "enableVarianceColor": false,
+        "invertVarianceColor": false,
+        "lineStyleRecentColor": "",
+        "measureOnlyHighlight": false,
+        "migrationVersion": 1,
+        "negativeColor": "#FF000A",
+        "positiveColor": "#82BA00",
+        "previousThemeType": "trafficlights",
+        "rowEvenColor": "#FFFFFF",
+        "rowHoverColor": "#CCFBF1",
+        "rowHoverTextColor": "#1F2937",
+        "rowOddColor": "#F0FDFA",
+        "tableThemeType": false,
+        "themeType": "trafficlights",
+        "valueColor": ""
+      },
+      "toolbar": {
+        "backupState": {},
+        "currentTab": "",
+        "enableHoverToolbar": true,
+        "hideDuplicateReportWarning": false,
+        "isPinned": true,
+        "readViewPin": true,
+        "setCanvasResize": false,
+        "showFloatingToolbar": true,
+        "showForecastTab": false,
+        "showMinimalTabEditMode": true,
+        "showMinimalView": true,
+        "showOnHover": false,
+        "showTabContent": true,
+        "toolbarTheme": "light"
+      },
+      "uiSettings": {
+        "aggregateOption": {
+          "avg": true,
+          "count": true,
+          "max": false,
+          "min": false,
+          "sum": true
+        },
+        "customScroll": false,
+        "dynamicRowIcon": true,
+        "enable": true,
+        "hideExpandLevel": {},
+        "scrollThickness": false,
+        "selectionBorder": true,
+        "showChildCount": false,
+        "showInfoRiverLogo": true,
+        "showRowDescendants": false,
+        "storedColumnTooltip": true
+      }
+    },
+    "visualStyles": {
+      "background": {
+        "backgroundColor": "#FFFFFF",
+        "isEnabled": true
+      },
+      "border": {
+        "color": "#E2E8F0",
+        "isEnabled": true,
+        "side": "all",
+        "width": 1
+      },
+      "cornerRadius": {
+        "isCustomCornerRadius": false,
+        "isEnabled": true,
+        "radiusBottomLeft": 0,
+        "radiusBottomRight": 0,
+        "radiusTopLeft": 0,
+        "radiusTopRight": 0
+      },
+      "isTooltipEnabled": true,
+      "padding": {
+        "bottomPadding": 5,
+        "isCustomPaddingSize": true,
+        "isEnabled": true,
+        "leftPadding": 10,
+        "rightPadding": 5,
+        "topPadding": 10
+      },
+      "rotation": {
+        "isEnabled": false,
+        "transform": 0
+      },
+      "shadow": {
+        "angle": 135,
+        "blur": 8,
+        "color": "#0000003f",
+        "distance": 10,
+        "isEnabled": false,
+        "opacity": 100,
+        "placement": "outer",
+        "side": "bottom",
+        "width": 0
+      },
+      "showHelperTooltips": true,
+      "showSelectedSeriesInTooltip": false,
+      "tooltipPageId": "auto",
+      "tooltipStyle": {
+        "backgroundColor": "#FFFFFF",
+        "bold": false,
+        "fontFamily": "Segoe UI",
+        "fontSize": 12,
+        "italic": false,
+        "labelColor": "#252423",
+        "underline": false,
+        "valueColor": "#252423"
+      },
+      "tooltipType": "default",
+      "varianceInTooltip": true,
+      "varianceTooltipType": "both"
+    },
+    "visualType": 10
+  }
+}

@@ -16,6 +16,14 @@ For each chart/KPI assignment, also construct its visible ordinary visual-level 
 
 This is the active construction guide for these features. It supersedes any older suggestion to put Scenario in Rows when an external Context constructor is unavailable.
 
+For feature selection and detailed visual behavior, start with the
+[Intelligence index](intelligence/index.md), then its
+[design guide](intelligence/design.md) and relevant
+[feature files](intelligence/feature-master-list.md). Use the
+[authoring guide](intelligence/authoring.md) for Intelligence part context;
+the bundled construction and source-binding contracts here remain authoritative
+for Planning embeds and connected measures.
+
 ## Business meaning first
 
 A planner chooses a version outside the grid, then works on employee, product or account rows within that version. The Context selection is passed into the embedded Planning visual. Scenario/version does not become a visible row or column unless the business explicitly asks for a comparison layout. Context also identifies the input coordinate; an ordinary dashboard filter alone does not configure that storage binding.

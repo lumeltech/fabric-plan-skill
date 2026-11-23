@@ -7,7 +7,7 @@
     "Typed reset helper preserves bindings, units, colors and dimension/Context filters",
     "Business routing, commands, example and all five recipe builders use the defaults"
   ],
-  "referenceExport": "HTTP 200 after Fabric getDefinition LRO; a3dc7c3d-a4cb-4257-bdec-8c22bbab32db",
+  "referenceExport": "HTTP 200 after Fabric getDefinition LRO; f0000000-0000-4000-8000-0000000000bd",
   "offlineTests": {
     "passed": 91,
     "skipped": 1,

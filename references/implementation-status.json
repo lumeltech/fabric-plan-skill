@@ -1,6 +1,6 @@
 {
-  "release": "single-file-infobridge-video-integration-2026-11-13",
-  "distribution": "One SKILL.md; extracts verified embedded local resources",
+  "release": "v50-current-contract",
+  "distribution": "Skill instructions, runtime, references, examples, fixtures, schemas, tools and vendored dependencies; task workspaces excluded by packaging allowlist",
   "requiresSourceRepository": false,
   "requiresPreviousReport": false,
   "requiresManualJsonRepair": false,
@@ -8,8 +8,8 @@
   "liveDeploymentThisRelease": "none; both reference definitions exported and DXT query metadata/transformations read; no report edit or refresh",
   "offlineSuite": {
     "command": "python plan.py test",
-    "result": "passed-all-including-Node-compression",
-    "tests": 202,
+    "result": "passed (1 skipped); verified 2026-11-23",
+    "tests": 599,
     "network": "blocked by test harness",
     "hashVectors": 272
   },
@@ -100,7 +100,7 @@
     "manualJsonFixesRequired": false,
     "orchestration": "New adapters are explicit callable phases; provision remains a verified-subset compiler."
   },
-  "deploymentPolicy": "continue-independent-work; explicit alternatives and per-module omissions",
+  "deploymentPolicy": "mutation-none-for-incomplete-original-scope; explicit-approved-revised-scope-required",
   "referenceIntegration": {
     "guide": "connected-construction.md",
     "savedDefinitionEvidence": true,
@@ -182,9 +182,9 @@
     "orchestration": "callable component phases; provision is not a universal graph compiler"
   },
   "currentRelease": {
-    "name": "native-forecast-and-complete-powertable-2026-11-13",
-    "offlineTests": 243,
-    "result": "passed",
+    "name": "v50-current-contract-2026-11-23",
+    "offlineTests": 599,
+    "result": "passed (1 skipped)",
     "added": [
       "Native Forecast complete records with closed actuals and editable Formula/Measure/Static/None open defaults",
       "Native column charts with ordinary visual filters and dashboard geometry",
@@ -207,15 +207,15 @@
     ]
   },
   "moduleRouting": {
-    "release": "v6",
+    "release": "v50",
     "command": "python plan.py discover",
     "guide": "module-routing.md",
     "catalog": "module-routing.json",
     "examples": "routing-examples.md",
     "modules": 40,
     "numberedModules": "F01-F30",
-    "meaning": "Current command discovery; construction availability and runtime verification remain distinct.",
-    "precedence": "Use current module routes and targeted correction guides over broad historical release gaps. Do not infer missing capability from the base provisioner alone.",
+    "meaning": "Current routed CLI commands are reachable; callable-only adapter phases are marked without a command. Scope and runtime verification remain distinct.",
+    "precedence": "Current SKILL.md transport/profile matrix and reachable parser routes take precedence over historical release notes.",
     "latestFixes": "Preserved; additional serializer import and columnTimeLevels preflight corrections.",
     "liveReportChanged": false
   },

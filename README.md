@@ -14,9 +14,16 @@ In v50, the public Create Plan request places each embedded Planning matrix on i
 
 ## Release layout
 
-Use this repository root as the package root for future releases. Ship `SKILL.md`,
-`plan.py`, `README.md`, `LICENSE`, `.gitignore` and the sibling resource directories
-from this tree directly at the root of the ZIP.
+Use this repository root as the package-layout root, not as the ZIP's full
+contents. Follow the [packaging and publication boundary](SKILL.md#packaging-and-publication-boundary)
+and its allowlist: include required instructions, runtime resources and selected
+reusable examples/assets directly at the ZIP root. Exclude `_build/`, `_brief/`,
+`_samples/`, caches and task-specific outputs by default; document any requested
+or required dependency exceptions and verify their relative paths.
+
+Publishing a Fabric Plan is separate: send only its validated definition and
+required report assets through the documented workflow, never the repository
+folder or `_build/`.
 
 ## What it does
 
@@ -100,12 +107,19 @@ workspace need an explicit destination file (see
 | `plan.py` | Command-line entry point |
 | `runtime/` | Constructors, codecs, validators and API adapters |
 | `references/` | Feature guides and contracts, loaded on demand |
+| `references/intelligence/` | Intelligence discovery, design, authoring, management and visual-feature guides |
 | `schemas/` | Plan definition part schemas |
 | `examples/` | Request and destination examples, including the five use cases |
 | `fixtures/` | Test and reference fixtures |
 | `tools/` | Node helpers (payload codec, HTTP, visual placement) |
 | `vendor/lzutf8/` | Third-party LZ-UTF8 library (MIT) |
 | `tests/` | Offline unit tests |
+
+For Intelligence work, use `python plan.py discover --module INTELLIGENCE`,
+then the [Intelligence index](references/intelligence/index.md) and
+[feature master list](references/intelligence/feature-master-list.md). These
+guides supplement the current [skill contract](SKILL.md); they are not a
+separate skill or a replacement for the bundled API execution routes.
 
 ## Tests
 
@@ -123,6 +137,12 @@ python -m unittest discover tests
   approved route mappings and process-scoped credentials.
 - Credentials come only from environment variables; none are stored.
 - Do not commit exported Plan definitions that contain customer data.
+- Source GUIDs in bundled briefs and native samples are replaced with synthetic
+  IDs in the `f0000000-0000-4000-8000-xxxxxxxxxxxx` range. Keep replacements
+  consistent across contents, links and sheet/visual folder names. Bind samples
+  to an explicitly authorized destination before live use.
+- GUID sanitization does not remove confidential business data or scrub Git
+  history; review both separately before sharing exports.
 
 ## License
 
