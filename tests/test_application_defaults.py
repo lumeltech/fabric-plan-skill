@@ -95,13 +95,15 @@ class RequiredDefaultsTests(unittest.TestCase):
         b=build(load(ROOT/'fixtures/model.json'),load(ROOT/'fixtures/finance-spec.json'))
         self.assertTrue(b['raw']['planProperties.json']['properties']['homeLayout']['show'])
         self.assertFalse(b['evidence']['applicationComplete'])
-        with self.assertRaisesRegex(ValueError,'missing rich'):require_delivery_phases(b,home_saved=True,home_visible=True,dashboard_geometry=[],dashboard_visibility=[])
+        with self.assertRaisesRegex(ValueError,'missing rich'):require_delivery_phases(b,home_visible=True,dashboard_geometry=[],dashboard_visibility=[])
 
-    def test_delivery_requires_all_home_and_dashboard_save_phases(self):
+    def test_public_delivery_checks_visibility_and_geometry_without_claiming_role_content(self):
         b=self.build();ids=[d['sheetGuid'] for d in b['dashboardIdentities']]
-        args=dict(home_saved=True,home_visible=True,dashboard_geometry=ids,dashboard_visibility=ids)
-        self.assertEqual(require_delivery_phases(b,**args)['mandatoryDefaults'],'passed')
-        for field,missing in [('home_saved',False),('home_visible',False),('dashboard_geometry',[]),('dashboard_visibility',[])]:
+        args=dict(home_visible=True,dashboard_geometry=ids,dashboard_visibility=ids)
+        result=require_delivery_phases(b,**args)
+        self.assertEqual(result['mandatoryDefaults'],'passed')
+        self.assertEqual(result['roleSpecificHome'],'not-published')
+        for field,missing in [('home_visible',False),('dashboard_geometry',[]),('dashboard_visibility',[])]:
             with self.subTest(field=field),self.assertRaisesRegex(ValueError,'Incomplete application'):
                 require_delivery_phases(b,**{**args,field:missing})
 

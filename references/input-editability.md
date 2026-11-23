@@ -4,10 +4,9 @@ For **new editable Data Input and Forecast measures**, explicitly emit
 `"allow_input": "ReadAndEdit"`, corresponding to **In both Read and Edit mode**.
 This applies to **every Data Input type**: Number, Simulate, Text (short and long),
 Checkbox, Person, List (single and multi select), and Date. It also applies to
-commentary and supported visual-column placement of these inputs. Forecast uses
-the same default in its edit configuration. Do not omit the property: the inspected native enum defaults to `Edit`
-when omitted. That native default is a source fact, not the skill's authoring
-default. Explicitly requested edit-only input may still use `"Edit"`.
+commentary and supported visual-column placement of these inputs.
+
+Forecast uses the same explicit default in its edit configuration. Choose `Edit` only when edit-only entry was requested.
 
 When the business asks for conditional lock/unlock, approval/status gating,
 eligibility or another expression-controlled edit rule, use **Allow Input based
@@ -49,22 +48,3 @@ A reference with formula gating requires an explicit remapped policy; do not cop
 its old IDs or silently erase the condition. For a repair of an existing report,
 preserve its intentional mode/formula and other locks unless that change is
 authorized. This default update is not a blanket unlock or data migration.
-
-## Discover by business meaning
-
-Requests such as "only let me edit an open period", "lock after submission",
-"reopen when returned" or "allow eligible products only" route to **F30** and the
-`conditional-input` intent in `plan-intent`. Resolve the target, condition, actual
-expression and row/column/context scope. Read the F30 business guide for policy
-and state dependencies. A full approval lifecycle may need additional modules;
-do not infer that the allow-input formula implements those transitions.
-
-```text
-python plan.py discover --module F30
-python plan.py plan-intent --input business-brief.json --out decision-plan.json
-```
-
-Keep the user-facing request functional. The agent selects this setting and writes
-the expression; the user need not supply JSON or enum names. Honor explicit
-validation instructions and distinguish a constructed/saved rule from proven
-editing behavior.

@@ -204,16 +204,7 @@ def guard_write(method,route,body):
     if method not in ('POST','PUT','PATCH'):return
     route=route.split('?',1)[0].rstrip('/')
     plan=bool(re.search(r'/plans(?:/[^/]+/updateDefinition)?$',route))
-    batch=route.endswith('/workload/properties/batch')
-    column=bool(re.search(r'/visual/datainput/column(?:/[^/]+)?$',route))
-    if not(plan or batch or column):return
+    if not plan:return
     if isinstance(body,bytes):body=json.loads(body)
     if not isinstance(body,dict):return
-    if column:
-        from .input_constraints import check_record
-        check_record(body)
     if plan and isinstance(body.get('definition'),dict):check_definition(unpack(body))
-    if batch:
-        for v in body.get('visuals',{}).values():
-            p=v.get('properties') if isinstance(v,dict) else None
-            if _planning(p):check_properties(p)

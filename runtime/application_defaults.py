@@ -162,8 +162,8 @@ def check_application_defaults(raw,home_layout):
     return {**result,'hiddenPlanningOwners':len(hidden_owners),'typography':typography,'navigatorDefaultsChecked':navigators,'dashboardsWithPageNavigator':len(navigation),'richPlanningHeaders':count,'measureRoleColors':'passed','homeContent':'passed',
         'homeVisibility':'passed','validation':'static-definition','rendering':'not-tested'}
 
-def require_delivery_phases(authored, *, home_saved, home_visible, dashboard_geometry, dashboard_visibility):
-    """Completion gate based on authored baseline and successful save receipts.
+def require_delivery_phases(authored, *, home_visible, dashboard_geometry, dashboard_visibility):
+    """Check the authored baseline and the public definition delivery phases.
 
     This is not a runtime/UI test. A skipped validation request never skips these
     construction and save phases. Component-only builds cannot pass this gate.
@@ -174,9 +174,9 @@ def require_delivery_phases(authored, *, home_saved, home_visible, dashboard_geo
     expected={d['sheetGuid'] for d in authored.get('dashboardIdentities',[])}
     declared={s['recordGuid'] for s in authored['raw']['definition.json']['sheets'] if s['sheetType']=='REPORTING'}
     if not expected or expected!=declared:raise ValueError('Incomplete application dashboard delivery identities')
-    if home_saved is not True or home_visible is not True:
-        raise ValueError('Incomplete application: Home content and visibility save phases are required')
+    if home_visible is not True:
+        raise ValueError('Incomplete application: Home visibility must be enabled in the public definition')
     if not expected<=set(dashboard_geometry) or not expected<=set(dashboard_visibility):
         raise ValueError('Incomplete application: each dashboard needs saved geometry and a visible declaration in the public create payload')
-    return {'mandatoryDefaults':'passed','baseline':baseline,'importContract':contents,'homeSave':'completed',
+    return {'mandatoryDefaults':'passed','baseline':baseline,'importContract':contents,'roleSpecificHome':'not-published',
             'dashboardSaves':len(expected),'runtimeValidation':'not-run'}

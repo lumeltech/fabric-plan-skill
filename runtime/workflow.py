@@ -7,8 +7,6 @@ from pathlib import Path
 from .codec import load,save,sha,dumps,pack
 from .transport import Client,plan_operation
 from .validate import validate_plan,schema_report
-from .session import native_session
-from .home_api import deploy_home
 from .surfaces import home_item,home_layout
 from .home_fit import readable_home_layout
 
@@ -52,6 +50,11 @@ def compile_home(spec):
     rows=[{'itemIds':[symbols[k] for k in r['blocks']],**{k:v for k,v in r.items() if k in ('height','widths')}} for r in spec['rows']]
     return readable_home_layout(items,rows,content_width_px=spec.get('contentWidthPx'))
 
+def home_delivery(authored):
+    return {'visibility':'public-create', 'show':authored['raw']['planProperties.json']['properties']['homeLayout']['show'],
+            'roleId':authored['homeSpec']['roleId'], 'content':'constructed-locally-not-published',
+            'gap':'Role-specific Home content and priority cannot be published through the documented public Plan transport.'}
+
 def provision(config,model,spec,run):
     from .scope import prepare_scope
     run=Path(run);run.mkdir(parents=True,exist_ok=True)
@@ -72,7 +75,7 @@ def provision(config,model,spec,run):
     preflight(spec)
     if config['name']!=spec['name']: raise ValueError('Creation name and authored Plan name differ')
     if not config.get('authorizedMutation'): raise ValueError('Current user authorization required')
-    signature=sha(dumps({'model':model,'spec':spec,'target':{k:config[k] for k in ('apiBase','powerbiApiBase','workspaceId','name')}}))
+    signature=sha(dumps({'model':model,'spec':spec,'target':{k:config[k] for k in ('apiBase','workspaceId','name')}}))
     cp=run/'construction.json'
     if cp.exists():
         authored=load(cp)
@@ -100,25 +103,11 @@ def provision(config,model,spec,run):
     if not plan: raise ValueError('Create receipt has no Plan ID. Reconcile the submitted operation before retrying.')
     from .public_alignment import check_placements
     dashboards=[check_placements(authored['raw'], d) for d in authored.get('dashboardIdentities', [])]
-    home=None
-    phase_errors=[]
-    if spec.get('home'):
-        h=spec['home']
-        try:
-            with native_session(config['powerbiApiBase'],config['tokenEnvironment'],config['workspaceId'],plan,run/'home-api') as native:
-                home=deploy_home(native,h.get('roleId','__everyone__'),authored['home'],h.get('order',1),'home-content')
-                home['visibility']='public-create'
-        except (ValueError,KeyError,RuntimeError) as e:
-            phase_errors.append({'phase':'home','status':'not-verified','error':str(e)})
-    required=None
-    try:
-        required=require_delivery_phases(authored,home_saved=home is not None,
-            home_visible=authored['raw']['planProperties.json']['properties']['homeLayout']['show'] is True,
-            dashboard_geometry=[d['sheetGuid'] for d in dashboards],
-            dashboard_visibility=[s['recordGuid'] for s in authored['raw']['definition.json']['sheets'] if s['sheetType']=='REPORTING' and s['isHidden'] is False])
-    except ValueError as e:
-        phase_errors.append({'phase':'mandatory-application-defaults','status':'incomplete','error':str(e)})
-    evidence={'planId':plan,'construction':'passed','mandatoryDefaults':required,'import':created.get('status'),'visibilitySource':'public-create',
+    home=home_delivery(authored)
+    phase_errors=[{'phase':'home-role-content','status':'unsupported','error':home['gap']}]
+    defaults=require_delivery_phases(authored,home_visible=home['show'],dashboard_geometry=[d['sheetGuid'] for d in dashboards],
+        dashboard_visibility=[s['recordGuid'] for s in authored['raw']['definition.json']['sheets'] if s['sheetType']=='REPORTING' and not s['isHidden']])
+    evidence={'planId':plan,'construction':'passed','mandatoryDefaults':defaults,'import':created.get('status'),'visibilitySource':'public-create',
         'home':home,'dashboards':dashboards,'calculation':'not-tested','inputEdits':'not-tested','connectedPropagation':'not-tested','rendering':'not-tested',
         'completion':'Supported application saved; evaluate retained scope and runtime checks separately',
         'coverage':scope['coverage'],'originalScopeComplete':scope['completeOriginalScope'] and not phase_errors,'phaseErrors':phase_errors}

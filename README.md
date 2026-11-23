@@ -16,8 +16,8 @@ runtime to construct, validate and deploy Plan content.
 
 > This is a Lumel-maintained community project, not an official Microsoft
 > product. The repository uses public Fabric APIs for the Plan lifecycle. New
-> reports set sheet visibility in the initial public create request. Only
-> role-specific Home layout uses the native workload API.
+> reports set sheet visibility in the initial public create request.
+> Role-specific Home layout is not supported by this skill.
 
 In v50, the public Create Plan request places each embedded Planning matrix on its dashboard. The original Planning sheet is hidden in Explorer when a visible dashboard embeds it. Its GUID continues to identify the grid for cross-sheet formulas and From Sheets bindings. For wide dashboards, the default layout puts navigation and slicers on the left, the matrix above the charts, and aligns the bottom edges. Supply the inner Reading viewport dimensions to size the layout for a particular display.
 
@@ -72,10 +72,9 @@ names and images are the property of their respective owners.
 
 Use this repository root as the package-layout root, not as the ZIP's full
 contents. Follow the [packaging and publication boundary](SKILL.md#packaging-and-publication-boundary)
-and its allowlist: include required instructions, runtime resources and selected
-reusable examples/assets directly at the ZIP root. Exclude `_build/`, `_brief/`,
-`_samples/`, caches and task-specific outputs by default; document any requested
-or required dependency exceptions and verify their relative paths.
+and include required instructions, runtime resources and selected
+reusable examples directly at the ZIP root. Use reviewed, tracked files only;
+exclude private working material, native exports, caches and task-specific outputs.
 
 Publishing a Fabric Plan is separate: send only its validated definition and
 required report assets through the documented workflow, never the repository
@@ -88,13 +87,13 @@ folder or `_build/`.
 | Plan lifecycle | Discover workspaces and models, create a new Plan, export and update its definition, deploy and read back |
 | Planning sheets | Input measures (number, text, checkbox, person, select, date), formulas and formula equality, forecasts and time intelligence, roll-forward balances, totals, measure hierarchies, anchors for business-grain assumptions, measure-weighted allocation rules, numeric input constraints |
 | Intelligence dashboards | Page Navigators, integrated variance charts, chart visual filters, Matrix formatting, conditional formatting, typography and layout defaults, embedded Planning and PowerTable visuals |
-| Home | Native Home content, role layouts and business navigation |
+| Home | Home content and business navigation within the public Plan definition |
 | PowerTable | Column configuration, lookups and source metadata |
 | Connected planning | InfoBridge sources, queries and mappings, Planning-source identity, From Sheets bindings |
 | Data sources | Semantic-model bindings, Fabric SQL and OneLake (From Sheets and From Queries) |
 | Dimensions | Dimension ID mapping, leaf keys and native XXH3 dimension hashing |
 | Checks and repair | Definition validation, import-contract checks, layout and presentation audits, formatting and property repair that preserves IDs and stored values |
-| Business recipes | Five complete, reproducible use cases (below) |
+| Business recipes | Five local construction examples (below); building a recipe does not verify live behavior |
 
 ### Business use cases
 
@@ -151,7 +150,7 @@ python plan.py usecase list
 python plan.py validate --help
 ```
 
-`discover` and the other local commands are read-only. Commands that write to a
+`discover` is read-only. Local builds write files, not workspace items. Commands that write to a
 workspace need an explicit destination file (see
 `examples/five-usecases/`) and `FABRIC_TOKEN`.
 
@@ -161,9 +160,8 @@ workspace need an explicit destination file (see
 |---|---|
 | `SKILL.md` | Agent instructions and routing |
 | `plan.py` | Command-line entry point |
-| `runtime/` | Constructors, codecs, validators and API adapters |
+| `runtime/` | Constructors, codecs, validators and public Fabric API client |
 | `references/` | Feature guides and contracts, loaded on demand |
-| `references/intelligence/` | Intelligence discovery, design, authoring, management and visual-feature guides |
 | `schemas/` | Plan definition part schemas |
 | `examples/` | Request and destination examples, including the five use cases |
 | `fixtures/` | Test and reference fixtures |
@@ -171,11 +169,8 @@ workspace need an explicit destination file (see
 | `vendor/lzutf8/` | Third-party LZ-UTF8 library (MIT) |
 | `tests/` | Offline unit tests |
 
-For Intelligence work, use `python plan.py discover --module INTELLIGENCE`,
-then the [Intelligence index](references/intelligence/index.md) and
-[feature master list](references/intelligence/feature-master-list.md). These
-guides supplement the current [skill contract](SKILL.md); they are not a
-separate skill or a replacement for the bundled API execution routes.
+For dashboards embedded in a Plan, use the direct [planning references](SKILL.md#planning-references).
+The standalone Intelligence reporting library is not distributed with this skill.
 
 ## Tests
 
@@ -189,16 +184,12 @@ python -m unittest discover tests
 
 - Workspace writes need an explicit destination file that names the workspace,
   the allowed public hosts and `authorizedMutation`; local commands never write.
-- External service adapters must be supplied outside the repository with
-  approved route mappings and process-scoped credentials.
+- Operations without a supported public route are out of scope.
 - Credentials come only from environment variables; none are stored.
 - Do not commit exported Plan definitions that contain customer data.
-- Source GUIDs in bundled briefs and native samples are replaced with synthetic
-  IDs in the `f0000000-0000-4000-8000-xxxxxxxxxxxx` range. Keep replacements
-  consistent across contents, links and sheet/visual folder names. Bind samples
-  to an explicitly authorized destination before live use.
-- GUID sanitization does not remove confidential business data or scrub Git
-  history; review both separately before sharing exports.
+- Do not add task briefs, native exports, handoff notes or third-party material
+  without verified redistribution rights. Removing a tracked file does not
+  remove it from earlier Git history.
 
 ## License
 

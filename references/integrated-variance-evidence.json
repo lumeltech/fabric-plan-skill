@@ -1,8 +1,0 @@
-{
-  "source": "User-designated MSIT Quarterly Forecast Review Category chart, read 2026-11-14",
-  "captureSha256": "a990c94aa987cbe4e9b1cc5320fe236b2a2c16cf12bfa4f7cad2ebb3caacaf64",
-  "contract": "ANALYTICS_PLUS 50; COLUMN_INTEGRATED_VERTICAL; template actualChartType integratedVariance; serialized measureConfig AC integratedVariance",
-  "selectionNote": "The sibling Region chart had the integrated top-level chartType but retained a groupedBar template/config. Use the internally consistent Category chart for the portable recipe.",
-  "retainedReferenceContent": "Only identity-free chart template/mode/measure configuration. No assignments, tenant/report IDs, filters, cached data, credentials or per-measure styling.",
-  "runtimeValidation": "Not performed; screenshot and saved properties are reference evidence only."
-}

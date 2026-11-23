@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from runtime.transport import Client, WorkloadRouteError
+from runtime.transport import Client
 from runtime.public_alignment import check_placements, fresh_matrix_ids
 from runtime.codec import load
 from runtime.planning_presentation import build_application
@@ -65,12 +65,9 @@ class PublicDashboardDelivery(unittest.TestCase):
             'a': {'originEntityId': '1', 'visualId': '2'},
             'b': {'originEntityId': '2', 'visualId': '3'}})
 
-    def test_native_wire_transport_blocks_non_home_before_sending(self):
-        c = Client('https://example.test/CoreAPI', 'TEST_TOKEN', auth_scheme='MWCToken',journal=ROOT)
-        with patch('urllib.request.urlopen') as send, patch('subprocess.run') as node:
-            for route in ['v2/workload/entity/', 'v1/workload/properties/batch/', 'v1/visual/datainput/column/', 'v1/access/roles/layout/__everyone__/../extra/']:
-                with self.subTest(route=route), self.assertRaises(WorkloadRouteError):
-                    c._http('GET', c.base+'/'+route, {}, None)
-            send.assert_not_called()
-            node.assert_not_called()
-
+    def test_internal_endpoints_rejected_before_credentials_or_submission(self):
+        client = Client('https://example.test', 'UNSET_TEST_TOKEN', journal=ROOT,
+                        adapter=lambda *args: self.fail('Unexpected submission'))
+        for route in ('/CoreAPI/v1/access/roles/layout/', '/metadata/v201606/generatemwctokenv2'):
+            with self.subTest(route=route), self.assertRaisesRegex(ValueError, 'public Fabric'):
+                client.request('POST',route,label='forbidden')

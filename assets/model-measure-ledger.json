@@ -1,6 +1,0 @@
-{
-  "$comment": "Copy to _brief/model-measure-ledger.json. One entry per model measure created, edited, or removed; include its description with expression and approval/readback evidence. No user names or emails. See references/intelligence/model-measures.md.",
-  "model": { "workspaceId": "<workspaceId>", "modelId": "<modelId>", "modelName": "<model name>" },
-  "permission": { "model_measure_permission": "none", "grantedOn": "" },
-  "measures": []
-}

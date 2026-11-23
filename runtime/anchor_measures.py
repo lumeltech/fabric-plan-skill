@@ -209,37 +209,3 @@ def apply_anchors(properties, owner_visual_id, requests, *, context=None, expose
     return {'properties': result, 'changes': changes, 'totals_changes': total_changes,
             'status': 'local-candidate', 'hash_origin': current['origin'],
             'runtime_validation': 'not run'}
-
-
-def save_anchors(client, entity_id, visual_id, requests, label, *, expose_entry_totals=True):
-    """Use the existing ETag batch writer on one native Planning owner.
-
-    Call only under an authorized report-change scope. No new endpoint, input
-    save, allocation, formula edit, clone or fallback is added.
-    """
-    from .session import page
-    from .forecast_review import save_properties
-
-    def owned(response):
-        matches = [v for v in response['payload']['visuals'] if str(v['id']) == str(visual_id)]
-        if len(matches) != 1 or matches[0].get('isEmbedded') or matches[0].get('visualType') != 80:
-            raise ValueError('Resolve the actual Planning owner, not its dashboard embed')
-        return matches[0]
-
-    first = page(client, str(entity_id))
-    visual = owned(first)
-    if not first['payload'].get('etag') or not visual['properties'].get('etag'):
-        raise ValueError('Current owner and visual ETags required')
-    before = visual['properties']['properties']
-    candidate = apply_anchors(before, str(visual_id), requests, expose_entry_totals=expose_entry_totals)
-    intended = candidate['properties']
-
-    def transform(current):
-        if current != before:
-            raise ValueError('Planning owner changed before anchor save; reread before retrying')
-        return intended
-
-    saved = save_properties(client, str(entity_id), str(visual_id), transform, label)
-    return {**{k: v for k, v in candidate.items() if k != 'properties'},
-            'save': saved, 'status': 'save-submitted' if intended != before else 'unchanged',
-            'saved_readback': 'not performed', 'runtime_validation': 'not run'}

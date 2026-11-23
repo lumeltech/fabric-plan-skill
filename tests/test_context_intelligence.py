@@ -7,7 +7,7 @@ from runtime.construct import build
 from runtime.identity import Registry
 from runtime.filters import selection,forward_filters,audit_context,prepare_context
 from runtime.intelligence import slicer,card,rectangles
-from runtime.intelligence_api import deploy_geometry,visibility
+from runtime.intelligence_api import visibility
 from runtime.readback import verify_authored
 from runtime.codec import pack,unpack,parts
 from runtime.scope import prepare_scope
@@ -173,63 +173,7 @@ class GeometryTransaction(unittest.TestCase):
         actual['definition.json']['sheets'][1]['isHidden']=False
         actual[f'sheets/{d["sheetGuid"]}/sheet.json']['properties']['reactiveVisualProperties']=[{'visualId':'999','properties':{'position':{'x':24,'y':500}}}]
         with self.assertRaises(ValueError):verify_authored(actual,b['raw'])
-        result=verify_authored(actual,b['raw'],[d['sheetGuid']]);self.assertEqual(result['dashboardGeometry'],'requires-native-phase')
         source=b['identities'][0];path=f'sheets/{source["sheetId"]}/visuals/{source["visualId"]}/properties.json'
         actual[path]['properties']['superFilterAssignments']=[]
-        with self.assertRaises(ValueError):verify_authored(actual,b['raw'],[d['sheetGuid']])
-    def fixture(self):
-        m,s=example();b=build(m,s);d=b['dashboardIdentities'][0];owner=b['identities'][0]
-        raw=b['raw'];sp=copy.deepcopy(raw[f'sheets/{d["sheetGuid"]}/sheet.json']['properties'])
-        # This legacy native-adapter fixture simulates the pre-alignment server state.
-        sp['reactiveVisualProperties'] = []
-        records=[]
-        for i,(portable,r) in enumerate(d['placements'].items()):
-            emb=portable==d['ownerGuid'];p=copy.deepcopy(owner_parts(b)[0] if emb else raw[f'sheets/{d["sheetGuid"]}/visuals/{portable}/properties.json']['properties'])
-            records.append({'id':'999' if emb else str(100+i),'visualType':80 if emb else p['visualType'],'isEmbedded':emb,'properties':{'properties':p,'etag':'v1'}})
-        state={'statusCode':200,'payload':{'etag':'p1','properties':{'properties':sp},'visuals':records}}
-        owner_state={'statusCode':200,'payload':{'properties':{},'visuals':[{'properties':owner_parts(b)[0]}]}}
-        return b,d,{owner['visualId']:{'entityId':'7','visualId':'999'}},state,owner_state
-    def test_layout_resolves_embed_without_grid_registration_scan(self):
-        b,d,_,state,owner=self.fixture()
-        source=next(s for s in b['raw']['definition.json']['sheets'] if s['sheetType']=='PLANNING')
-        owner['payload']['visuals'][0].update(id='999',visualType=80,isEmbedded=False)
-        catalog={'workloadEntities':[{'displayName':d['name'],'entityType':20,'id':20},
-                                    {'displayName':source['displayName'],'entityType':10,'id':7}]}
-        class Client:
-            def request(self,method,route,body,label):
-                assert (method,route)==('POST','/v1/workload/properties/batch/')
-        with patch('runtime.intelligence_api.entities',return_value=catalog) as sheets, \
-             patch('runtime.intelligence_api.page',side_effect=[state,owner]) as pages:
-            result=deploy_geometry(Client(),b['raw'],d,{},'layout',verify=False)
-        sheets.assert_called_once()
-        self.assertEqual([args.args[1] for args in pages.call_args_list],['20','7'])
-        self.assertEqual(result['owner'],{'sheetGuid':source['recordGuid'],'entityId':'7','visualId':'999'})
-        from runtime.application_defaults import home_layout_for_sheets
-        layout={'items':[{'type':'preview-cards','instanceState':{'previewCards':{}}}]}
-        home=home_layout_for_sheets(None,layout,b['raw'],[result['owner']])
-        self.assertEqual(home['items'][0]['instanceState']['previewCards']['unSelectedEntityIds'],['7'])
-
-    def test_native_mapping_batch_preserves_owner_and_replay_is_read_only(self):
-        b,d,mapping,state,owner=self.fixture();writes=[]
-        def read(c,e):return copy.deepcopy(owner if e=='7' else state)
-        class Client:
-            def request(self,method,url,body,label):
-                writes.append(body);state['payload']['properties']=body['workloadEntities']['20']
-                for v in state['payload']['visuals']:
-                    if v['id'] in body['visuals']:v['properties']={**body['visuals'][v['id']],'etag':'v2'}
-                return {'body':{'statusCode':200}}
-        with patch('runtime.intelligence_api.entities',return_value={'workloadEntities':[{'displayName':d['name'],'id':20}]}),patch('runtime.intelligence_api.page',side_effect=read):
-            result=deploy_geometry(Client(),b['raw'],d,mapping,'test');self.assertEqual(result['count'],11)
-            override=state['payload']['properties']['properties']['reactiveVisualProperties'][0]
-            self.assertEqual(override['visualId'],'999');self.assertEqual(override['properties']['originEntityId'],'7')
-            self.assertNotIn('999',writes[0]['visuals']);self.assertEqual(len(writes[0]['visuals']),10)
-            result=deploy_geometry(Client(),b['raw'],d,mapping,'test');self.assertEqual(result['write'],'already-matched');self.assertEqual(len(writes),1)
-    def test_extra_visual_or_wrong_unit_aborts_before_write(self):
-        for change in ['extra','unit']:
-            b,d,mapping,state,owner=self.fixture()
-            if change=='extra':state['payload']['visuals'].append({'id':'unexpected','isEmbedded':True})
-            else:state['payload']['properties']['properties']['canvasStyle']['dimension']['elementScalingUnit']='percentage'
-            with patch('runtime.intelligence_api.entities',return_value={'workloadEntities':[{'displayName':d['name'],'id':20}]}),patch('runtime.intelligence_api.page',side_effect=lambda c,e:copy.deepcopy(owner if e=='7' else state)):
-                with self.assertRaises(ValueError):deploy_geometry(None,b['raw'],d,mapping,'test')
-
+        with self.assertRaises(ValueError):verify_authored(actual,b['raw'])
 if __name__=='__main__':unittest.main()

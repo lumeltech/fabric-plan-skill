@@ -34,11 +34,6 @@ python plan.py repair-formula-equality --input formula.json --out fixed.json
 Input is `{"formula":"<one native formula>"}`. Checking writes issues with
 offsets/line numbers and fails if comparison equals are found. Repair writes
 the corrected formula and a change list; it is local only. Apply it to selected
-native formula fields, inspect the narrow diff, preserve IDs/business logic,
-publish via the standard scoped writer and track save status if authorized.
+native formula fields, inspect the narrow diff and preserve IDs/business logic.
 Do not block an unrelated scoped repair because a different existing formula
 elsewhere contains an old operator. Do not change user input data.
-
-This rule supersedes single-equals **comparison** examples in older reference
-material. Supplied original documents and historical capture files remain
-unchanged as evidence; adapt their native expressions before new authoring.

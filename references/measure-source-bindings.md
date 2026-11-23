@@ -1,10 +1,6 @@
 # Measure source identity and typed assignment
 
-Use this guide when assigning measures to Planning, Intelligence, filter cards or
-downstream calculations. The display caption never proves the measure's source.
-Resolve the requested origin first, then its current catalog IDs and native types.
-A DAX measure registered inside a Planning sheet remains a semantic-model measure;
-its Native companion row ID does not make it a From Sheets output.
+Resolve the intended source from supplied model, sheet or query metadata before constructing a Planning assignment. A model measure on a Planning sheet is still a model measure.
 
 ## Business request to source contract
 
@@ -38,9 +34,7 @@ PowerBI request: `{ "sourceType":"PowerBI", "fieldId":"Finance[Current Forecast]
 Use the current model metadata as `model`, not an invented field dictionary.
 When this field is a numeric Column, the binding defaults to `aggregationType:
 "sum"`. Supply request `aggregation` only for an explicit source override. This
-does not change an explicit DAX Measure. Read
-[numeric-column-values.md](numeric-column-values.md) for separate grid total
-settings and preservation of existing registered IDs after UI aggregation edits.
+does not change an explicit DAX Measure or the grid total settings.
 
 Visual request: sourceType `Visual`, string `visualId`, `sourceMeasureGuid`,
 optional `columnId`, and destination `bucket`. `sheets` contains the matching
@@ -50,8 +44,7 @@ match its owner registration. The returned destination measureGuid is distinct
 from the source measureGuid; use `sheet_column_id` for the external column key.
 Fabric SQL uses the current row id; OneLake uses measureGuid when id is absent/null.
 Current owner-scoped OneLake records may also omit visualId. When present, it
-must agree. Runtime visual IDs remain distinct from ALM visual GUIDs. Read
-[onelake-linked-values.md](onelake-linked-values.md) for both storage profiles.
+must agree. Keep the runtime visual ID distinct from the portable definition GUID.
 
 InfoBridge request: sourceType `InfoBridge`, `queryId`, `outputId`, a typed
 `assignment` from the current query metadata, and destination `bucket`. `queries`
@@ -73,20 +66,3 @@ These constructors preserve lossless string IDs. In an existing Planning
 consumer, changing its internal measureGuid can break formulas, formatting or
 stored inputs: preserve it or perform an explicitly scoped migration. Rebinding
 a chart does not authorize changes to Planning formulas or stored values.
-
-## Reconcile every registration together
-
-When replacing a chart binding, update pivotAssignments and its ordinary
-superFilterAssignments together: id, sourceId, sourceType, visualId/queryId,
-columnType, dataRoleType, dataType, measureGuid, table/column metadata, isDaxMeasure
-and sort references. `comparison_chart` calls `reconcile_chart_filters`: retain
-exact surviving source/role cards and their selections; remove obsolete generated
-cards and duplicates; add the corrected field cards. A same-caption field from
-another namespace does not inherit selections by name. Custom/context filters
-and existing hidden selections remain untouched. Reconcile those separately only
-if they explicitly reference the changed field; never globally replace strings.
-
-This is required construction logic, not a request for runtime validation.
-Read current metadata and ETags needed to save. If the user skips validation,
-do not query calculations, open the UI, perform post-save readback or run a test
-suite. Return the API receipt and state that runtime behavior was not validated.

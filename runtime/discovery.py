@@ -1,5 +1,4 @@
-"""Read-only business intent -> bundled guide -> shipped execution route lookup."""
-import copy
+"""Local lookup of direct reference files and supported operations."""
 import json
 from pathlib import Path
 import re
@@ -9,7 +8,11 @@ STOP = set('a an and as at be by for from i in into is it me my of on or please 
 
 
 def catalog():
-    return json.loads((ROOT / 'references/module-routing.json').read_text(encoding='utf-8'))
+    data = json.loads((ROOT / 'references/module-routing.json').read_text(encoding='utf-8'))
+    for module in data['modules']:
+        for guide in module['guides']:
+            guide['command'] = 'python plan.py reference ' + guide['file']
+    return data
 
 
 def tokens(text):
@@ -27,21 +30,24 @@ def discover(query='', module=None):
         wanted = tokens(query)
         scored = []
         for m in matches:
-            labels = [m['id'], m['name'], *m['aliases']]
-            corpus = ' '.join([*labels, *m['businessRequests'], *m['examples']])
+            labels = [m['name'], *m['aliases']]
+            corpus = ' '.join([*labels, *m['businessRequests']])
             score = len(wanted & tokens(corpus))
-            score += 3 * sum(1 for phrase in labels if phrase.casefold() in query.casefold())
+            score += 3 * sum(1 for phrase in labels if re.search(
+                r'(?<!\w)' + re.escape(phrase.casefold()) + r'(?!\w)', query.casefold()))
+            if query.strip().casefold() == m['id'].casefold():
+                score += 100
             if score:
                 scored.append((score, m))
         matches = [m for score, m in sorted(scored, key=lambda v: (-v[0], v[1]['id']))]
     expanded = []
     for m in matches:
-        item = copy.deepcopy(m)
-        item['operations'] = [dict(id=key, **copy.deepcopy(data['actions'][key])) for key in m['operations']]
+        item = dict(m)
+        item['operations'] = [dict(id=key, **data['actions'][key]) for key in m['operations']]
         expanded.append(item)
     return dict(release=data['release'], query=query, coverageMeaning=data['coverageMeaning'],
                 count=len(expanded), modules=expanded,
-                note='Local discovery only. Read guides and limits before selecting execution phases.')
+                note='Local discovery only; no operation has been run.')
 
 
 def render(result, compact=False):
@@ -51,11 +57,10 @@ def render(result, compact=False):
     for m in result['modules']:
         lines.append(f"\n{m['id']} | {m['name']} | {m['coverage']}")
         lines.append('  Business: '+' '.join(m['businessRequests']))
-        if compact:
-            lines.append(f"  Details: python plan.py discover --module {m['id']}")
-            continue
-        lines.append('  Guides:')
+        lines.append('  Direct guides:')
         lines.extend('    '+g['command'] for g in m['guides'])
+        if compact:
+            continue
         lines.append('  Prerequisites: '+m['prerequisites'])
         for op in m['operations']:
             lines.append(f"  Operation {op['id']} [{op['phase']}]: {op['description']}")
@@ -64,9 +69,6 @@ def render(result, compact=False):
             lines.append('    Inputs: '+op['inputs'])
             lines.append('    Callables: '+', '.join(op['symbols']))
         if not m['operations']:
-            lines.append('  No complete creation command is shipped; read the selected contract before identifying a supported alternative.')
+            lines.append('  Guidance only; no executable operation.')
         lines.append('  Limits: '+m['limitations'])
-        lines.extend('  Example: '+e for e in m['examples'])
-        if m['related']:
-            lines.append('  Related: '+', '.join(m['related']))
     return '\n'.join(lines)

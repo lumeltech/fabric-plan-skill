@@ -40,29 +40,3 @@ def append_record(properties,payload,record_id,*,visual_type=None):
     if any(x['id']==record['id'] or x['name']==record['name'] for x in saved):raise ValueError('Rule record/name collision')
     saved.append(record)
     return p
-
-def save_rule(client,entity_id,visual_id,payload,record_id,label):
-    """Save only this owner's rule state, with fresh ETags and exact readback.
-
-    This is configuration persistence through the captured properties batch
-    route. It does not execute an allocation or certify native engine behavior.
-    """
-    from .session import page
-    from .forecast_review import save_properties
-    def owned(response):
-        matches=[v for v in response['payload']['visuals'] if str(v['id'])==str(visual_id)]
-        if len(matches)!=1 or matches[0].get('isEmbedded') or matches[0].get('visualType')!=80:
-            raise ValueError('Resolve one actual Planning owner')
-        return matches[0]
-    before=owned(page(client,str(entity_id)))
-    props=before['properties']['properties']
-    intended=append_record(props,payload,record_id,visual_type=before['visualType'])
-    def transform(current):
-        if current!=props:raise ValueError('Planning owner changed; reread before saving')
-        return intended
-    result=save_properties(client,str(entity_id),str(visual_id),transform,label)
-    after=owned(page(client,str(entity_id)))['properties']['properties']
-    if after!=intended:raise ValueError('Saved Planning properties differ from intended state')
-    check=verify_saved_rule(payload,after['visualState']['data_input_rules'])
-    return {'save':result,'verification':check,'idOrigin':'fresh authored saved-state ID',
-        'runtimeExecution':'not-tested'}

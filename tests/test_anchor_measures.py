@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from runtime.anchor_measures import AnchorContractGap, apply_anchors, capture_context, save_anchors
+from runtime.anchor_measures import AnchorContractGap, apply_anchors, capture_context
 from runtime.business_intent import plan_intent
 from runtime.discovery import discover
 
@@ -127,34 +127,6 @@ class AnchorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'entry total is hidden'):
             apply_anchors(p, 'owner', [request(p)], expose_entry_totals=False)
 
-    def test_native_writer_uses_existing_route_and_preserves_owner(self):
-        p = fixture()
-        response = {'payload': {'etag': 'entity-e', 'visuals': [{'id':'42', 'visualType':80, 'isEmbedded':False,
-                    'properties':{'etag':'visual-e','properties':p}}]}}
-        class Client:
-            def request(self, method, route, body, **kw):
-                self.sent = (method, route, body, kw)
-                return {'status':200,'body':{'payload':{'accepted':True}}}
-        c = Client()
-        with patch('runtime.session.page', return_value=response), patch('runtime.forecast_review.page', return_value=response):
-            out = save_anchors(c, '7', '42', [request(p)], 'anchor')
-        self.assertEqual(c.sent[:2], ('POST','/v1/workload/properties/batch/'))
-        self.assertEqual(c.sent[2]['etags']['visuals'], {'42':'visual-e'})
-        self.assertEqual(c.sent[2]['visuals']['42']['properties']['sentinelDataInput'], p['sentinelDataInput'])
-        self.assertEqual(out['saved_readback'], 'not performed')
-        self.assertEqual(out['runtime_validation'], 'not run')
-
-    def test_native_writer_rejects_embed_and_stale_state_without_mutation(self):
-        p = fixture()
-        response = {'payload': {'etag':'e','visuals':[{'id':'42','visualType':80,'isEmbedded':True,
-                    'properties':{'etag':'v','properties':p}}]}}
-        with patch('runtime.session.page', return_value=response), self.assertRaises(ValueError):
-            save_anchors(object(), '7', '42', [request(p)], 'anchor')
-        response['payload']['visuals'][0]['isEmbedded'] = False
-        changed = copy.deepcopy(response); changed['payload']['visuals'][0]['properties']['properties']['other'] = True
-        with patch('runtime.session.page', return_value=response), patch('runtime.forecast_review.page', return_value=changed), self.assertRaises(ValueError):
-            save_anchors(object(), '7', '42', [request(p)], 'anchor')
-
     def test_business_variations_route_without_requiring_a_donor_hash(self):
         for query in ('regional benefits hidden employee leaf formulas', 'plant quarterly scrap assumptions',
                       'product price policy shared across regions', 'hide repeated assumptions at hierarchy levels'):
@@ -167,7 +139,7 @@ class AnchorTests(unittest.TestCase):
                                   'intent':'display-anchor','details':details}]}
         planned = plan_intent(brief)
         self.assertTrue(planned['readyForAuthoring'])
-        self.assertEqual([op['id'] for op in planned['requirements'][0]['operations']], ['anchor-construct','anchor-save'])
+        self.assertEqual([op['id'] for op in planned['requirements'][0]['operations']], ['anchor-construct'])
         self.assertEqual(planned['requirements'][0]['unresolved'], [])
         self.assertEqual(details['displayAtAllLevels'], False)
 

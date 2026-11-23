@@ -1,10 +1,5 @@
 # Direct numeric columns in Values
 
-Use this for direct column assignment, implicit measures, default Sum, missing
-DAX measures, screenshot recreation or changing to a column-based semantic model.
-Discover `NUMERIC-COLUMN-VALUES`. This is integrated into Planning, Intelligence
-cards, charts, comparison charts and automatic dashboard construction.
-
 ## Construction rule
 
 Resolve the requested metric against the current semantic model. Use an existing
@@ -14,11 +9,10 @@ aggregation to Sum**. Do not require or create a DAX wrapper just to use it.
 Do not assign every numeric field: keys and codes remain dimensions/mappings
 unless the user actually requests them as metrics.
 
-New direct column bindings retain `sourceType: "PowerBI"`, `columnType: "Column"`,
-`dataRoleType: "Measure"` and the exact current model field in `id`/`sourceId`.
-They explicitly include `aggregationType: "sum"` and `customSource: true`.
-Planning uses `bucketId: "ameasure"`; Intelligence uses its appropriate AC/PY
-bucket. Presentation labels never replace physical table/column identity.
+New direct column bindings retain `sourceType: "PowerBI"`, `columnType: "Column"`
+and `dataRoleType: "Measure"`.
+
+Keep the physical field identity and use the Planning `ameasure` bucket. For example:
 
 ```json
 {
@@ -67,13 +61,6 @@ Currency conversion grain, aggregation of rates, and mixed-currency totals still
 need the business calculation contract; the assignment default does not settle
 those calculation choices.
 
-Intelligence card/chart specs use `aggregation` for their source value and
-`comparisonAggregation` for a chart baseline. Both default to Sum for columns.
-`resolve_measure` accepts the same source `aggregation`. The shared constructors
-generate matching chart field filters using the actual source type and method.
-Automatic dashboards can select an assigned numeric-column metric when no
-explicit DAX metric is present.
-
 ## Preserve persisted identities
 
 For new column bindings, the bundled identity registry uses the normalized
@@ -85,19 +72,3 @@ aggregation differs from the hash prefix that originally created it.
 `registered_measure` preserves that current identity when reusing a Native
 column in another visual. From Sheets and InfoBridge keep their own contracts;
 this default does not reclassify their origins as Power BI.
-
-## Evidence and portable example
-
-A sanitized definition fixture
-full definition export. Five direct numeric columns had `aggregationType: "sum"`;
-the source remained a Column assigned as Measure. FX grid totals remained None,
-and threshold grid totals remained Min. Some existing measure identities and
-filter configuration hints retained their previous aggregation history. Preserve
-existing state; use consistent assignments and filters for fresh construction.
-The package contains no report IDs, credentials, financial rows or old-report
-dependency from that capture. Saved-definition evidence is not calculation proof.
-
-Run `python examples/numeric-column-values/build.py <output-folder>` using the
-extracted package alone. It builds a complete synthetic application without any
-DAX measure, with independent grid totals, explicit Average override, comparison
-charts, Home, Arial and complete Page Navigators. No live deployment is performed.

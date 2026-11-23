@@ -4,8 +4,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from runtime.pivots import compile_pivots,select_pivot
 from runtime.identity import Registry
 from runtime.layout import inventory,placement_batch
-from runtime.native import save_home,set_home_visibility
-from runtime.session import native_session,result_body
+from runtime.native import set_home_visibility
 from runtime.transport import plan_operation,Client
 from runtime.codec import loads
 from test_runtime import page
@@ -41,31 +40,26 @@ class NewNativeTests(unittest.TestCase):
     def test_conflicting_etag_rejected(self):
         p=page();p['payload']['visuals'][0]['properties']['etag']='other'
         with self.assertRaises(ValueError): placement_batch(p,'page','nav',{'x':20,'y':20,'width':560,'height':80},inventory(p)['fingerprint'])
-    def test_absent_home_200_null(self):
-        class Fake:
-            def __init__(self): self.calls=[]
-            def request(self,method,route,body=None,**kw):
-                self.calls.append((method,body))
-                if len(self.calls)==1: return {'body':{'payload':{'data':None,'etag':None}}}
-                if method=='POST': return {'body':{'payload':{'etag':'e'}}}
-                return {'body':{'payload':{'data':{'items':[]},'etag':'e'}}}
-        c=Fake();r=save_home(c,'__everyone__',{'items':[]},1,'home')
-        self.assertNotIn('etag',c.calls[1][1]);self.assertEqual(r['priority'],'submitted-not-returned-by-content-reader')
     def test_visibility_requires_bool(self):
         with self.assertRaises(ValueError): set_home_visibility({},'false')
-    def test_native_application_error(self):
-        with self.assertRaises(RuntimeError): result_body({'body':{'statusCode':400,'payload':{}}})
-    def test_token_exchanged_scoped_and_removed(self):
-        calls=[];env_before=set(os.environ);os.environ['TEST_API_TOKEN']='mock-public'
-        def adapter(method,url,headers,body):
-            calls.append((url,headers,loads(body.decode()) if body else None))
-            return {'status':200,'headers':{},'body':{'Token':'mock-child','TargetUriHost':'a.analysis.windows.net','CapacityObjectId':'cap'}}
-        with tempfile.TemporaryDirectory() as t:
-            with native_session('https://api.example.invalid','TEST_API_TOKEN','workspace','plan',t,adapter) as c:
-                self.assertEqual(c.auth_scheme,'MWCToken');self.assertEqual(os.environ[c.token_env],'mock-child');env=c.token_env
-            self.assertNotIn(env,os.environ)
-            self.assertTrue(all('mock-child' not in f.read_text() for f in Path(t).glob('*')))
-        self.assertEqual(calls[0][2]['artifacts'][0]['artifactObjectId'],'plan')
+    def test_public_home_visibility_preserves_existing_layout(self):
+        from unittest.mock import patch
+        from runtime.home_api import visibility_via_alm
+        from runtime.codec import pack,unpack
+        layout={'show':False,'roles':[{'id':'existing'}]}
+        raw={'planProperties.json':{'properties':{'homeLayout':layout,'other':42}}}
+        envelope=pack(raw)
+        def operation(client, workspace, kind, plan, **kwargs):
+            nonlocal envelope
+            if kind=='update':
+                envelope=kwargs['definition']
+            else:
+                self.assertEqual(kind,'export')
+            return {'body':envelope}
+        with patch('runtime.home_api.plan_operation',side_effect=operation):
+            visibility_via_alm(None,'workspace','plan',True,'show-home')
+        props=unpack(envelope)['planProperties.json']['properties']
+        self.assertEqual(props,{'homeLayout':{**layout,'show':True},'other':42})
     def test_blank_create_has_no_definition(self):
         class Fake:
             def request(self,m,r,b,**k): self.body=b;return {'status':201,'body':{'id':'new'}}

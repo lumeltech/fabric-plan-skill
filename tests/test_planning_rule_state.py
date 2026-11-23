@@ -1,6 +1,6 @@
 import copy,unittest
 from unittest.mock import patch
-from runtime.planning_rule_state import append_record,authored_record,save_rule
+from runtime.planning_rule_state import append_record,authored_record
 from runtime.rule_factories import measure_weighted_rule,verify_saved_rule
 
 class PlanningRuleState(unittest.TestCase):
@@ -27,26 +27,5 @@ class PlanningRuleState(unittest.TestCase):
         out=append_record(props,self.payload,'902',visual_type=80)
         self.assertNotIn('visualType',out)
         with self.assertRaises(ValueError):append_record(props,self.payload,'902',visual_type=203)
-
-    def test_save_rejects_embedded_proxy(self):
-        pg={'payload':{'visuals':[{'id':'1','visualType':80,'isEmbedded':True}]}}
-        with patch('runtime.session.page',return_value=pg), patch('runtime.forecast_review.save_properties') as write:
-            with self.assertRaises(ValueError):save_rule(None,'1','1',self.payload,'902','test')
-            write.assert_not_called()
-
-    def test_save_preserves_native_properties_and_reads_back(self):
-        props=copy.deepcopy(self.props);del props['visualType']
-        before={'payload':{'visuals':[{'id':'1','visualType':80,'properties':{'properties':props}}]}}
-        intended=append_record(props,self.payload,'902',visual_type=80)
-        after=copy.deepcopy(before);after['payload']['visuals'][0]['properties']['properties']=intended
-        def write(client,eid,vid,transform,label):
-            self.assertEqual(transform(props),intended)
-            changed=copy.deepcopy(props);changed['position']={}
-            with self.assertRaises(ValueError):transform(changed)
-            return {'saved':True}
-        with patch('runtime.session.page',side_effect=[before,after]), patch('runtime.forecast_review.save_properties',side_effect=write):
-            result=save_rule(None,'1','1',self.payload,'902','test')
-        self.assertEqual(result['verification']['persistedId'],'902')
-        self.assertEqual(result['runtimeExecution'],'not-tested')
 
 if __name__=='__main__':unittest.main()

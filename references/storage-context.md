@@ -1,4 +1,4 @@
-# Storage Context versus page and global filters (v39)
+# Storage Context versus page and global filters
 
 Rows and Columns already define the planning input coordinate. **Do not also
 add an assigned row or column dimension to Context.** For example, Year and
@@ -33,19 +33,10 @@ ID mapping policy, and the same intended selected scenario/version. A source
 Version cannot become destination Year/Quarter, and a page filter cannot replace
 either owner's Context. Do not copy registration UUIDs or runtime context hashes.
 
-The shared builder provides:
-
 - `runtime.storage_context.signature(owner)` for symbolic specs or current
   native owner properties. Presentation labels and registration order are ignored.
 - `require_same(source, destination)` checks identity, key mapping and typed
   initial selection. Both owners with no external storage context are valid.
-- Recipe preparation, native `extend_sheet`, and `quarterly_review` call this
-  check before creating linked columns.
-- `audit_links(destination, owners, query_contracts)` checks saved consumers
-  against fresh source owners and query lineage. Embedded visuals use their
-  actual Planning owner, not a newly invented storage context on the dashboard.
-- `filters.audit_context` checks mirrored registrations and binding for Number,
-  typed/visual-column inputs and Forecast. Context remains external to axes.
 
 ### From Queries lineage
 
@@ -82,10 +73,4 @@ a field can change which existing inputs are found. Do not silently migrate or
 re-key populated inputs as a presentation fix. Preserve existing values and
 require a supported retention/migration plan for a storage-key change.
 
-Save/readback checks establish configured fields, selections, input binding and
-query lineage. They do not prove dynamic propagation, isolation when switching
-versions, or calculation correctness. Keep these runtime checks separate. Initial
-InfoBridge refresh remains optional when wiring is valid.
-
-See [context-intelligence.md](context-intelligence.md),
-[onelake-linked-values.md](onelake-linked-values.md).
+These local checks compare metadata. They do not test recalculation or isolation when a user switches versions.

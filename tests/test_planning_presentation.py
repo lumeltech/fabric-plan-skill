@@ -73,13 +73,4 @@ class PresentationTests(unittest.TestCase):
             if p.get('visualType')==50:p['chartType']='CARD'
         with self.assertRaisesRegex(ValueError,'missing rich'):check_application(b['raw'])
 
-    def test_visibility_save_can_skip_after_readback(self):
-        from unittest.mock import patch
-        from runtime.intelligence_api import visibility_native
-        class Client:
-            def request(self,*args,**kwargs):return {'status':200,'body':{}}
-        with patch('runtime.intelligence_api.entities',return_value={'workloadEntities':[{'id':'4','isHidden':10}]}) as read:
-            r=visibility_native(Client(),'4',True,'publish',verify=False,version='v1')
-            self.assertEqual(read.call_count,1);self.assertEqual(r['nativeReadback'],'not-run')
-
 if __name__=='__main__':unittest.main()

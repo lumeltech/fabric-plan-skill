@@ -12,17 +12,15 @@ def contains(actual,expected,path='$'):
         if type(actual) is not bool or actual!=expected: raise ValueError('Readback Boolean mismatch '+path)
     elif actual!=expected: raise ValueError('Readback value mismatch '+path)
 
-def verify_authored(actual,expected,staged_dashboard_guids=()):
+def verify_authored(actual,expected):
     root=actual['definition.json'];want=expected['definition.json']
     contains(root['semanticModelReference'],want['semanticModelReference'],'semanticModelReference')
     sheets={s['recordGuid']:s for s in root['sheets']}
     if len(sheets)!=len(root['sheets']): raise ValueError('Duplicate exported sheet identity')
     for s in want['sheets']:
         if s['recordGuid'] not in sheets: raise ValueError('Missing authored sheet')
-        staged=s['recordGuid'] in staged_dashboard_guids
-        if staged and type(sheets[s['recordGuid']].get('isHidden')) is not bool: raise ValueError('Missing staged dashboard visibility')
         current=sheets[s['recordGuid']]
-        contains(current,{k:v for k,v in s.items() if k not in ('order','workloadItemEntityVisuals') and not (staged and k=='isHidden')},'sheet')
+        contains(current,{k:v for k,v in s.items() if k not in ('order','workloadItemEntityVisuals')},'sheet')
         # Import/export may enumerate embedded references before direct visuals.
         # Identity, embedding and kind must match; display stacking is verified in properties.
         actual_visuals={v['visualId']:v for v in current['workloadItemEntityVisuals']}
@@ -38,12 +36,6 @@ def verify_authored(actual,expected,staged_dashboard_guids=()):
             for c in wantpart['columns']:
                 if c['measureGuid'] not in records: raise ValueError('Missing input record')
                 contains(records[c['measureGuid']],c,name+'/'+c['measureGuid'])
-        elif name in {f'sheets/{g}/sheet.json' for g in staged_dashboard_guids}:
-            # This field is authored after ALM using resolved runtime identities.
-            # Its validation MUST run in the native dashboard phase on every resume.
-            import copy
-            wantpart=copy.deepcopy(wantpart);wantpart.get('properties',{}).pop('reactiveVisualProperties',None)
-            contains(actual[name],wantpart,name)
         else: contains(actual[name],wantpart,name)
     return {'status':'passed-authored-fields-readback','nativeCalculation':'not-tested',
-            'dashboardGeometry':'requires-native-phase' if staged_dashboard_guids else 'not-applicable'}
+            'dashboardGeometry':'checked-against-definition'}

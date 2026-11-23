@@ -107,14 +107,6 @@ Never copy an absolute $1m pool into every employee. Resolve an appropriate
 allocation method for amounts. Formula/native measures remain calculated and
 read-only; anchoring neither grants write rights nor supplies YTD logic.
 
-## Saved JSON contract and executable scope
-
-Synthetic regression fixtures cover `anchor_config` records on managed measures,
-including semantic and input examples. They share one layout hash and use
-`display_at_all_levels: false`. This is construction evidence, not a UI,
-input-save or formula-execution test. `dataInputType: 6` alone does not distinguish
-Native, Formula and DataInput; inspect the typed measure record and assignment.
-
 Persist here, preserving the entire managed-measure member and its identity:
 
 ```text
@@ -133,9 +125,6 @@ properties.visualState.manage_measures[*].anchor_config
 IDs are exact decimal **strings**, including values larger than JavaScript's
 safe integer. Resolve them from `rowDimensions`/`columnDimensions` using exact
 `externalKey`, not display labels, data-input IDs, storage keys or model IDs.
-The UI has an Enable Anchor Measure control; `is_enabled` was absent from all
-21 exported configs. Do not insert it into this saved subtree or infer a general
-disable payload from its absence. Disabling/reset serialization is not established.
 
 Bundled `runtime.anchor_measures` provides:
 
@@ -146,40 +135,12 @@ Bundled `runtime.anchor_measures` provides:
   fields, upserts only anchor configuration and necessary entry totals, and returns
   a local candidate/change list. It preserves input/formula records, aggregation,
   bindings, locks, storage mappings and every unrelated property.
-- `save_anchors(client, entity_id, visual_id, requests, label, ...)`: resolves a
-  fresh Planning owner, rejects embeds/stale state, and uses the external
-  `properties-batch` operation with current ETags. It reports submission, not
-  rendered behavior or completed post-save verification.
 
 **Hash contract:** the portable implementation uses
 the existing bundled Python XXH3 engine, with no npm dependency or donor report.
 `generate_dimension_id(exact_source_id)` produces an unsigned decimal string;
 `generate_dimension_hash(all_ordered_row_ids, all_ordered_column_ids)` hashes
-`rows.join("-") + "__" + columns.join("-")` and returns lowercase hexadecimal
-without leading zeroes. See [dimension-hashing.md](dimension-hashing.md), the
-bundled synthetic tests. The fixtures verify exact serialization and independent
-anchor instances without an external report or UI test.
-
-No saved anchor is required to create the first one. Existing saved anchors must
-agree with the computed current pivot hash and contain available dimensions. A
-mismatch stops that anchor operation; it does not silently rewrite other anchors
-or erase stored values. A captured context also guards the exact owner and state.
-Never transplant IDs/hashes, hash display labels, or hash only the anchor subset.
-Known active Pivot configs are resolved in order; ambiguous state is rejected.
-After an axis change, resolve intended anchors against the new effective layout;
-the builder does not invent a general reset or multi-layout migration payload.
-
-Disable/reset serialization, partial-pivot edit enforcement, propagation and
-rendering remain outside the hash proof. Base construction and saved-state
-mutation are implemented; native execution still has its own acceptance boundary.
-
-## Use the bundled builder
-
-`plan.py discover "keep regional policy in employee formulas but hide repeated rows"`
-routes to F20. `plan.py plan-intent` supports `shared-assumption` and
-`display-anchor` after the agent interprets the business request. It records the
-actual grain, consumers and distribution/display choices; it does
-not choose constants or an anchor based only on keywords.
+`rows.join("-") + "__" + columns.join("-")` and returns lowercase hexadecimal without leading zeroes.
 
 For offline authoring, pass exact current owner properties plus requests:
 
@@ -199,62 +160,4 @@ For offline authoring, pass exact current owner properties plus requests:
 
 ```sh
 python plan.py construct-native anchor --input anchor-request.json --out anchor-candidate.json
-python examples/anchor-measures/example.py --out example-output.json
 ```
-
-The example is a self-contained **synthetic** saved-owner fixture, using the
-observed JSON shape and a hash computed from its remapped ordered dimension IDs. It demonstrates binding,
-preservation and visibility requests; it is not a deployable reference artifact.
-`examples/anchor-measures/saved-profile.json` is a synthetic regression profile.
-No token, tenant, workspace, artifact or private target identity is needed by the
-example or shipped as configuration.
-
-For an authorized native update, use `builder-api anchor-apply` with the normal
-application session config and a request containing `entity_id`, `visual_id`,
-`requests`, and optional `expose_entry_totals`. The API helper obtains current
-properties and computes the hash itself; do not pass the offline fixture. Save
-the same actual Planning owner used by embeds. This scoped helper is useful for
-existing measures and typed-input phases.
-
-For a **new report**, use a per-measure `anchor` object in the ordinary base spec:
-
-```json
-{
-  "key": "benefits", "kind": "DataInput", "label": "Benefits %",
-  "aggregation": "AverageLeaf", "distribute": true,
-  "default_value": {"Static": 0.22},
-  "anchor": {
-    "row_fields": ["Region[Region]"],
-    "column_fields": ["Calendar[Year]"],
-    "display_at_all_levels": false
-  }
-}
-```
-
-The example rate is illustrative, not a universal default. Resolve source fields,
-calendar and business values from the actual request. The base builder supports
-Native, Number DataInput, Forecast and Formula measures; typed input factories
-retain their separate phases and can use the scoped helper after registration.
-The builder generates dimension IDs from exact metadata keys, binds the selected
-fields after the final pivot is constructed, computes the hash of the complete
-effective pivot, and retains all typed records/formulas. `planning.anchor-measure`
-is a composed capability. The import contract rejects omitted or altered requested
-anchors and hidden required entry totals. Raw `anchor_config` options are rejected
-in a symbolic base spec; they are native output, not user-facing builder syntax.
-
-Run `python examples/anchor-measures/new-report.py --out candidate.json` for a
-package-only first-anchor example. It uses synthetic metadata included in the
-package and does not fetch or deploy a report.
-
-## Full use-case context and evidence
-
-Read [anchor-business-cases.md](anchor-business-cases.md) for the ten worked
-business cases, combined workforce math, reporting examples and transfer rules.
-These examples are design guidance, not authorization or executable product syntax.
-
-The saved profile establishes the four native keys and current ID representation;
-the cases establish business/design intent. Neither proves partial-pivot writes,
-filter exceptions, new-member behavior, edit enforcement, allocation, disabled
-serialization. The bundled algorithm tests establish hash generation. Collapse/hide is not actual dimension
-removal and must not clear anchoring or values. Preserve the F20 contract's
-remaining view/removal distinctions. Respect user-requested validation scope.

@@ -2,7 +2,6 @@ import copy, math, unittest
 from runtime.surfaces import home_item, home_layout
 from runtime.home_fit import audit_home_fit, readable_home_layout
 from runtime.workflow import compile_home
-from runtime.native import save_home
 
 class HomeFitTests(unittest.TestCase):
     def setUp(self):
@@ -18,10 +17,6 @@ class HomeFitTests(unittest.TestCase):
         report = audit_home_fit({'items': self.items, 'rows': self.rows})
         self.assertFalse(report['passed'])
         self.assertIn('narrow-text', {x['code'] for x in report['issues']})
-
-    def test_native_save_rejects_bad_width_before_network(self):
-        with self.assertRaisesRegex(ValueError, 'pixels'):
-            save_home(None, '__everyone__', {'items': self.items, 'rows': self.rows}, 1, 'bad')
 
     def test_unknown_viewport_stacks_and_releases_heights(self):
         before = copy.deepcopy((self.items, self.rows))

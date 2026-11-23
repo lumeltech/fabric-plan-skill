@@ -1,16 +1,6 @@
-> v18: [measure-display-defaults.md](measure-display-defaults.md) is the default: assigned measure cards stay visible at **All**, with no selected values/ranges. Numeric Planning measures use per-measure Auto (`13: "auto"`). Apply dimension selections only to the dimension card itself; preserve all source bindings and intentional existing filters.
+# Visual-level filter registration in a chart definition
 
-# Intelligence visual-level filter registration
-
-Every dimension or measure assigned to an Intelligence chart needs its own ordinary visible field-filter registration. A chart assignment alone does not create the saved side-panel filter card. This applies to KPI cards as well as category/comparison charts.
-
-The active property is **`properties.superFilterAssignments[]`**, alongside `properties.pivotAssignments`. It is not `visualState.embeddedSuperFilter`, page-level filters, global filters, external Context or a slicer. Those have separate purposes and must be preserved. New measure cards must have empty `filter: []` and null min/max/equal values: no restriction (the card displays All); an empty `superFilterAssignments: []` means no registered field cards.
-
-## Construct from current assignments
-
-Use `runtime.chart_filters.ensure_chart_filters(props)` after chart field construction, then `audit_chart_filters(props)`. `intelligence.card()` now calls the constructor automatically. The native dashboard placement phase also ensures and audits registrations for chart visuals. For other chart constructors, call the same helper after setting all categories and measures.
-
-The factory is parameterized by current assignments; it contains no historical report, model, query or source IDs. It creates fresh filter IDs. In repair mode it adds missing ordinary cards without deleting existing filters, selected values, Context, hidden scope, formatting or geometry. If an existing registration is corrupt, inspect and repair that registration's identity explicitly while preserving its selection; do not clear the whole list to pass validation.
+For local inspection or construction of supplied chart properties, distinguish `pivotAssignments` (fields) from `superFilterAssignments` (ordinary visible field cards). A card set to All has `filter: []` and null numeric bounds. An empty card list is not equivalent. Page/global filters and storage Context have separate purposes.
 
 For each assigned field:
 
@@ -51,23 +41,4 @@ This compact excerpt illustrates the contract; use the complete constructor rath
 }
 ```
 
-The constructor also emits complete sort, Top N, search, scale, selection, aggregation and pane configuration.
-
-## Import, identity repair and validation
-
-When query identities are resolved after import, reconcile nested filter assignments and sort IDs along with the chart assignments. Do not add a correct filter while leaving a stale default registration for the same assigned field. Native numeric query IDs and portable ALM query GUIDs are different serializations; compare identities consistently within each representation.
-
-The audit checks one ordinary visible filter per assignment, matching nested identities, role flags, type, bucket and evaluation grain. It detects a dimension that appears only inside a measure filter, hidden or duplicate registrations, and stale query/sort identities. Preserve extra intentionally authored filters rather than treating them as unwanted fields.
-
-Some service versions can add `customSource:true` to a top-level semantic-measure
-assignment while leaving its ordinary filter assignment without that flag. The
-audit normalizes only this true-versus-absent case; explicit false, InfoBridge
-flags, source IDs, buckets, types and evaluation grain remain significant.
-
-Save using fresh ETags, reread native properties, and compare all unrelated visual/page properties for preservation. Export and audit the portable definition too. Persisted filter metadata does not prove that the pane renders, that changing a threshold works, or that an InfoBridge query has successfully refreshed. Do not attribute an InfoBridge query-not-found error solely to missing filter registration.
-
-## Evidence boundary
-
-Synthetic fixtures cover numeric InfoBridge filters, semantic measure filters,
-and category/comparison examples. Offline tests verify the identity normalization;
-native visual behavior remains a separate acceptance step.
+`runtime.chart_filters.ensure_chart_filters(props)` constructs missing ordinary cards locally; `audit_chart_filters(props)` checks identity, role and evaluation grain. Preserve intentional restrictions on existing cards and custom filters. These helpers do not read a workspace or verify the rendered pane.

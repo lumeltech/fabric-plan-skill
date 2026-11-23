@@ -31,17 +31,16 @@ def sample():
         'parameter':{'parameter_id':'CALC_VARIABLE_example_asof','label':'QTD As Of Date',
           'field':'Calendar[MonthStart]','selected_value':'2031-02-01 00:00:00','technical_name':'ExampleAsOfDate'}}
     candidate,manifest=add_time_column(result['envelope'],**request)
-    # Native create request: use column-create followed by column-register after
-    # resolving current destination identities. This is not an ALM record.
-    note=input_create('90000000000001002','Quarterly management commentary','LongText',
+    # Separate local construction example, not a deployed column.
+    commentary=input_create('90000000000001002','Quarterly management commentary','LongText',
         {'allow_entry_on_totals_or_subtotals':False},'example-comment-config',visual_column=True)
-    return model,spec,result,request,candidate,manifest,note
+    return model,spec,result,request,candidate,manifest,commentary
 
 if __name__=='__main__':
     out=Path(sys.argv[1]);out.mkdir(parents=True,exist_ok=True)
-    model,spec,result,request,candidate,manifest,note=sample()
+    model,spec,result,request,candidate,manifest,commentary=sample()
     for name,value in [('model',model),('spec',spec),('baseline',result['envelope']),
-        ('time-column.request',request),('candidate',candidate),('changes',manifest),('commentary.native-create',note),
+        ('time-column.request',request),('candidate',candidate),('changes',manifest),('commentary.local',commentary),
         ('equality.request',{'formula':'var test = 0; IF(AND(test = 0, [Missing FX cells] = 0), [Raw FX effect USD], BLANK)'}),
         ('equality.fixed',repair_equality('var test = 0; IF(AND(test = 0, [Missing FX cells] = 0), [Raw FX effect USD], BLANK)'))]:
         save(out/(name+'.json'),value)

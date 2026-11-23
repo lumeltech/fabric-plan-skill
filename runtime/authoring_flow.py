@@ -4,15 +4,6 @@ Checks are local definition checks, not proof of backend initialization or UI
 behavior. The original request must be captured before any scope transformation.
 """
 import copy
-import re
-
-
-def repository_failure(body):
-    """Recognize the observed non-transient repository errors, without leaking body."""
-    text=str(body)
-    if 'undefined' not in text or not re.search(r'Cannot read propert(?:y|ies)',text,re.I):
-        return None
-    return next((name for name in ('findPaginatedRows','findAll','findOne') if name in text),None)
 
 
 def require_base_input_contract(measure):
@@ -27,7 +18,7 @@ def require_base_input_contract(measure):
 def require_import_contract(requested_spec,authored,raw=None):
     """Verify unfiltered base requirements against a construction or candidate.
 
-    Independent native phases belong in a recipe's explicit post section, never
+    Unimplemented phases belong in a recipe's explicit post section, never
     in a rewritten/stripped base specification. Real reference-only requests are
     valid. No dummy input is required or invented.
     """

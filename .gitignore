@@ -1,0 +1,13 @@
+# Private working material and generated Plan output
+/_brief/
+/_samples/
+/_build/
+/TEAM-HANDOFF.md
+
+# Templates and content from the excluded standalone reporting library
+/assets/
+/references/intelligence/
+
+__pycache__/
+*.pyc
+.DS_Store

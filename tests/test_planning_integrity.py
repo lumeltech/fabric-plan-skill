@@ -75,20 +75,16 @@ class PlanningIntegrityTests(unittest.TestCase):
         p=example();p['visualState']['filters'][0]['filterDTO']['tableNames']=[]
         with self.assertRaisesRegex(ValueError,'inconsistent lengths'):repair_properties(p)
 
-    def test_public_and_native_writes_reject_unchecked_payload(self):
+    def test_public_writes_reject_unchecked_payload(self):
         bad=example();good=repair_properties(bad)['properties']
         for p,ok in [(bad,False),(good,True)]:
             requests=[('/v1/workspaces/workspace/plans',pack({'entities/plan/visuals/grid/properties.json':{'properties':p}})),
                 ('/v1/workspaces/workspace/plans/id/updateDefinition',pack({'entities/plan/visuals/grid/properties.json':{'properties':p}})),
-                ('/v1/workload/properties/batch/',{'visuals':{'123':{'properties':p}}})]
+                ]
             for route,body in requests:
                 if ok:guard_write('POST',route,body)
                 else:
                     with self.subTest(route=route),self.assertRaises(ValueError):guard_write('POST',route,body)
-
-    def test_other_visuals_and_read_requests_unaffected(self):
-        guard_write('GET','/v1/workload/properties/batch/',{'visuals':{'123':{'properties':example()}}})
-        guard_write('POST','/v1/workload/properties/batch/',{'visuals':{'123':{'properties':{'visualType':50,'visualState':{}}}}})
 
     def test_http_client_rejects_before_credentials_journal_or_adapter(self):
         from runtime.transport import Client
@@ -96,7 +92,7 @@ class PlanningIntegrityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             client=Client('https://example.invalid','UNSET_INTEGRITY_TEST_TOKEN',journal=folder,adapter=lambda *args:calls.append(args))
             with self.assertRaisesRegex(ValueError,'Incomplete Planning globalStyles'):
-                client.request('POST','/v1/workload/properties/batch/',{'visuals':{'123':{'properties':example()}}},label='rejected')
+                client.request('POST','/workspaces/w/plans',pack({'sheets/s/visuals/v/properties.json':{'properties':example()}}),label='rejected')
             self.assertEqual(calls,[]);self.assertEqual(list(Path(folder).iterdir()),[])
 
     def test_builder_and_formatting_compiler_complete_defaults(self):

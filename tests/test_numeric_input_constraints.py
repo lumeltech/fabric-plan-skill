@@ -47,8 +47,6 @@ class NumericInputContracts(unittest.TestCase):
         p=input_create('123','Rate','Number',{'min_value':{'Static':0},'max_value':{'Static':15}},'')
         p['columnMeta']['measure_type']['DataInput']['column_type']['Number']['max_value']={'Static':Decimal('0.15')}
         with self.assertRaisesRegex(ValueError,'Static does not support decimal'):
-            guard_write('POST','/v1/visual/datainput/column/',p)
-        with self.assertRaisesRegex(ValueError,'Static does not support decimal'):
             guard_write('POST','/workspaces/w/plans/p/updateDefinition',pack({'sheets/s/visuals/v/dataInput.json':{'columns':[p]}}))
 
 if __name__=='__main__':unittest.main()

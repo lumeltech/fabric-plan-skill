@@ -4,20 +4,11 @@ No implicit endpoint discovery guesses. Supply metadata-resolved API roots.
 import urllib.request, urllib.error, urllib.parse, email.utils, datetime, time, os, base64, json, re, subprocess
 from pathlib import Path
 from .codec import load, loads, dumps, save, sha
-class WorkloadRouteError(ValueError):
-    """The requested native route is outside the Home layout contract."""
-
 class HttpError(RuntimeError):
     def __init__(self,status,body=None):
-        from .authoring_flow import repository_failure
         self.status=status
-        self.repositoryMember=repository_failure(body) if status in (400,500) else None
-        self.category=('authentication' if status in (401,403) else
-                       'native-repository-unavailable' if self.repositoryMember else 'http-error')
-        detail=(' NATIVE_REPOSITORY_UNAVAILABLE ('+self.repositoryMember+
-            '): retain this Plan and stop dependent native writes; verify the documented route and imported contents before resuming'
-            if self.repositoryMember else '')
-        super().__init__('HTTP '+str(status)+detail)
+        self.category="authentication" if status in (401,403) else "http-error"
+        super().__init__("HTTP "+str(status))
 def now(): return datetime.datetime.now(datetime.timezone.utc).isoformat()
 def retry_seconds(headers,default=2):
     s=headers.get('retry-after')
@@ -29,19 +20,19 @@ def retry_seconds(headers,default=2):
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self,*args,**kwargs): return None
 class Client:
-    def __init__(self,base,token_env,allowed_hosts=None,journal=None,adapter=None,sleep=time.sleep,auth_scheme='Bearer',context_headers=None):
+    def __init__(self,base,token_env,allowed_hosts=None,journal=None,adapter=None,sleep=time.sleep):
         self.base=base.rstrip('/'); self.token_env=token_env
         host=urllib.parse.urlsplit(base).netloc
         self.allowed=set(allowed_hosts or [host]); self.allowed.add(host)
         self.journal=Path(journal or 'run'); self.journal.mkdir(parents=True,exist_ok=True)
-        self.adapter=adapter or self._http; self.sleep=sleep; self.auth_scheme=auth_scheme
-        self.context_headers=dict(context_headers or {})
-        if any(k.lower() in ('authorization','cookie') for k in self.context_headers): raise ValueError('Credentials must use environment')
+        self.adapter=adapter or self._http; self.sleep=sleep
         self.check_url(base)
     def check_url(self,url):
         p=urllib.parse.urlsplit(url)
         if p.scheme!='https' or p.netloc not in self.allowed or p.username or p.password or p.fragment:
             raise ValueError('Unapproved HTTPS endpoint')
+        if {'coreapi','generatemwctokenv2'} & set(urllib.parse.unquote(p.path).lower().split('/')):
+            raise ValueError('Expected a public Fabric API endpoint')
         return url
     def _token(self):
         t=os.environ.get(self.token_env)
@@ -53,11 +44,6 @@ class Client:
             if c.get('exp',float('inf'))<=time.time()+5: raise ValueError('AUTH_EXPIRED: renew environment credential and resume')
         return t
     def _http(self,method,url,headers,body):
-        if self.auth_scheme.lower() == 'mwctoken' or '/coreapi/' in urllib.parse.urlsplit(url).path.lower():
-            relative = url.removeprefix(self.base + '/')
-            role = re.fullmatch(r'v1/access/roles/layout/(?:[a-zA-Z0-9_-]+/)?', relative)
-            if not role or method not in ('GET','POST') or (method == 'POST' and relative == 'v1/access/roles/layout/'):
-                raise WorkloadRouteError('The runtime permits native workload requests only for role-specific Home layout')
         node=os.environ.get('FABRIC_PLAN_HTTP_NODE')
         if node:
             # Optional managed-Windows transport. Credentials travel over stdin, not argv/files.
@@ -99,15 +85,13 @@ class Client:
                 if result['status']>=400: raise HttpError(result['status'],result.get('body'))
                 return result
             raise RuntimeError('UNCERTAIN_SUBMISSION: reconcile server state before resubmitting '+label)
-        headers={'Authorization':self.auth_scheme+' '+token,'Content-Type':content_type,**self.context_headers}
+        headers={'Authorization':'Bearer '+token,'Content-Type':content_type}
         if accept is not None:
             if not isinstance(accept,str) or '\r' in accept or '\n' in accept:raise ValueError('Invalid Accept header')
             headers['Accept']=accept
         if ip: save(ip,{'request':intent,'submittedAt':now(),'state':'submitted'})
         for attempt in range(4):
             try: r=self.adapter(method,url,headers,raw)
-            except WorkloadRouteError:
-                raise
             except Exception:
                 if not mutable and attempt<3: self.sleep(2*(attempt+1)); continue
                 raise RuntimeError('Request interrupted; mutation intent retained' if mutable else 'GET interrupted') from None
@@ -116,9 +100,7 @@ class Client:
             if isinstance(r.get('body'),dict) and 'binaryBase64' in r['body'] and token.encode() in base64.b64decode(r['body']['binaryBase64'],validate=True):
                 raise RuntimeError('Binary response contained credential; not journaled')
             # Retry reads only. Even a throttled write is explicit, resumable reconciliation.
-            from .authoring_flow import repository_failure
-            deterministic=r['status'] in (400,500) and repository_failure(r.get('body'))
-            if not mutable and not deterministic and (r['status']==429 or r['status']>=500) and attempt<3:
+            if not mutable and (r['status']==429 or r['status']>=500) and attempt<3:
                 self.wait(retry_seconds(r['headers'])); continue
             clean={'status':r['status'],'headers':{k:v for k,v in r['headers'].items() if k in ('location','retry-after','x-ms-operation-id','etag','requestid','x-ms-request-id','content-type','content-range')},'body':r.get('body')}
             if rp:

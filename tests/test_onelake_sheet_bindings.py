@@ -9,7 +9,6 @@ from runtime.measure_bindings import sheet_column_id,resolve_measure,registered_
 from runtime.identity import Registry,xxh3
 from runtime.linked_values import value_assignment
 from runtime.bridge_identity import rebind_planning_outputs
-from runtime.usecases import extend_sheet,comparison_measures
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -102,30 +101,6 @@ class OneLakeSheetBindings(unittest.TestCase):
         result=rebind_planning_outputs(props,[self.companion(a)],
             [{'measure_guid':a['measureGuid'],'query_guid':q['id'],'source_measure_guid':self.record['measureGuid']}],{q['id']:q})
         self.assertEqual(result['properties'],props)
-    def test_recipe_direct_link_phase_uses_onelake_record_without_repair(self):
-        target={'pivotAssignments':[],'visualState':{'rowDimensions':[],'columnDimensions':[],
-            'manage_measures':[],'aggregation_config':{'measure_aggregation':{}},'formatConfig':{'measure':{}}}}
-        client=Mock();client.request.return_value={'body':{'statusCode':200,'payload':{}}}
-        def owner(_,name):return ('2','2',target) if name=='Consumer' else ('1','1',self.props)
-        def cols(_,vid):return [] if vid=='2' else [self.record]
-        def save(_,eid,vid,fn,label):return fn(copy.deepcopy(target))
-        with tempfile.TemporaryDirectory() as tmp,patch('runtime.usecases.owner',side_effect=owner),\
-             patch('runtime.usecases.columns',side_effect=cols),patch('runtime.usecases.save_properties',side_effect=save),\
-             patch('runtime.builder_api.create_column',return_value={'status':'persisted-record-readback'}) as create:
-            out=extend_sheet(client,{'sheet':'Consumer','links':[{'sourceSheet':'Planning 1','sourceMeasure':self.record['name'],'label':'Linked Plan'}]},tmp)
-        a=out['pivotAssignments'][0];self.assertEqual(a['id'],self.record['measureGuid'])
-        payload=create.call_args.args[2]
-        self.assertEqual(create.call_args.args[1],'2')
-        client.request.assert_not_called()
-        self.assertEqual(payload['measureGuid'],a['measureGuid'])
-        self.assertEqual(out['visualState']['manage_measures'][0]['id'],a['measureGuid'])
-    def test_recipe_comparison_reads_query_metadata_without_refresh(self):
-        a=self.fixture['nativeAssignments']['InfoBridge'];c=self.companion(a)
-        src={**self.owner,'columns':[self.record,c],'properties':{**self.props,'pivotAssignments':[a]}}
-        client=Mock();client.request.return_value={'body':{'statusCode':200,'payload':[self.query]}}
-        left,right=comparison_measures(client,src,{'left':self.record['name'],'right':c['name']},[src],{})
-        self.assertEqual(left['sourceType'],'Visual');self.assertEqual(right['sourceType'],'InfoBridge')
-        client.request.assert_called_once_with('GET',f'/v2/ib/query/{self.query["id"]}/meta/')
     def test_example_runs_outside_workspace_with_new_ids_each_time(self):
         with tempfile.TemporaryDirectory() as tmp:
             ids=[]

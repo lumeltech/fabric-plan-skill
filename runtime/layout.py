@@ -101,20 +101,3 @@ def verify_unchanged(before,after,target_id,intended,gap=0):
         if k not in ('position','dimension') and old['properties'].get(k)!=new['properties'].get(k): raise ValueError('Unrelated target property changed')
     if new['rectangle']!=intended: raise ValueError('Persisted geometry differs')
     return audit(after,gap=gap)
-def place_native(client,page_id,visual_id,intended,label,gap=0,version=None):
-    from .session import page
-    before=page(client,page_id,version); inv=inventory(before)
-    if visual_id not in inv['visuals']: raise ValueError('Unknown runtime visual')
-    if inv['visuals'][visual_id]['rectangle']==intended:
-        return {**audit(before,gap=gap),'write':'already-matched'}
-    body=placement_batch(before,page_id,visual_id,intended,inv['fingerprint'])
-    # Validate candidate without mutating real state, including every obstacle.
-    candidate=copy.deepcopy(before)
-    if inv['visuals'][visual_id]['embedded']: candidate['payload']['properties']=body['workloadEntities'][page_id]
-    else:
-        for v in candidate['payload']['visuals']:
-            if v['id']==visual_id: v['properties']=body['visuals'][visual_id]
-    audit(candidate,gap=gap)
-    client.request('POST','/v1/workload/properties/batch/',body,label=label)
-    after=page(client,page_id,version)
-    return verify_unchanged(before,after,visual_id,intended,gap)

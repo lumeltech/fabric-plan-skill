@@ -16,9 +16,4 @@ cutoff for a full-quarter estimate. Retain all required historical months.
 A comparison baseline must likewise combine actuals-to-date with the selected
 open forecast if that is the requested outlook comparison.
 
-When changing already-created formulas, preserve stable measure identities and
-unrelated records. Prepare a scoped current-definition patch with `codec.patch`,
-current part hashes and the supported Plan update operation. Do not repeat
-column creation with a changed payload and expect it to overwrite. Check the
-saved definition afterward. Construction and readback do not prove engine
-execution or parameter propagation.
+When correcting a formula, preserve the existing measure identity, storage and unrelated records. Check a synthetic closed/open boundary with known amounts before relying on the definition; a local candidate does not prove evaluation.

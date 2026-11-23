@@ -84,34 +84,3 @@ def normalize_arial(properties):
         if 'manage_measures' in state:
             out['visualState'].setdefault('globalStyles',{})['fontFamily']='Arial'
     return out
-
-def finish_native_typography(client,entity_ids=None):
-    """Fresh-read -> ETag update -> fresh-read for owned visuals only.
-
-    Run after native chart/comparison construction and before publishing a new
-    application. Embedded visuals retain their single owner's formatting.
-    A completed earlier receipt must not replace current-state inspection.
-    """
-    from .session import entities,page
-    from .forecast_review import save_properties
-    catalog=entities(client)['workloadEntities']
-    wanted={str(x) for x in entity_ids} if entity_ids is not None else {str(e['id']) for e in catalog}
-    if not wanted<={str(e['id']) for e in catalog}:raise ValueError('Unknown typography owner entity')
-    result=[]
-    for eid in sorted(wanted):
-        before=page(client,eid)
-        owned=[v for v in before['payload']['visuals'] if not v.get('isEmbedded')]
-        changed=[]
-        for v in owned:
-            p=v.get('properties',{}).get('properties',{})
-            if normalize_arial(p)==p:continue
-            vid=str(v['id'])
-            save_properties(client,eid,vid,normalize_arial,'typography-'+vid+'-'+uuid.uuid4().hex)
-            changed.append(vid)
-        current=page(client,eid)
-        for v in current['payload']['visuals']:
-            if v.get('isEmbedded'):continue
-            p=v.get('properties',{}).get('properties',{})
-            if normalize_arial(p)!=p:raise ValueError('Arial readback differs for visual '+str(v['id']))
-        result.append({'entityId':eid,'changedVisuals':changed,'savedReadback':'passed'})
-    return {'font':'Arial','entities':result,'runtimeRendering':'not-tested'}

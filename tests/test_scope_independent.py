@@ -93,14 +93,10 @@ class IndependentScopeTests(unittest.TestCase):
             if action=='export':return {'body':pack(server),'status':200}
             if action=='update':server=unpack(kwargs['definition']);return {'body':{},'status':200}
             raise AssertionError(action)
-        @contextmanager
-        def unavailable(*args,**kwargs):
-            raise RuntimeError('Synthetic native registration failure')
-            yield
         config={'authorizedMutation':True,'name':request['name'],'apiBase':'https://example.invalid/fabric',
-            'powerbiApiBase':'https://example.invalid/powerbi','workspaceId':'new-workspace','tokenEnvironment':'NO_TOKEN_USED'}
+            'workspaceId':'new-workspace','tokenEnvironment':'NO_TOKEN_USED'}
         with tempfile.TemporaryDirectory(dir=ROOT.parent) as run, patch('runtime.workflow.Client',return_value=object()), \
-             patch('runtime.workflow.plan_operation',side_effect=operation),patch('runtime.workflow.native_session',unavailable):
+             patch('runtime.workflow.plan_operation',side_effect=operation):
             result=provision(config,model(),request,run)
             self.assertIsNone(result['planId']);self.assertEqual(actions,[])
             self.assertEqual(result['mutation'],'none');self.assertFalse(result['originalScopeComplete'])

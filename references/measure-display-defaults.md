@@ -1,7 +1,4 @@
-# Measure cards at All and Auto number formatting (v18)
-
-Apply these defaults to new applications and new numeric measures in any business
-case. They are independent of the wording of the prompt or the five case recipes.
+# Measure cards at All and Auto number formatting
 
 ## Assigned measure cards stay visible, with no preset restriction
 
@@ -68,32 +65,6 @@ reset. Existing cell/row/column overrides remain; inspect operation order if the
 override the requested display. Do not clear all formatConfig or replace a full
 globalStyles object with a fragment.
 
-This observed wire shape is **Matrix/Planning-specific**. For a Charts/KPI numeric
-display use its own `hiddenProperties_!!!_numberFormatting` contract in A02 of
-`planning-integrity.md`, with Auto for amount roles and percentage for percentage
-roles; preserve its encoding and full required state. Never copy Matrix property
-13 into a Charts store or use the chart `percentage` scaling token in Matrix.
-
-## Discoverable commands and scoped update
-
-```text
-python plan.py discover "show assigned measures as All and use Auto number formatting"
-python plan.py reference measure-display-defaults.md
+```sh
 python plan.py planning-display-defaults --input display-request.json --out candidate.json
 ```
-
-`examples/measure-display.request.json` is a complete synthetic local example of
-that request. Replace it with the current target's properties/records for a real
-repair; do not deploy the synthetic IDs.
-
-The request contains actual current `properties` and `records` (native or ALM
-DataInput columns), plus optional `overwrite_scaling` and
-`clear_measure_selections` booleans. Both default false. Set them true only when
-the user requested that reset. Numeric IDs are resolved from those typed records
-and assignments. The command returns a local properties candidate; deployment
-still uses the ordinary authorized writer, current ETags and preservation rules.
-
-Business routing: F03 for Auto, F07/F22 for unrestricted visible measure cards,
-F21/F18/F19 for source identity. The five-case builder uses the same helpers.
-The export is evidence for persistence shape, not proof of new runtime behavior.
-Respect the user's decision to perform UI/runtime validation themselves.

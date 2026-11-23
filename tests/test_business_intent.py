@@ -21,6 +21,7 @@ class BusinessIntentTests(unittest.TestCase):
         b=json.loads((ROOT/'examples/business-intent/merit-review.json').read_text())
         b['requirements'].reverse() # business prose need not arrive in execution order
         r=plan_intent(b);self.assertTrue(r['readyForAuthoring'])
+        self.assertTrue((ROOT/'references'/r['defaultPolicy']['source']).is_file())
         self.assertEqual({x['text'] for x in r['requirements']},{x['text'] for x in b['requirements']})
         order=r['executionOrder']
         for x in r['requirements']:

@@ -5,9 +5,7 @@ from runtime.codec import load,pack,save
 from runtime.authoring_flow import require_import_contract
 from runtime.planning_presentation import build_application
 from runtime.transport import Client,HttpError
-from runtime.builder_api import create_column
 from runtime.input_factories import input_create
-from runtime.session import entities
 from runtime.workflow import provision
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -89,28 +87,10 @@ class AuthoringFlowTests(unittest.TestCase):
             self.assertEqual(result['mutation'],'none');self.assertFalse(result['originalScopeComplete'])
             self.assertTrue(Path(run,'scope-coverage.json').exists())
 
-    def test_native_catalog_failure_checks_both_documented_reads_without_post(self):
-        calls=[]
-        def adapter(method,url,headers,body):
-            calls.append((method,url))
-            if '/v2/workload/entity/' in url:
-                return {'status':200,'headers':{},'body':{'statusCode':200,'payload':{'workloadEntities':[]}}}
-            return {'status':500,'headers':{},'body':{'message':"Cannot read properties of undefined (reading 'findPaginatedRows')"}}
-        with tempfile.TemporaryDirectory() as run,patch.dict(os.environ,{'FLOW_TEST_TOKEN':'synthetic-credential'}):
-            client=Client('https://example.invalid','FLOW_TEST_TOKEN',journal=run,adapter=adapter,sleep=lambda _:self.fail('Deterministic failure retried'))
-            self.assertEqual(entities(client,'v2')['workloadEntities'],[])
-            payload=input_create('123','Reason','LongText',{},'configuration')
-            with self.assertRaises(HttpError) as error:create_column(client,'7',payload,'create-reason')
-            self.assertEqual(error.exception.category,'native-repository-unavailable')
-            self.assertEqual(error.exception.repositoryMember,'findPaginatedRows')
-            self.assertEqual(len(calls),3);self.assertTrue(all(m=='GET' for m,u in calls))
-            self.assertTrue(any('/v1/visual/' in u for m,u in calls))
-            self.assertTrue(any('/v2/visual/' in u for m,u in calls))
-
     def test_auth_failure_is_not_repository_failure(self):
         for status in (401,403):
             error=HttpError(status,{'message':"Cannot read properties of undefined (reading 'findOne')"})
-            self.assertEqual(error.category,'authentication');self.assertIsNone(error.repositoryMember)
+            self.assertEqual(error.category,'authentication')
 
     def test_repository_create_failure_is_not_replayed(self):
         calls=[]
@@ -119,8 +99,8 @@ class AuthoringFlowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as run,patch.dict(os.environ,{'FLOW_TEST_TOKEN':'synthetic-credential'}):
             client=Client('https://example.invalid','FLOW_TEST_TOKEN',journal=run,adapter=adapter)
             for _ in range(2):
-                with self.assertRaises(HttpError) as error:client.request('POST','/v1/visual/datainput/column/',{},label='same-request')
-                self.assertEqual(error.exception.repositoryMember,'findOne')
+                with self.assertRaises(HttpError) as error:client.request('POST','/workspaces/w/plans',{},label='same-request')
+                self.assertEqual(error.exception.status,400)
             self.assertEqual(calls,['POST'])
 
 if __name__=='__main__':unittest.main()

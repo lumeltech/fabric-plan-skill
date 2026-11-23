@@ -1,17 +1,7 @@
-"""Executable From Sheets, quarterly commentary/variance, CF and chart composition.
-
-Uses the bundled native session. No agent SDK, source checkout or old Plan needed.
-These application routes are tenant/build-dependent, not public Fabric REST APIs.
-Successful saves are not calculation/rendering certification.
-"""
-import copy,uuid
-from pathlib import Path
-from .codec import load,save,dumps
-from .identity import xxh3,Registry,native_id
-from .session import entities,page,columns,result_body
-from .builder_api import scoped
-from .input_factories import input_create,formula_create
-from .chart_filters import ensure_chart_filters
+"""Local From Sheets, conditional formatting and comparison chart constructors."""
+import copy
+from .codec import dumps
+from .identity import xxh3,native_id
 
 def from_sheet_assignment(source,source_visual,source_name,label=None,bucket='ameasure',order=1):
     """source is a current /datainput/column/ record, NOT an ALM record.
@@ -89,90 +79,3 @@ def comparison_chart(properties,forecast_assignment,actuals_assignment, *, integ
     from .chart_filters import reconcile_chart_filters
     reconcile_chart_filters(out)
     return out
-
-def owner(client,sheet_name):
-    matches=[e for e in entities(client)['workloadEntities'] if e['displayName']==sheet_name]
-    if len(matches)!=1:raise ValueError('Missing/ambiguous sheet '+sheet_name)
-    eid=str(matches[0]['id']);p=page(client,eid)
-    vs=[v for v in p['payload']['visuals'] if not v.get('isEmbedded') and v.get('visualType')==80]
-    if len(vs)!=1:raise ValueError('Expected one owned Planning visual in '+sheet_name)
-    return eid,str(vs[0]['id']),vs[0]['properties']['properties']
-
-def find_column(catalog,name):
-    xs=[c for c in catalog if c['name']==name or c['measureGuid']==name]
-    if len(xs)!=1:raise ValueError('Missing/ambiguous measure '+name)
-    return xs[0]
-
-def save_properties(client,entity_id,visual_id,transform,label):
-    before=page(client,str(entity_id));v=next(v for v in before['payload']['visuals'] if str(v['id'])==str(visual_id))
-    props=transform(copy.deepcopy(v['properties']['properties']))
-    if props==v['properties']['properties']:return {'status':'unchanged'}
-    body={'visuals':{str(visual_id):{'schema':'0.0.1','properties':props}},'workloadEntities':{},'workload':{},
-        'etags':{'visuals':{str(visual_id):v['properties']['etag']},'workloadEntities':{str(entity_id):before['payload']['etag']}}}
-    return result_body(client.request('POST','/v1/workload/properties/batch/',body,label=label))
-
-def quarterly_review(client,request,run):
-    """Native post-import phase. No post-save reads or runtime tests.
-
-    Reads only current identities, existing columns and mutation ETags. A returned
-    asynchronous column job pauses dependents instead of pretending it completed.
-    """
-    run=Path(run);run.mkdir(parents=True,exist_ok=True)
-    se,sv,sp=owner(client,request['sourceSheet']);te,tv,tp=owner(client,request['targetSheet'])
-    if sv==tv:raise ValueError('Source and consumer must be distinct owners')
-    from .storage_context import require_same
-    require_same(sp,tp)
-    ss=sp['visualState'];ts=tp['visualState']
-    for key in ('rowDimensions','columnDimensions'):
-        sk=[d['externalKey'] for d in ss[key]];tk=[d['externalKey'] for d in ts[key]]
-        if not set(tk)<=set(sk):raise ValueError('From Sheets consumer must use same/subset dimensions')
-        if key=='columnDimensions' and tk!=sk[:len(tk)]:raise ValueError('Use ordered coarser calendar levels')
-    source=find_column(columns(client,sv),request['sourceForecast'])
-    existing=columns(client,tv);actual=find_column(existing,request['targetActuals'])
-    if 'Native' not in actual['columnMeta']['measure_type']:raise ValueError('Resolve native actuals')
-    label=request.get('forecastLabel','Sales Forecast');assignment=from_sheet_assignment(source,sv,request['sourceSheet'],label)
-    mid=assignment['measureGuid'];statefile=run/'review-identities.json'
-    if statefile.exists():ids=load(statefile)
-    else:
-        reg=Registry();ids={'sourceVisual':sv,'targetVisual':tv,'linked':mid,'variance':reg.custom('variance'),
-            'commentary':reg.custom('commentary'),'commentaryConfig':str(uuid.uuid4())};save(statefile,ids)
-    if any(ids[k]!=v for k,v in [('sourceVisual',sv),('targetVisual',tv),('linked',mid)]):raise ValueError('Resume identity changed')
-    commentary=request.get('commentaryLabel','Quarterly Commentary');variance=request.get('varianceLabel','Variance')
-    created=[{'measureGuid':mid,'columnType':6,'name':label,'columnMeta':{'id':mid,'label':label,'data_type':'Number','measure_type':{'Native':{'measure_role':'FCMeasure'}}}},
-        input_create(ids['commentary'],commentary,'LongText',{},ids['commentaryConfig'],visual_column=False),
-        formula_create(ids['variance'],variance,'${forecast} - ${actual}',{'forecast':mid,'actual':actual['measureGuid']})]
-    from .builder_api import create_column
-    for payload in created:
-        r=create_column(client,tv,payload,'create-'+payload['measureGuid'])
-        save(run/('created-'+payload['measureGuid']+'.json'),r)
-        if r.get('status')=='pending':return {'status':'pending-column-jobs','jobIds':r['jobIds'],'dependentsSaved':False}
-    def register(p):
-        p['pivotAssignments']=[a for a in p['pivotAssignments'] if a.get('measureGuid')!=mid]+[assignment]
-        s=p['visualState'];members=s.setdefault('manage_measures',[])
-        for n,c in enumerate(created):
-            cid=c['measureGuid'];entry=next((m for m in members if m['id']==cid),None)
-            if entry is None:members.append({'id':cid,'label':c['name'],'order':len(members),'visible':True})
-            else:entry.update(label=c['name'],visible=True)
-            ag='None' if cid==ids['commentary'] else 'Formula' if cid==ids['variance'] else 'Sum'
-            s.setdefault('aggregation_config',{}).setdefault('measure_aggregation',{})[cid]={'row':ag,'column':ag}
-            s.setdefault('formatConfig',{}).setdefault('measure',{}).setdefault(cid,[{'format':{'4':'Arial','5':'#FFF0C2' if cid==ids['commentary'] else '#DFF2E7'},'order':n}])
-        from .display_defaults import auto_number_formatting
-        p['visualState']=auto_number_formatting(s,[mid,ids['variance']])
-        from .column_presentation import ensure_assigned_measure_filters
-        ensure_assigned_measure_filters(p)
-        return apply_negative_variance(p,ids['variance'],variance)
-    save_properties(client,te,tv,register,'review-register-'+tv)
-    for chart in request.get('charts',[]):
-        # Resolve current visual by unique layer name within the named dashboard.
-        es=[e for e in entities(client)['workloadEntities'] if e['displayName']==chart['sheet']]
-        if len(es)!=1:raise ValueError('Ambiguous dashboard')
-        eid=str(es[0]['id']);p=page(client,eid)
-        vs=[v for v in p['payload']['visuals'] if not v.get('isEmbedded') and v['properties']['properties'].get('layerProperties',{}).get('layerProperties',{}).get('name')==chart['visualName']]
-        if len(vs)!=1:raise ValueError('Ambiguous chart layer')
-        vid=str(vs[0]['id']);props=vs[0]['properties']['properties']
-        actuals=[a for a in props['pivotAssignments'] if a.get('dataRoleType')=='Measure' and a.get('id')==chart['actualsField']]
-        if len(actuals)!=1:raise ValueError('Assign the resolved semantic actuals measure to the base chart first')
-        py=copy.deepcopy(actuals[0]);py.update(name=chart.get('actualsLabel','Sales Actuals'),customName=chart.get('actualsLabel','Sales Actuals'))
-        save_properties(client,eid,vid,lambda p:comparison_chart(p,assignment,py),'variance-chart-'+vid)
-    result={'status':'saved','linkedMeasureGuid':mid,'ids':ids,'runtimeValidation':'not-run','postSaveReads':False}
-    save(run/'result.json',result);return result

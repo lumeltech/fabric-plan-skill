@@ -8,26 +8,26 @@ import copy
 from .discovery import catalog
 
 ROUTES={
- 'shared-assumption':(['F20','F05'],['anchor-construct','anchor-save'],['measure','sheetGrain','rowDimensions','columnDimensions','eligibleScope','aggregation','distribution','consumers','displayAtAllLevels']),
- 'display-anchor':(['F20','F12'],['anchor-construct','anchor-save'],['measure','sheetGrain','rowDimensions','columnDimensions','consumers','displayAtAllLevels']),
- 'time-intelligence':(['TIME-INTELLIGENCE','FORMULAS'],['planning-time-column','formula','column-create','column-register'],['source','period','cutoffScope','cutoffControl','cutoff','aggregation','missingPolicy']),
- 'one-time-column':(['TIME-INTELLIGENCE','F05'],['input','formula','column-create','column-register'],['kind','grain','placement','storageContext']),
- 'editable-value':(['F05'],['input','column-create','column-register'],['unit','grain','default']),
- 'conditional-input':(['F30'],['input','forecast','column-create','column-register'],['target','condition','expression','scope']),
- 'calculated-value':(['FORMULAS','F02'],['formula','column-create','column-register'],['expression','inputs','aggregation']),
- 'rolling-forecast':(['F09','TIME-INTELLIGENCE'],['forecast','forecast-review'],['actuals','grain','openPeriod','openDefault','timezone']),
- 'balance-roll-forward':(['ROLL-FORWARD','FORMULAS','F09','F12','F01'],['roll-forward-presentation','planning-totals','formula','column-create','column-register'],['grain','calendar','unit','seedAuthority','movements','signConvention','forecastCutoff','editableFields','dependencyStrategy','aggregation']),
- 'reuse-values':(['F19'],['resolve-measure-binding','forecast-review'],['sourceOrigin','source','targetGrain','transformation','grainCompatibility']),
- 'commentary':(['F05','TIME-INTELLIGENCE'],['input','column-create','column-register'],['grain','placement']),
- 'comparison':(['INTELLIGENCE','F15'],['resolve-measure-binding','integrated-variance'],['current','baseline','grain','difference','favorableDirection','unit']),
- 'conditional-format':(['CONDITIONAL-FORMATTING','F15'],['build','format-matrix','forecast-review'],['target','condition','meaning']),
+ 'shared-assumption':(['F20','F05'],['anchor-construct'],['measure','sheetGrain','rowDimensions','columnDimensions','eligibleScope','aggregation','distribution','consumers','displayAtAllLevels']),
+ 'display-anchor':(['F20','F12'],['anchor-construct'],['measure','sheetGrain','rowDimensions','columnDimensions','consumers','displayAtAllLevels']),
+ 'time-intelligence':(['TIME-INTELLIGENCE','FORMULAS'],['planning-time-column','formula'],['source','period','cutoffScope','cutoffControl','cutoff','aggregation','missingPolicy']),
+ 'one-time-column':(['TIME-INTELLIGENCE','F05'],['input','formula'],['kind','grain','placement','storageContext']),
+ 'editable-value':(['F05'],['input'],['unit','grain','default']),
+ 'conditional-input':(['F30'],['input','forecast'],['target','condition','expression','scope']),
+ 'calculated-value':(['FORMULAS','F02'],['formula'],['expression','inputs','aggregation']),
+ 'rolling-forecast':(['F09','TIME-INTELLIGENCE'],['forecast'],['actuals','grain','openPeriod','openDefault','timezone']),
+ 'balance-roll-forward':(['ROLL-FORWARD','FORMULAS','F09','F12','F01'],['roll-forward-presentation','planning-totals','formula'],['grain','calendar','unit','seedAuthority','movements','signConvention','forecastCutoff','editableFields','dependencyStrategy','aggregation']),
+ 'reuse-values':(['F19'],['resolve-measure-binding'],['sourceOrigin','source','targetGrain','transformation','grainCompatibility']),
+ 'commentary':(['F05','TIME-INTELLIGENCE'],['input'],['grain','placement']),
+ 'comparison':(['F15'],['resolve-measure-binding'],['current','baseline','grain','difference','favorableDirection','unit']),
+ 'conditional-format':(['CONDITIONAL-FORMATTING','F15'],['build','format-matrix'],['target','condition','meaning']),
  'storage-identity':(['DIMENSION-ID'],['leaf-key-mapping','mapping'],['leaf','idField','ancestorDependency']),
- 'master-data-maintenance':(['POWERTABLE'],['powertable','table-source','table-initialize','table-schema','table-save'],['source','key','editableColumns']),
- 'allocation':(['RULES'],['rule','rule-create'],['source','targetGrain','weights','missingWeights','totalRule']),
+ 'master-data-maintenance':(['POWERTABLE'],['powertable','table-source'],['source','key','editableColumns']),
+ 'allocation':(['RULES'],['rule'],['source','targetGrain','weights','missingWeights','totalRule']),
  'approval':(['F13'],[],['scope','stages']),
  'access-control':(['F25'],[],['scope','audience','policy']),
  'scenario':(['SCENARIOS'],['input','filters','build'],['behavior','scope']),
- 'navigation':(['NAVIGATOR'],['navigator','navigator-create'],['destinations'])
+ 'navigation':([],[],['destinations'])
 }
 
 def plan_intent(brief):
@@ -53,10 +53,10 @@ def plan_intent(brief):
             if origin=='semantic' and transform=='direct':
                 mids=['F21'];ops=['resolve-measure-binding'];notes.append('Reuse the original PowerBI assignment, not its Native Planning companion as From Sheets.')
             elif transform in ('join','merge','append','sql','aggregate'):
-                mids=['F18'];ops=['bridge-source','bridge-'+('construct-query' if transform=='aggregate' else transform),'bridge-query','bridge-reload','bridge-poll','bridge-consumer']
+                mids=['F18'];ops=['bridge-source','bridge-'+('construct-query' if transform=='aggregate' else transform),'bridge-consumer']
                 notes.append('Resolve transformed query outputs before assigning InfoBridge IDs. A saved graph does not prove refresh or materialization.')
             elif origin=='query' and transform=='direct':
-                mids=['F18'];ops=['bridge-inventory','bridge-consumer','resolve-measure-binding']
+                mids=['F18'];ops=['bridge-consumer','resolve-measure-binding']
             elif origin=='sheet' and transform=='direct' and grain in ('same','coarser-compatible'):
                 notes.append('Link the produced input/Forecast/formula output at its resolved source ID; do not duplicate inputs.')
             elif origin and transform:
@@ -103,6 +103,8 @@ def plan_intent(brief):
             notes.append('Distinguish a transient sensitivity input, persisted version Context and native scenario lifecycle; the basic constructors do not cover all three.')
             if details.get('behavior') not in ('transient-sensitivity','persisted-version-context'):
                 needs.append('Resolve native scenario lifecycle or ambiguous scenario behavior; the selected constructors do not implement it')
+        if kind=='navigation':
+            needs.append('Navigation publication is not provided by the supported planner routes')
         if kind in ('approval','access-control'):
             needs.append('Selected package has guide-only coverage; resolve a supported implementation without substituting slicers or colors for controls')
         guides=[]
@@ -123,7 +125,9 @@ def plan_intent(brief):
         active.remove(key);seen.add(key);order.append(key)
     for key in ids:walk(key)
     return {'request':brief['request'],'requirements':results,'executionOrder':order,
-      'defaultPolicy':{'source':'application-defaults.md','nonNegotiable':True,'completionGate':'runtime.application_defaults.require_delivery_phases','required':['Arial for all authored text','enabled native Home with saved business overview and sheet navigation','rich sheet header and source-role legend','source-role measure colors','Intelligence header/slicers/charts/owner-preserving embed','canonical source names and typed identities','complete formatting and dynamic column presentation','stable leaf-key storage where dependency is established','integrated variance for baseline comparison bars','visible assigned measure cards at All without preset restrictions','per-measure Auto number scaling for numeric Planning measures']},
+      'defaultPolicy':{'source':'planning-presentation.md','nonNegotiable':True,'completionGate':'runtime.application_defaults.require_delivery_phases',
+        'scope':'Public definition only; role-specific Home content and priority are not published.',
+        'required':['Arial for all authored text','Home visibility enabled in the public definition','rich sheet header and source-role legend','source-role measure colors','Intelligence header/slicers/charts/owner-preserving embed','canonical source names and typed identities','complete formatting and dynamic column presentation','stable leaf-key storage where dependency is established','integrated variance for baseline comparison bars','visible assigned measure cards at All without preset restrictions','per-measure Auto number scaling for numeric Planning measures']},
       'presentationDefaults':{'totals_config':{'row_grand_total':'Top','row_sub_total':'Top','column_grand_total':'Left','column_sub_total':None},'measureBasedRollForward':'Recommend Measures in Rows with a logical native Measure Model; preserve explicit user choices'},
       'businessAssumptions':copy.deepcopy(brief.get('assumptions',[])),
       'noImplicitBusinessConstants':['2026 dates','10 percent growth','15 percent merit limit','3 percent inflation','monthly time grain','USD currency','particular table or field names'],

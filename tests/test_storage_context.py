@@ -5,7 +5,6 @@ from runtime.storage_context import signature,require_same,query_contract,requir
 from runtime.consumer_bindings import numeric_output_fields
 from runtime.construct import build,planning
 from runtime.identity import Registry
-from runtime.usecases import extend_sheet
 from test_context_intelligence import example,owner_parts
 
 
@@ -81,15 +80,6 @@ class StorageContextTests(unittest.TestCase):
         proof=query_contract(q,[self.props],{'Version[Name]':'v'})
         field=numeric_output_fields(q,storage_context=proof)[0]
         planning(self.model,s,Registry(),query_fields=[field])
-
-    def test_native_link_phase_stops_before_column_create_on_context_mismatch(self):
-        src=copy.deepcopy(self.props);dst=copy.deepcopy(self.props)
-        dst['visualState']['dimension_id_mapping']['mappings'].pop('Version[Name]')
-        record=self.records[0];client=Mock()
-        with TemporaryDirectory() as run,patch('runtime.usecases.owner',side_effect=[('1','1',dst),('2','2',src)]),patch('runtime.usecases.columns',side_effect=[[],[record]]),patch('runtime.builder_api.create_column') as create:
-            with self.assertRaisesRegex(ValueError,'Context mismatch'):
-                extend_sheet(client,{'sheet':'Destination','links':[{'sourceSheet':'Source','sourceMeasure':record['name'],'label':'Linked'}]},run)
-            create.assert_not_called();client.request.assert_not_called()
 
     def test_saved_consumer_audit(self):
         p=copy.deepcopy(self.props);p['pivotAssignments'].append({'sourceType':'Visual','visualId':'21','bucketId':'ameasure'})

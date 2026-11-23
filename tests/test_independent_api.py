@@ -15,11 +15,10 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from runtime.activation import select_saved_pivot
 from runtime.codec import load, loads, pack, unpack
-from runtime.home_api import decode_roles, deploy_home
+from runtime.home_api import decode_roles
 from runtime.identity import Registry
-from runtime.layout import audit, place_native, verify_unchanged
+from runtime.layout import audit, verify_unchanged
 from runtime.pivots import compile_pivots
 from runtime.transport import Client
 from runtime.workflow import preflight, provision
@@ -41,48 +40,6 @@ def native_page():
             'pageFilter': 'preserve', 'reactiveVisualProperties': []}},
         'visuals': [{'id': '101', 'visualType': 80,
                      'properties': {'etag': 'visual-1', 'properties': props}}]}}
-
-
-class PageAdapter:
-    def __init__(self, lose_response=False):
-        self.state = native_page()
-        self.writes = 0
-        self.lose_response = lose_response
-
-    def __call__(self, method, url, headers, body):
-        if method == 'GET':
-            return {'status': 200, 'headers': {}, 'body': copy.deepcopy(self.state)}
-        incoming = loads(body.decode('utf-8'))
-        self.writes += 1
-        for vid, wrapped in incoming['visuals'].items():
-            target = next(v for v in self.state['payload']['visuals'] if v['id'] == vid)
-            target['properties'] = {**copy.deepcopy(wrapped), 'etag': 'visual-' + str(self.writes + 1)}
-        for wrapped in incoming['workloadEntities'].values():
-            self.state['payload']['properties'] = copy.deepcopy(wrapped)
-        self.state['payload']['etag'] = 'page-' + str(self.writes + 1)
-        if self.lose_response:
-            self.lose_response = False
-            raise OSError('Simulated response loss after write applied')
-        return {'status': 200, 'headers': {}, 'body': {'statusCode': 200, 'payload': {}}}
-
-
-class HomeAdapter:
-    def __init__(self):
-        self.data = self.etag = self.order = None
-        self.writes = 0
-
-    def __call__(self, method, url, headers, body):
-        if url.endswith('/layout/'):
-            payload = {'__everyone__': {'homeLayoutOrder': self.order, 'homeLayoutEnabled': True}}
-        elif method == 'GET':
-            payload = {'data': self.data, 'etag': self.etag}
-        else:
-            incoming = loads(body.decode('utf-8'))
-            self.writes += 1
-            self.data, self.order = incoming['data'], incoming['homeLayoutOrder']
-            self.etag = 'home-' + str(self.writes)
-            payload = {'etag': self.etag}
-        return {'status': 200, 'headers': {}, 'body': {'statusCode': 200, 'payload': copy.deepcopy(payload)}}
 
 
 class WorkflowServer:
@@ -132,23 +89,6 @@ class WorkflowServer:
     def pending(operation):
         return {'status': 202, 'headers': {
             'location': 'https://example.invalid/v1/operations/' + operation, 'retry-after': '0'}, 'body': {}}
-
-    def native(self, method, url, headers, body):
-        sheet = self.raw['definition.json']['sheets'][0]
-        owner = sheet['workloadItemEntityVisuals'][0]
-        prefix = 'sheets/' + sheet['recordGuid'] + '/visuals/' + owner['visualId'] + '/'
-        if url.endswith('/entity/'):
-            payload = {'workloadEntities': [{'id': '201', 'displayName': sheet['displayName'], 'entityType': 10}]}
-        elif '/datainput/column/' in url:
-            columns = self.raw[prefix + 'dataInput.json']['columns']
-            payload = {'resBody': columns, 'totalRecordCount': len(columns)}
-        elif url.endswith('/properties/'):
-            payload = {'etag': 'page-1', 'visuals': [{'id': '101', 'visualType': 80,
-                'properties': {'etag': 'visual-1', 'properties': self.raw[prefix + 'properties.json']['properties']}}]}
-        else:
-            raise AssertionError('Unexpected mocked native route: ' + url)
-        return {'status': 200, 'headers': {}, 'body': {'statusCode': 200, 'payload': copy.deepcopy(payload)}}
-
 
 class IndependentApiTests(unittest.TestCase):
     def test_model_cli_discovers_tmdl_twice_without_recipe_or_native_flag(self):
@@ -207,33 +147,6 @@ class IndependentApiTests(unittest.TestCase):
         self.network.start()
         self.addCleanup(self.network.stop)
 
-    def client(self, name, adapter):
-        return Client('https://example.invalid/native', TOKEN_ENV, journal=self.directory / name,
-                      adapter=adapter, sleep=lambda seconds: None)
-
-    def test_completed_native_actions_reconcile_without_second_write(self):
-        actions = [
-            ('pivot', PageAdapter(), lambda c: select_saved_pivot(c, '201', '101', '301', 'same-step')),
-            ('place', PageAdapter(), lambda c: place_native(c, '201', '101',
-                {'x': 30, 'y': 40, 'width': 200, 'height': 100}, 'same-step')),
-            ('home', HomeAdapter(), lambda c: deploy_home(c, '__everyone__',
-                {'items': [], 'rows': []}, 1, 'same-step'))]
-        for name, adapter, action in actions:
-            with self.subTest(action=name):
-                client = self.client(name, adapter)
-                action(client)
-                result = action(client)
-                self.assertEqual(result['write'], 'already-matched')
-                self.assertEqual(adapter.writes, 1)
-
-    def test_pivot_applied_before_response_loss_reconciles(self):
-        adapter = PageAdapter(lose_response=True)
-        client = self.client('lost-pivot', adapter)
-        with self.assertRaisesRegex(RuntimeError, 'interrupted'):
-            select_saved_pivot(client, '201', '101', '301', 'pivot')
-        self.assertEqual(select_saved_pivot(client, '201', '101', '301', 'pivot')['write'], 'already-matched')
-        self.assertEqual(adapter.writes, 1)
-
     def test_orphan_override_is_not_a_complete_inventory(self):
         page = native_page()
         page['payload']['properties']['properties']['reactiveVisualProperties'] = [
@@ -265,16 +178,6 @@ class IndependentApiTests(unittest.TestCase):
             input=text.encode('utf-8'), capture_output=True, check=True, timeout=30).stdout.decode('ascii')
         self.assertEqual(decode_roles(compressed, node), json.loads(text))
 
-    def test_native_place_rejects_traversal_label_before_any_api(self):
-        cli = runpy.run_path(str(ROOT / 'plan.py'), run_name='independent_cli_test')
-        argv = ['plan.py', 'native', 'place', '--config', 'unused', '--input', 'unused',
-                '--run', str(self.directory / 'run'), '--label', '../escaped']
-        with patch.object(sys, 'argv', argv), patch('runtime.session.native_session') as session:
-            with self.assertRaisesRegex(ValueError, 'Unsafe operation label'):
-                cli['main']()
-            session.assert_not_called()
-
-
 class WorkflowRegressionTests(unittest.TestCase):
     setUp = IndependentApiTests.setUp
 
@@ -287,7 +190,7 @@ class WorkflowRegressionTests(unittest.TestCase):
                     {'key': 'allowed', 'kind': 'Native', 'source': 'Metrics[CanEdit]', 'label': 'CanEdit'},
                     {'key': 'hours', 'kind': 'DataInput', 'label': 'Available Hours',
                      'min_value': {'Static': 0}, 'allow_input': {'BasedOnFormula': '${allowed} > 0'}}]}]}
-        config = {'apiBase': 'https://example.invalid/v1', 'powerbiApiBase': 'https://example.invalid',
+        config = {'apiBase': 'https://example.invalid/v1',
             'workspaceId': 'workspace', 'name': spec['name'], 'tokenEnvironment': TOKEN_ENV, 'authorizedMutation': True}
         return config, model, spec
 
@@ -295,11 +198,7 @@ class WorkflowRegressionTests(unittest.TestCase):
         config, model, spec = self.inputs()
         def client(base, env, allowed=None, journal=None):
             return Client(base, env, allowed, journal, server.public, sleep=lambda seconds: None)
-        @contextmanager
-        def native(base, env, workspace, plan, journal, native_read_versions=None):
-            yield Client('https://example.invalid/native', env, journal=journal,
-                         adapter=server.native, sleep=lambda seconds: None)
-        with patch('runtime.workflow.Client', client), patch('runtime.workflow.native_session', native):
+        with patch('runtime.workflow.Client', client):
             return provision(config, model, spec, directory)
 
     def test_public_create_contains_visibility_and_complete_grid(self):
@@ -322,35 +221,14 @@ class WorkflowRegressionTests(unittest.TestCase):
         self.run_workflow(server, directory)
         self.assertEqual((server.creates, server.updates), (1, 0))
 
-    def test_native_calls_for_standard_provision_are_only_home(self):
+    def test_public_create_reports_role_specific_home_gap(self):
         server = WorkflowServer()
-        observed = []
-        original = server.native
-        def native(method, url, headers, body):
-            observed.append((method, url))
-            return original(method, url, headers, body)
-        server.native = native
-        with patch('runtime.navigation_publish.publish',side_effect=AssertionError('navigation publication')), \
-             patch('runtime.intelligence_api.visibility_native',side_effect=AssertionError('visibility writer')), \
-             patch('runtime.session.columns',side_effect=AssertionError('grid validation')):
-            result = self.run_workflow(server, self.directory / 'restricted')
-        self.assertTrue(observed)
-        self.assertTrue(all('/v1/access/roles/layout/' in url for method,url in observed))
-        self.assertEqual(result['dashboards'][0]['geometrySource'],'public-create')
-        self.assertEqual(result['visibilitySource'],'public-create')
-
-    def test_successful_layout_and_home_complete_the_new_report(self):
-        server = WorkflowServer()
-        with patch('runtime.intelligence_api.deploy_geometry',side_effect=AssertionError('unexpected native alignment')) as geometry, \
-             patch('runtime.workflow.deploy_home',return_value={'write':'submitted'}) as home, \
-             patch('runtime.navigation_publish.publish',side_effect=AssertionError('unexpected navigation')), \
-             patch('runtime.session.columns',side_effect=AssertionError('unexpected grid validation')):
-            result = self.run_workflow(server, self.directory / 'successful')
-        geometry.assert_not_called()
-        home.assert_called_once()
-        self.assertEqual((server.creates,server.updates),(1,0))
-        self.assertTrue(result['originalScopeComplete'],result['phaseErrors'])
-        self.assertEqual(result['mandatoryDefaults']['dashboardSaves'],1)
+        result = self.run_workflow(server, self.directory / 'public-only')
+        self.assertEqual(result['home']['visibility'], 'public-create')
+        self.assertEqual(result['home']['content'], 'constructed-locally-not-published')
+        self.assertEqual(result['phaseErrors'][0]['status'], 'unsupported')
+        self.assertFalse(result['originalScopeComplete'])
+        self.assertEqual(result['dashboards'][0]['geometrySource'], 'public-create')
 
     def test_hidden_dashboard_is_rejected_before_create(self):
         from runtime.application_defaults import require_business_navigation

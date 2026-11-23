@@ -12,17 +12,12 @@ do not copy them to chart or PowerTable state.
 | Column Grand Total | ON, Left | `column_grand_total: "Left"` |
 | Column Subtotal | OFF | `column_sub_total: null` |
 
-These values were observed in the user-saved Treasury reference before applying
-them to the roll-forward reports. OFF is JSON null, not false, zero or "Off".
+OFF is JSON null, not false, zero or "Off".
+
 Omitted positions invoke native behavior and are not a reliable authored default.
 Allowed alternate row positions are Bottom (and Split for row subtotal); column
 positions are Left/Right. Retain `freeze_total` and unrelated settings. New
 construction keeps `freeze_total: false`; this is separate from total visibility.
-
-The native totals updater is not a general sparse merge: omitted position fields
-can clear positions. Merge against current state and submit the complete four
-positions with preserved related settings through the existing supported adapter.
-Do not overwrite intentionally configured views/bookmarks as an incidental repair.
 
 ## Local commands and overrides
 
@@ -38,9 +33,4 @@ positions, validates native enum values, and preserves explicit null/positions.
 `totals_config` spec overrides only supplied positions. `columnPresentation:
 "preserve"` preserves expansion but does not disable totals defaults for new grids.
 
-An embed uses its Planning owner; update that owner once. Measures-in-Rows is a
-separate roll-forward recommendation, not a universal grid-layout requirement.
-Totals visibility does not determine their business math: opening balances use
-First over time, closing balances Last, flows Sum, and percentages/diagnostics
-need their explicit aggregation policy. See
-[roll-forward-authoring.md](roll-forward-authoring.md).
+Total visibility does not determine business math: over time use First for opening balances, Last for closing balances and Sum for additive flows. Specify aggregation for rates and diagnostics.

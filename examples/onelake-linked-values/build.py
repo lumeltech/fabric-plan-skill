@@ -1,8 +1,7 @@
 """Package-only cold construction; synthetic catalogs, no network or old report.
 
-Creates a new base application with query Values and the direct-link native-phase
-payload. The illustrated runtime owner ID is a simulated post-import response;
-live link creation requires the source identity for the requested binding.
+Creates a new base application with query Values and illustrates a direct
+binding using a synthetic owner identity. No binding is saved to a workspace.
 """
 from pathlib import Path
 import sys,uuid
@@ -50,14 +49,10 @@ def build(destination):
     qa=resolve_measure({'sourceType':'InfoBridge','queryId':query['id'],'outputId':field['outputId'],
         'assignment':qa,'bucket':'ameasure'},queries=[query])
     assert_resolved(qa,query)
-    native={'measureGuid':direct['measureGuid'],'columnType':6,'name':'Direct Plan Input',
-        'columnMeta':{'id':direct['measureGuid'],'label':'Direct Plan Input','data_type':'Number',
-                      'measure_type':{'Native':{'measure_role':'FCMeasure'}}}}
     save(destination/'construction.json',b)
     save(destination/'definition.json',b['envelope'])
     save(destination/'bindings.json',{'storageProfile':'OneLake','sourceRecord':source,'direct':direct,
-        'queryMetadata':query,'query':qa,'directNativeCompanion':native,
-        'runtime':'not-tested','network':'not-used','liveNextStep':'Resolve actual new native owner IDs and run the bundled link/register phase; optional manual refresh.'})
+        'queryMetadata':query,'query':qa,'runtime':'not-tested','network':'not-used'})
     return b
 
 if __name__=='__main__':

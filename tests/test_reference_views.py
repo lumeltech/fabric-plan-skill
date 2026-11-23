@@ -1,7 +1,6 @@
 import unittest,copy
 from runtime.reference_views import audit,audit_native_capture
 from runtime.page_parameters import number_parameter
-from runtime.builder_api import powertable_schema,read_bookmark
 from runtime.transport import HttpError
 
 def sample():
@@ -49,30 +48,5 @@ class ReferenceViews(unittest.TestCase):
     def test_parameter_names(self):
         with self.assertRaises(ValueError):number_parameter('Rate','two words')
         with self.assertRaises(ValueError):number_parameter('Rate','rate',parameter_id='reused-guid')
-
-class Readers(unittest.TestCase):
-    def test_schema_survives_details_failure(self):
-        class Client:
-            def request(self,method,path):
-                if path.endswith('/details/'):raise HttpError(400)
-                return {'body':{'statusCode':200,'payload':[{'name':'Id','isPrimaryKey':True}]}}
-        r=powertable_schema(Client(),'opaque-source')
-        self.assertEqual(r['status'],'partial');self.assertTrue(r['schema'][0]['isPrimaryKey'])
-        self.assertEqual(r['errors']['details']['status'],400)
-    def test_schema_failure_preserves_details(self):
-        class Client:
-            def request(self,method,path):
-                if path.endswith('/table/schema/'):raise HttpError(500)
-                return {'body':{'statusCode':200,'payload':{'tableName':'Product'}}}
-        r=powertable_schema(Client(),'opaque-source');self.assertEqual(r['details']['tableName'],'Product')
-        self.assertEqual(r['readStatus']['schema'],'failed')
-    def test_auth_not_reclassified_partial(self):
-        class Client:
-            def request(self,*a):raise HttpError(403)
-        with self.assertRaises(HttpError):powertable_schema(Client(),'s')
-    def test_bookmark_identity_mismatch(self):
-        class Client:
-            def request(self,*a):return {'body':{'bookmarkSlug':'wrong','bookmarkMeta':{'bookmarkSlug':'B'},'bookmarkVisualMeta':{}}}
-        with self.assertRaisesRegex(ValueError,'identity'):read_bookmark(Client(),'B')
 
 if __name__=='__main__':unittest.main()
