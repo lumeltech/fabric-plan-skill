@@ -1,16 +1,77 @@
 # Fabric Planning Skills
 
+<p align="center">
+  <a href="https://lumel.com/">
+    <img src="https://lumel.com/wp-content/uploads/lumel-orange.svg" alt="Lumel" width="180">
+  </a>
+</p>
+
+> **Lumel project** · [Canonical repository](https://github.com/lumeltech/fabric-plan-skill) · [Fabric Plan documentation](https://docs.fabricplan.com/) · [Lumel](https://lumel.com/)
+
 An agent skill for building and maintaining **Microsoft Fabric Plan** applications
 from business requirements and a Power BI semantic model. An AI coding agent
 (GitHub Copilot, Claude Code, Codex or any client that supports skills) reads
 `SKILL.md`, routes the request to the right guide, and uses the bundled Python
 runtime to construct, validate and deploy Plan content.
 
-> This is a community project, not an official Microsoft product. The repository
-> uses public Fabric APIs for the Plan lifecycle. New reports set sheet visibility in the initial public create request.
-> Only role-specific Home layout uses the native workload API.
+> This is a Lumel-maintained community project, not an official Microsoft
+> product. The repository uses public Fabric APIs for the Plan lifecycle. New
+> reports set sheet visibility in the initial public create request. Only
+> role-specific Home layout uses the native workload API.
 
 In v50, the public Create Plan request places each embedded Planning matrix on its dashboard. The original Planning sheet is hidden in Explorer when a visible dashboard embeds it. Its GUID continues to identify the grid for cross-sheet formulas and From Sheets bindings. For wide dashboards, the default layout puts navigation and slicers on the left, the matrix above the charts, and aligns the bottom edges. Supply the inner Reading viewport dimensions to size the layout for a particular display.
+
+## About Lumel and Fabric Plan
+
+[Lumel](https://lumel.com/) develops planning, business intelligence and
+writeback solutions for Microsoft Fabric. This repository is published from the
+[Lumel Technologies GitHub organization](https://github.com/lumeltech) as a
+community resource for authoring and maintaining Fabric Plan applications.
+
+- [Fabric Plan documentation](https://docs.fabricplan.com/)
+- [Fabric Planning Community](https://community.fabricplan.com/) — forums,
+  documentation and training
+- [Microsoft Fabric Community](https://community.fabric.microsoft.com/) —
+  Microsoft's broader Fabric user community
+- [Planning in Microsoft Fabric: a shared vision through collaboration with Lumel](https://www.microsoft.com/en-us/microsoft-fabric/blog/2024/12/04/planning-in-microsoft-fabric-a-shared-vision-through-collaboration-with-lumel/)
+- [Lumel IBCS resources](https://lumel.com/ibcs/)
+
+<p align="center">
+  <a href="https://docs.fabricplan.com/">
+    <img src="https://lumel.com/wp-content/uploads/lumel-planning.svg" alt="Lumel enterprise planning on Microsoft Fabric" width="720">
+  </a>
+</p>
+
+## Microsoft and Lumel
+
+Microsoft describes its work with Lumel as a collaboration that brings
+enterprise performance management for planning applications to Power BI and
+Microsoft Fabric. Lumel subsequently announced that Planning in Fabric IQ was
+co-engineered as a native first-party experience and made available in public
+preview.
+
+<p align="center">
+  <a href="https://www.microsoft.com/en-us/microsoft-fabric/blog/2024/12/04/planning-in-microsoft-fabric-a-shared-vision-through-collaboration-with-lumel/">
+    <img src="https://www.microsoft.com/en-us/microsoft-fabric/blog/wp-content/uploads/2024/12/Fabric_392264_Blog_241203.jpg" alt="Microsoft and Lumel collaboration for enterprise planning in Microsoft Fabric" width="720">
+  </a>
+</p>
+
+- Read Microsoft's announcement:
+  [Planning in Microsoft Fabric: A shared vision through collaboration with Lumel](https://www.microsoft.com/en-us/microsoft-fabric/blog/2024/12/04/planning-in-microsoft-fabric-a-shared-vision-through-collaboration-with-lumel/)
+- Read Lumel's first-party alliance announcement:
+  [Enterprise Planning in Microsoft Fabric](https://lumel.com/newsroom/lumel-microsoft-strategic-first-party-alliance-fabric-planning/)
+
+These links describe the Microsoft–Lumel collaboration for the Fabric planning
+capability. They do not imply that Microsoft endorses, publishes or maintains
+this skill repository. Microsoft, Microsoft Fabric, Lumel and related product
+names and images are the property of their respective owners.
+
+## Stay connected
+
+[Lumel on GitHub](https://github.com/lumeltech) ·
+[LinkedIn](https://www.linkedin.com/company/lumeltech/) ·
+[X](https://x.com/lumel_tech) ·
+[YouTube](https://www.youtube.com/@LumelTechnologies)
 
 ## Release layout
 
