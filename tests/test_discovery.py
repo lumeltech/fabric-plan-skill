@@ -73,6 +73,25 @@ class DiscoveryTests(unittest.TestCase):
         self.assertNotIn('python plan.py forecast-review',rendered)
         self.assertNotIn('python plan.py native place',rendered)
 
+    def test_powertable_modes_and_external_sql_companion_are_routed(self):
+        route=discover(module='POWERTABLE')['modules'][0]
+        guides={g['file'] for g in route['guides']}
+        expected={
+            'powertable/index.md',
+            'powertable/connect-existing-tables.md',
+            'powertable/create-from-scratch.md',
+            'powertable/modeling.md',
+            'powertable/column-mappings.md',
+            'powertable/analyze-data.md',
+            'powertable/analyze-across-sheets.md',
+        }
+        self.assertTrue(expected<=guides)
+        for query in ('PowerTable from scratch','analyze PowerTable','compare PowerTable sheets'):
+            self.assertIn('POWERTABLE',[m['id'] for m in discover(query)['modules']])
+        index=(ROOT/'references/powertable/index.md').read_text()
+        self.assertIn('github.com/gim-home/skills-for-fabric/tree/main/skills/sqldb-cli',index)
+        self.assertIn('external companion',index)
+
     def test_current_skill_and_core_references_have_clean_encoding(self):
         suspects=('Ã','â€','Â','Æ’')
         paths=[ROOT/'SKILL.md',*(ROOT/'references').glob('*.md')]

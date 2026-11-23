@@ -3608,12 +3608,51 @@
     },
     {
       "id": "POWERTABLE",
-      "name": "PowerTable maintenance",
+      "name": "PowerTable creation and analysis",
       "coverage": "separate-phase",
       "businessRequests": [
-        "Maintain products, employees or valid business combinations before transactions exist."
+        "Maintain products, employees or valid business combinations before transactions exist.",
+        "Connect one to five existing Fabric SQL Database tables as PowerTable sheets.",
+        "Design and create PowerTable-backed SQL tables from scratch.",
+        "Ask a natural-language data question about one existing PowerTable sheet.",
+        "Compare or reconcile data from two or three PowerTable sheets."
       ],
       "guides": [
+        {
+          "file": "powertable/index.md",
+          "heading": null,
+          "command": "python plan.py reference powertable/index.md"
+        },
+        {
+          "file": "powertable/connect-existing-tables.md",
+          "heading": null,
+          "command": "python plan.py reference powertable/connect-existing-tables.md"
+        },
+        {
+          "file": "powertable/create-from-scratch.md",
+          "heading": null,
+          "command": "python plan.py reference powertable/create-from-scratch.md"
+        },
+        {
+          "file": "powertable/modeling.md",
+          "heading": null,
+          "command": "python plan.py reference powertable/modeling.md"
+        },
+        {
+          "file": "powertable/column-mappings.md",
+          "heading": null,
+          "command": "python plan.py reference powertable/column-mappings.md"
+        },
+        {
+          "file": "powertable/analyze-data.md",
+          "heading": null,
+          "command": "python plan.py reference powertable/analyze-data.md"
+        },
+        {
+          "file": "powertable/analyze-across-sheets.md",
+          "heading": null,
+          "command": "python plan.py reference powertable/analyze-across-sheets.md"
+        },
         {
           "file": "saved-view-reference.md",
           "heading": null,
@@ -3652,10 +3691,16 @@
         "update",
         "table-config-repair"
       ],
-      "prerequisites": "Authorized physical SQL table, schema, artifact and connection. Physical primary keys and lookup uniqueness must be resolved.",
-      "limitations": "Configured grid requires all five ALM parts, double properties wrapper and coherent source IDs. Deferred sheet is uninitialized; account connection presence alone does not establish workload binding. Physical row writes have separate authorization/completion.",
+      "prerequisites": "Resolve the mode first. Existing and from-scratch creation require an authorized Fabric SQL Database, explicit schema, physical primary keys and a confirmed FabricSql connection. Analysis requires a confirmed Plan/PowerTable source and read-only SQL access. `sqldb-cli` is an external companion for SQL authoring/consumption.",
+      "limitations": "Creation is limited to five sheets/tables. New-table SQL types and Currency metadata follow the PowerTable allowlist. Analysis is read-only; cross-analysis is limited to three source sheets and requires confirmed relationships before answer queries. Configured grids require coherent ALM parts/source IDs. Deferred sheets are uninitialized. Workload writes and SQL operations require approved external profiles or companions.",
       "aliases": [
         "powertable",
+        "PowerTable from scratch",
+        "connect existing PowerTable",
+        "create PowerTable app",
+        "analyze PowerTable",
+        "compare PowerTable sheets",
+        "cross-sheet PowerTable analysis",
         "master data",
         "product maintenance",
         "employee master",
@@ -3668,7 +3713,12 @@
         "POWERTABLE-CONFIG",
         "SAVED-VIEW-REFERENCE"
       ],
-      "examples": []
+      "examples": [
+        "Connect dbo.Employee and dbo.Department to one new Plan.",
+        "Create an employee leave PowerTable application in a confirmed schema.",
+        "Show the top three highest-paid employees in an existing PowerTable.",
+        "Compare returns and sales by territory across two PowerTable sheets."
+      ]
     },
     {
       "id": "LOOKUP",

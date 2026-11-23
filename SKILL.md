@@ -1078,7 +1078,75 @@ prove rendering or query execution.
 
 ## Complete PowerTable construction
 
-Use `runtime.powertable_factory.configured_table` and `references/powertable-alm-construction.md` when the authorized SQL table and connection are resolved. Bundle all five parts: the sheet companion and the visual's properties, source, column configurations and source settings. The visual properties require the double schema/properties wrapper. Use the real SQL schema, a fresh source GUID, creationMode 2, a real SQLDbNative artifact binding, and source settings linked to that same GUID. The embedded presentation defaults contain no old report IDs.
+PowerTable requests dispatch by their current source state. Select exactly one
+mode, announce it, and read every linked reference end to end before issuing a
+command:
+
+| Mode | Use when | Required references |
+|---|---|---|
+| `powertable-existing` | One to five existing Fabric SQL Database tables are connected to a new Plan | [Connect existing tables](references/powertable/connect-existing-tables.md), [column mappings](references/powertable/column-mappings.md) |
+| `powertable-from-scratch` | New SQL tables must be designed and created before the Plan | [Modeling](references/powertable/modeling.md), [create from scratch](references/powertable/create-from-scratch.md), [column mappings](references/powertable/column-mappings.md) |
+| `powertable-analysis` | A natural-language question targets one existing PowerTable sheet | [Analyze PowerTable data](references/powertable/analyze-data.md) |
+| `powertable-cross-analysis` | Two or three PowerTable sheets must be compared or reconciled | [Analyze across sheets](references/powertable/analyze-across-sheets.md), [single-sheet analysis](references/powertable/analyze-data.md) |
+
+Use the [PowerTable reference index](references/powertable/index.md) to keep
+the mode, source state and required follow-on references together. The
+[`sqldb-cli` companion skill](https://github.com/gim-home/skills-for-fabric/tree/main/skills/sqldb-cli)
+is an external dependency, not bundled runtime. Its
+[authoring guide](https://github.com/gim-home/skills-for-fabric/tree/main/skills/sqldb-cli/references/authoring.md)
+supports DDL/discovery and its
+[consumption guide](https://github.com/gim-home/skills-for-fabric/tree/main/skills/sqldb-cli/references/consumption.md)
+supports read-only T-SQL. Resolve and install that companion separately when a
+PowerTable mode needs it; never manufacture a local `sqldb-cli` path.
+
+Apply these rules in all creation and analysis modes:
+
+- Create at most five PowerTable sheets in one run. In `powertable-from-scratch`,
+  the approved model is limited to five SQL tables per run.
+- In from-scratch mode, offer no sample data, reference-only sample rows, or
+  inserted synthetic rows. Ask for a row count only after insertion is selected;
+  accept only 1-100 rows per newly created table.
+- Use only the SQL type allowlist in
+  [PowerTable modeling](references/powertable/modeling.md). Set every Currency
+  column's `columnMeta.currency` to US Dollar.
+- For existing tables, search every user schema. If requested tables are absent,
+  offer create-through-from-scratch, another database, or cancellation.
+- After SQL Database selection in either creation mode, list user schemas,
+  mark `dbo` as the default and obtain explicit schema selection.
+- In from-scratch mode, show proposed tables in readable table layouts and offer
+  approve, fine-tune, custom tables or cancel. Do not discover a connection or
+  stage writes until the model is approved; repeat the complete preview after
+  every change.
+- In analysis mode, read the complete saved Plan definition, show the selected
+  sheet's database/schema/table/column mappings, and obtain explicit source
+  confirmation before the first data query.
+- Cross-sheet analysis compares at most three source sheets. Profile and confirm
+  every relationship before answer queries, aggregate each sheet before
+  combining, and scope discovery to the compared source tables, their Plans and
+  their databases. Name sources use the key sheet's own database.
+- Resolve Plan, workspace, database, table and connection identities by listing
+  and exact filtering. Never guess IDs, overwrite collisions or retry a possibly
+  successful write without readback.
+- Terminal write by mode: existing mode creates the Plan then verifies it;
+  from-scratch mode commits the approved transactional SQL DDL/DML, creates the
+  Plan, and verifies both; both analysis modes are strictly read-only.
+
+### PowerTable creation destination
+
+Confirm the target workspace and choose workspace root or an existing folder.
+Create the Plan in the confirmed workspace first; move it only after creation
+has completed and its Plan ID is resolved. Verify top-level `folderId` through
+Get Plan independently of definition readback before reporting placement.
+A destination change requires a refreshed review and approval.
+
+For the actual definition, use `runtime.powertable_factory.configured_table` and
+`references/powertable-alm-construction.md` when the authorized SQL table and
+connection are resolved. Bundle all five parts: the sheet companion and the
+visual's properties, source, column configurations and source settings. The
+visual properties require the double schema/properties wrapper. Use the real SQL
+schema, a fresh source GUID, creation mode consistent with the documented
+generator, a real SQLDbNative artifact binding, and source settings linked to
+that same GUID. The embedded presentation defaults contain no old report IDs.
 
 An empty POWERTABLE sheet only shows setup/welcome; it is not a configured
 table. A direct-initialization error is not proof that a generic Fabric SQL
@@ -1093,6 +1161,20 @@ Verify owned type-30 visuals, non-null dataSourceId, the schema in the resolved 
 When the user accepts deferred maintenance initialization, retain native visible POWERTABLE sheets even if the SQL connection is unavailable. An empty sheet is a navigation entry displaying the welcome/setup screen, not a configured table awaiting credentials. Mark it sheet-only-uninitialized and maintenance incomplete. When configured tables are requested, earlier acceptance of a sheet-only fallback does not establish configured-table completion. The complete ALM constructor or the supported native initializer must create the real visual/source/column records; do not fabricate them or clear a working PowerTable. Use runtime.powertable_readiness.inspect_native before reporting configured-table completion, and compare item-bound connections separately from the account connection catalog. Continue independent Plan modules when maintenance is incomplete.
 
 Read `references/maintenance-deferred-connection.md`; use `runtime.maintenance_shells` or `plan.py prepare-maintenance` for the same-item addition. Export a fresh baseline, preserve unrelated part bytes and verify the new native sheet catalog after publication. Preserve and audit the existing chart Visual level field filters, external Context and slicers after every import. Validate query field IDs against current output metadata even when chart and filter agree: ALM can remap both to incorrect input-row IDs. Use `consumer_bindings.audit_visual_consumers` and the scoped `restore_import_bindings` recovery from this deployment's intended properties, then save with fresh ETags and re-export. The updated bundle retains the chart filter constructors and their regression tests.
+
+### PowerTable completion summary
+
+End a creation run without waiting to be asked:
+
+| Field | Value |
+|---|---|
+| Workspace name | Display name of the workspace that holds the Plan |
+| Artifact name | Plan display name (`Plan`) |
+| Report URL | `https://app.powerbi.com/groups/{workspaceId}/plans/{planId}` |
+
+When verification fails, report the artifact as unverified but retain the
+summary. After a SQL commit without a Plan, report the persisted SQL tables and
+omit the URL; never represent the partial state as complete.
 
 ## Execute from the installed skill directory
 
@@ -1115,6 +1197,8 @@ From the installed runtime, first use `plan.py discover` and `references/module-
 | Intelligence mode guides, design topics and feature-level references | [Intelligence index](references/intelligence/index.md), [feature master list](references/intelligence/feature-master-list.md), `plan.py discover --module INTELLIGENCE` |
 | Every module: business request, guide, command, inputs and limits | `references/module-routing.md`, `references/module-routing.json`, `plan.py discover`, `references/routing-examples.md` |
 | External adapter compatibility and acceptance guide | `references/builder-integration.md` |
+| PowerTable request modes and source-state routing | [PowerTable index](references/powertable/index.md), [existing tables](references/powertable/connect-existing-tables.md), [from scratch](references/powertable/create-from-scratch.md), [analysis](references/powertable/analyze-data.md), [cross-analysis](references/powertable/analyze-across-sheets.md) |
+| External SQL Database authoring and consumption companion | [`sqldb-cli`](https://github.com/gim-home/skills-for-fabric/tree/main/skills/sqldb-cli) |
 | Typed-column/rule factories and local construction | `runtime/input_factories.py`, `runtime/rule_factories.py`, `plan.py construct-native`; workload writes are callable-only through an approved external adapter profile |
 | PowerTable encoding, new Navigator host and Home assets | `runtime/powertable_factory.py`, `runtime/navigator_api.py`, `runtime/assets_api.py` |
 | Native Forecast intent, complete records and defaults | `references/forecast-authoring.md`, `runtime/forecast.py`, `tests/test_forecast.py` |

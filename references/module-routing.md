@@ -673,17 +673,43 @@ bundled construction paths.
 
 Related: F27, F07, F15.
 
-## POWERTABLE PowerTable maintenance
+## POWERTABLE PowerTable creation and analysis
 
-**Invoke for:** Maintain products, employees or valid business combinations before transactions exist.
+**Invoke for:** Maintain products or employees; connect one to five existing
+Fabric SQL Database tables; design a PowerTable application from scratch;
+analyze one PowerTable sheet; or compare two or three PowerTable sheets.
 
-**Read:** [powertable-alm-construction.md](powertable-alm-construction.md), [maintenance-deferred-connection.md](maintenance-deferred-connection.md), [connected-construction.md](connected-construction.md).
+**Mode map:** Start with the [PowerTable index](powertable/index.md). Select
+exactly one mode:
+
+| Mode | Required guides |
+|---|---|
+| `powertable-existing` | [connect existing tables](powertable/connect-existing-tables.md), [column mappings](powertable/column-mappings.md) |
+| `powertable-from-scratch` | [modeling](powertable/modeling.md), [create from scratch](powertable/create-from-scratch.md), [column mappings](powertable/column-mappings.md) |
+| `powertable-analysis` | [analyze PowerTable data](powertable/analyze-data.md), [column mappings](powertable/column-mappings.md) |
+| `powertable-cross-analysis` | [analyze across sheets](powertable/analyze-across-sheets.md), [analyze PowerTable data](powertable/analyze-data.md), [column mappings](powertable/column-mappings.md) |
+
+Also use [powertable-alm-construction.md](powertable-alm-construction.md),
+[maintenance-deferred-connection.md](maintenance-deferred-connection.md) and
+[connected-construction.md](connected-construction.md) for the existing
+runtime component contracts. The external
+[`sqldb-cli`](https://github.com/gim-home/skills-for-fabric/tree/main/skills/sqldb-cli)
+companion supplies SQL authoring and consumption; it is not bundled.
 
 **Execution:** separate-phase. `runtime.powertable_factory.configured_table(...)`; `python plan.py construct-native table-column --input column.request.json --out column.json`; `python plan.py construct-native powertable-source --input source.request.json --out source.json`; `python plan.py construct-native powertable-rows --input rows.request.json --out rows.payload.json`; `python plan.py prepare-maintenance --baseline definition.json --requests maintenance.json --out maintenance`; `python plan.py api update --config destination.json --payload candidate.json --run run --label update`
 
-**Inputs/dependencies:** Authorized physical SQL table, schema, artifact and connection. Physical primary keys and lookup uniqueness must be resolved.
+**Inputs/dependencies:** Resolve the mode and source state first. Creation
+requires an authorized SQL Database, an explicit schema, physical primary keys,
+a confirmed FabricSql connection and the destination approval chain. Analysis
+requires a confirmed Plan/PowerTable source and read-only SQL access.
 
-**Boundaries:** Configured grid requires all five ALM parts, double properties wrapper and coherent source IDs. Deferred sheet is uninitialized; account connection presence alone does not establish workload binding. Physical row writes have separate authorization/completion.
+**Boundaries:** At most five created sheets/tables; 1-100 optional synthetic rows
+per new table; allowlisted SQL types; US Dollar Currency metadata; all-schema
+discovery; explicit schema and source confirmations. Analysis is read-only and
+cross-analysis is limited to three source sheets with confirmed relationships
+before aggregate answer queries. Configured grids require coherent ALM parts and
+source IDs. Deferred sheets are uninitialized. Approved `sqldb-cli` and external
+adapter profiles are required for their respective SQL/workload writes.
 
 
 Related: LOOKUP, F17, F18.
