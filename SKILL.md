@@ -9,7 +9,7 @@ description: Build, validate and update Microsoft Fabric Plan applications from 
 
 # Fabric Plan
 
-Use the Python CLI from this skill's directory. Use a separate task directory for inputs, generated definitions and readbacks. Python 3.11+ and Node.js 24+ are required for the full offline workflow.
+Run the Python CLI as `python scripts/plan.py` from this skill's root directory; data files live under `assets/`. Use a separate task directory for inputs, generated definitions and readbacks. Python 3.11+ and Node.js 24+ are required for the full offline workflow.
 
 The bundled Python client adds the telemetry header to every request it sends, including operation polls and retries, and preserves it through the optional Node adapter. The value identifies this skill only and must not include tenant, workspace, report, user or credential data.
 
@@ -33,7 +33,7 @@ The bundled Python client adds the telemetry header to every request it sends, i
 
 ## Examples
 
-- **New Plan:** `python plan.py build --model fixtures/model.json --spec fixtures/finance-spec.json --out /path/to/trial` constructs and validates an offline candidate; workspace creation remains a separate authorized step.
+- **New Plan:** `python scripts/plan.py build --model assets/fixtures/model.json --spec assets/fixtures/finance-spec.json --out /path/to/trial` constructs and validates an offline candidate; workspace creation remains a separate authorized step.
 - **Extension or repair:** export the named Plan, patch only the requested parts and dependencies, validate locally, then update only after the reviewed baseline still matches.
 - **Unsupported capability:** state that the requested operation has no public Fabric Plan API and identify the missing supported route without proposing a private workaround.
 
@@ -46,8 +46,8 @@ The bundled Python client adds the telemetry header to every request it sends, i
 ## Execution
 
 1. Identify the target model and workspace. Use current model metadata for field names, types, hierarchy levels and aggregation. Do not deploy the synthetic fixtures. If a required source, identity or field cannot be resolved, identify the missing input rather than inventing one.
-2. Use `python plan.py discover "business request"` to narrow the choice of topic, or select a guide below. Read only the topic needed. `python plan.py --help` is the inventory of executable commands; use a subcommand's `--help` for its arguments.
-3. Construct and validate a local candidate. For example, `python plan.py build --model fixtures/model.json --spec fixtures/finance-spec.json --out /path/to/trial` writes local files without credentials. Before a workspace create or update, check required input registrations, formula references, sheet bindings, dashboard geometry and coverage against the request.
+2. Use `python scripts/plan.py discover "business request"` to narrow the choice of topic, or select a guide below. Read only the topic needed. `python scripts/plan.py --help` is the inventory of executable commands; use a subcommand's `--help` for its arguments.
+3. Construct and validate a local candidate. For example, `python scripts/plan.py build --model assets/fixtures/model.json --spec assets/fixtures/finance-spec.json --out /path/to/trial` writes local files without credentials. Before a workspace create or update, check required input registrations, formula references, sheet bindings, dashboard geometry and coverage against the request.
 4. Use only the documented **public Fabric APIs**. Export, list and get are live reads; create, update, rename and delete require explicit write authorization for the named destination, and delete also needs a matching confirmation ID and the Plan's current name. A new update rechecks the reviewed baseline. Stop on drift. This check is not atomic: coordinate exclusive editing if a concurrent overwrite is unacceptable. If a feature lacks a public route, report it as unavailable; do not substitute workload endpoints, token exchanges or UI automation.
 5. Export the result from the destination and compare it with the intended changes. Preserve native numeric identities as decimal strings. Placement identifies where a grid appears; its source owner and measure identify what formulas and bindings consume. Check both using saved identities, not sheet order. Neither check proves stored values survived.
 6. Report what was built, validated locally, persisted, and verified interactively as separate outcomes. A saved definition does not prove that navigation, input or rendered layout works. After a failed write, read back current state before retrying; do not assume rollback.
@@ -81,4 +81,4 @@ Choose a reference directly; the list is a menu, not a reading sequence.
 | Review forecasts | [Actuals versus forecast](references/actual-forecast-review.md), [forecast time intelligence](references/forecast-time-intelligence.md) |
 | Format a grid or chart | [Column presentation](references/planning-column-presentation.md), [measure display](references/measure-display-defaults.md), [conditional formatting](references/conditional-formatting.md), [integrated variance](references/integrated-variance.md), [chart filters](references/chart-visual-filters.md) |
 
-Machine-readable resources (not required reading): [discovery catalog](catalog/module-routing.json), [capability gaps](catalog/api-contract-gaps.json), [header metrics](fixtures/arial-header-metrics.json), [preservation manifest](references/preservation-manifest.json).
+Machine-readable resources (not required reading): [discovery catalog](assets/catalog/module-routing.json), [capability gaps](assets/catalog/api-contract-gaps.json), [header metrics](assets/fixtures/arial-header-metrics.json), [preservation manifest](assets/preservation-manifest.json).

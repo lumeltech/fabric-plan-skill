@@ -30,9 +30,9 @@ commands add new feature records to a fresh export and keep every other part
 byte for byte:
 
 ```bash
-python plan.py planning-features --baseline current-definition.json --input planning-features.request.json --out candidate
-python plan.py powertable-features --baseline current-definition.json --input features.request.json --out candidate
-python plan.py cube-part --baseline current-definition.json --input cube.request.json --out candidate
+python scripts/plan.py planning-features --baseline current-definition.json --input planning-features.request.json --out candidate
+python scripts/plan.py powertable-features --baseline current-definition.json --input features.request.json --out candidate
+python scripts/plan.py cube-part --baseline current-definition.json --input cube.request.json --out candidate
 ```
 
 `planning-features` adds `writeback.json`, inserted rows, scenarios and row

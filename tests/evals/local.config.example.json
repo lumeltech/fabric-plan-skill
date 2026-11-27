@@ -1,0 +1,8 @@
+{
+  "githubAccount": "",
+  "model": "claude-sonnet-5",
+  "judgeModel": "claude-sonnet-5",
+  "workspaceName": "Planning-Test",
+  "workspaceId": "",
+  "allowWrites": false
+}

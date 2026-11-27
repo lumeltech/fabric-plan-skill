@@ -91,31 +91,32 @@ Start a new agent session, then ask, for example:
 Run from the skill folder:
 
 ```text
-python plan.py --help
-python plan.py discover "workforce merit salary cost"
-python plan.py usecase list
-python plan.py validate --help
+python scripts/plan.py --help
+python scripts/plan.py discover "workforce merit salary cost"
+python scripts/plan.py usecase list
+python scripts/plan.py validate --help
 ```
 
 `discover` is read-only. Local builds write files, not workspace items. Commands that write to a
 workspace need an explicit destination file (see
-`examples/five-usecases/`) and `FABRIC_TOKEN`.
+`assets/examples/five-usecases/`) and `FABRIC_TOKEN`.
 
 ## Repository layout
 
 | Path | Contents |
 |---|---|
 | `SKILL.md` | Agent instructions and routing |
-| `plan.py` | Command-line entry point |
-| `runtime/` | Constructors, codecs, validators and the public Fabric API client |
-| `catalog/` | Machine-readable discovery routing and the ledger of capabilities with no public route |
+| `scripts/plan.py` | Command-line entry point |
+| `scripts/runtime/` | Constructors, codecs, validators and the public Fabric API client |
+| `assets/catalog/` | Machine-readable discovery routing and the ledger of capabilities with no public route |
 | `references/` | Feature guides and contracts, loaded on demand |
-| `schemas/` | Plan definition part schemas |
-| `examples/` | Request and destination examples, including the five use cases |
-| `fixtures/` | Test and reference fixtures |
-| `tools/` | Node helpers (payload codec, HTTP, visual placement) |
-| `vendor/lzutf8/` | Third-party LZ-UTF8 library (MIT) |
-| `tests/` | Offline unit tests |
+| `assets/schemas/` | Plan definition part schemas |
+| `assets/examples/` | Request and destination examples, including the five use cases |
+| `assets/fixtures/` | Test and reference fixtures |
+| `scripts/tools/` | Node helpers (payload codec, HTTP, visual placement) |
+| `scripts/vendor/lzutf8/` | Third-party LZ-UTF8 library (MIT) |
+| `assets/preservation-manifest.json` | Roll-forward preservation data |
+| `tests/` | Offline unit tests (`tests/evals/` holds the Vally smoke and full evals) |
 
 For dashboards embedded in a Plan, use the direct [planning references](SKILL.md#planning-references).
 The standalone Intelligence reporting library is not distributed with this skill.
@@ -125,8 +126,27 @@ The standalone Intelligence reporting library is not distributed with this skill
 The tests are offline and need no credentials:
 
 ```text
-python -m unittest discover tests
+python scripts/plan.py test
 ```
+
+### Before you open a PR
+
+CI runs only the offline checks. Run the agent evals on your machine with your
+own Copilot model (macOS or Linux; needs Python 3.11+, Node.js 24+, `gh`, and
+`az` for connected runs):
+
+1. Copy `tests/evals/local.config.example.json` to `tests/evals/local.config.json`
+   (git-ignored). Set `githubAccount` to a `gh` login whose Copilot plan lists
+   the `model` and `judgeModel`.
+2. Run `tests/run-evals.sh --dry-run` to check the setup, then
+   `tests/run-evals.sh --full`. Add `--connected` (with `allowWrites: true` and
+   `az login`) to run against your test workspace.
+3. Paste the summary line it prints into the pull request.
+
+Results are written to `vally-results/` (git-ignored).
+
+How each tier, eval case and grader works, and how the evals stay safe in a
+shared workspace: [the evals guide in tests/evals/](tests/evals/).
 
 ## Safety
 
@@ -136,7 +156,7 @@ python -m unittest discover tests
   display name.
 - Operations without a supported public route are out of scope. They are recorded
   with their reason and the public part that remains in
-  [`catalog/api-contract-gaps.json`](catalog/api-contract-gaps.json); report them as
+  [`assets/catalog/api-contract-gaps.json`](assets/catalog/api-contract-gaps.json); report them as
   unavailable rather than routing around them.
 - Public Fabric requests include
   `x-ms-fabric-skill: fabric-plan-skill` for skill-level telemetry.
@@ -148,7 +168,7 @@ python -m unittest discover tests
 
 ## License
 
-MIT; see [LICENSE](LICENSE). `vendor/lzutf8` is Copyright (c) 2014-2018 Rotem Dan,
-under the MIT license in `vendor/lzutf8/LICENSE.txt`.
+MIT; see [LICENSE](LICENSE). `scripts/vendor/lzutf8` is Copyright (c) 2014-2018 Rotem Dan,
+under the MIT license in `scripts/vendor/lzutf8/LICENSE.txt`.
 
 Microsoft and Microsoft Fabric are trademarks of the Microsoft group of companies.

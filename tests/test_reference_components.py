@@ -1,6 +1,6 @@
 import unittest,copy,sys
 from pathlib import Path
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from runtime.dimension_mapping import dimension_mapping,validate_mapping
 from runtime.table_columns import column_config
 from runtime.construct import field,planning

@@ -1,4 +1,5 @@
 """Offline regressions: selection isolation, exact Auto wire and preservation."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,json,tempfile,unittest
 from pathlib import Path
 from runtime.chart_filters import ensure_chart_filters,audit_chart_filters
@@ -104,7 +105,7 @@ class DisplayDefaultsTests(unittest.TestCase):
                 table,col=key.split('[',1);col=col[:-1]
                 fields.append({'id':key,'tableName':table,'columnName':col,'columnType':'Measure' if key in native else 'Column',
                     'dataType':'Double' if key in native else 'Int64' if col in ('Year','Quarter','MonthNumber') or col.endswith(('ID','Key')) else 'String'})
-            model={'reference':json.loads((ROOT/'fixtures/model.json').read_text())['reference'],'fields':fields}
+            model={'reference':json.loads((ROOT/'assets/fixtures/model.json').read_text())['reference'],'fields':fields}
             with tempfile.TemporaryDirectory() as tmp:
                 b,_,_=prepare(c,model,tmp,'Offline '+c['title'])
                 for path,obj in b['raw'].items():

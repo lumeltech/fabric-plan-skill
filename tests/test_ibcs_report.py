@@ -1,4 +1,5 @@
 """IBCS dashboards: Plan theme on request, a Matrix in place of the embedded grid, message title and footnotes."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import json
 import unittest
 from pathlib import Path
@@ -12,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def model():
-    return load(ROOT / 'fixtures/model.json')
+    return load(ROOT / 'assets/fixtures/model.json')
 
 
 def table(**extra):

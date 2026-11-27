@@ -14,7 +14,7 @@ from contextlib import contextmanager
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0,str(ROOT/'scripts'))
 from runtime.codec import load, loads, pack, unpack
 from runtime.identity import Registry
 from runtime.layout import audit, verify_unchanged
@@ -25,7 +25,7 @@ from runtime.workflow import preflight, provision
 TOKEN_ENV = 'FABRIC_PLAN_INDEPENDENT_TEST_TOKEN'
 
 def decode_roles(payload,node):
-    result=subprocess.run([node,str(ROOT/'tools/decode-lzutf8.cjs')],input=payload,
+    result=subprocess.run([node,str(ROOT/'scripts/tools/decode-lzutf8.cjs')],input=payload,
                           text=True,encoding='utf-8',capture_output=True,timeout=30,check=True)
     return loads(result.stdout)
 
@@ -129,10 +129,10 @@ class IndependentApiTests(unittest.TestCase):
                 self.fail(f'Unexpected discovery request: {method} {url}')
             return {'status': status, 'headers': metadata, 'body': payload}
 
-        argv = ['plan.py', 'usecase', 'model', '--config', str(config), '--run', str(run)]
+        argv = ['scripts/plan.py', 'usecase', 'model', '--config', str(config), '--run', str(run)]
         with patch.object(sys, 'argv', argv), patch.object(Client, '_http', respond), redirect_stdout(StringIO()):
             for _ in range(2):
-                runpy.run_path(str(ROOT / 'plan.py'), run_name='__main__')
+                runpy.run_path(str(ROOT / 'scripts/plan.py'), run_name='__main__')
         self.assertEqual(len(operations), 2)
         model = load(run / 'current-model.json')
         self.assertEqual(model['reference']['semanticModelName'], 'Sales model')
@@ -180,7 +180,7 @@ class IndependentApiTests(unittest.TestCase):
             self.skipTest('Optional Node runtime unavailable for LZUTF8 test')
         text = '{"__everyone__":{"title":"R\u00e9sum\u00e9 \u2013 \u6d4b\u8bd5","runtimeId":18446744073709551615}}'
         program = "const fs=require('node:fs');const lz=require(process.argv[1]);process.stdout.write(lz.compress(fs.readFileSync(0,'utf8'),{outputEncoding:'Base64'}));"
-        compressed = subprocess.run([node, '-e', program, str(ROOT / 'vendor/lzutf8/lzutf8.js')],
+        compressed = subprocess.run([node, '-e', program, str(ROOT / 'scripts/vendor/lzutf8/lzutf8.js')],
             input=text.encode('utf-8'), capture_output=True, check=True, timeout=30).stdout.decode('ascii')
         self.assertEqual(decode_roles(compressed, node), json.loads(text))
 
@@ -188,7 +188,7 @@ class WorkflowRegressionTests(unittest.TestCase):
     setUp = IndependentApiTests.setUp
 
     def inputs(self):
-        model = load(ROOT / 'fixtures/model.json')
+        model = load(ROOT / 'assets/fixtures/model.json')
         spec = {'name': 'Synthetic Capacity', 'requiredCapabilities': [
             'planning.numeric', 'planning.native-measure', 'planning.conditional-edit-policy'],
             'sheets': [{'name': 'Capacity', 'rows': ['Employee[Employee]'], 'columns': ['Period[Month]'],

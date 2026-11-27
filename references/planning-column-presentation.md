@@ -39,8 +39,8 @@ collapsed saved views or bookmarks. Row-only sheets have no column levels to see
 ## Commands
 
 ```text
-python plan.py planning-column-presentation --input properties.json --out candidate.json
-python plan.py planning-column-presentation --input properties.json --out candidate.json --expansion-only
+python scripts/plan.py planning-column-presentation --input properties.json --out candidate.json
+python scripts/plan.py planning-column-presentation --input properties.json --out candidate.json --expansion-only
 ```
 
 Callables: `runtime.column_presentation.expand_columns(properties)` and

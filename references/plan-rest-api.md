@@ -59,8 +59,8 @@ and are journaled like every other write.
   journaled delete instead of sending another.
 
 ```sh
-python plan.py api list --config destination.json --run run --label plans
-python plan.py api delete --config destination.json --run run --label delete
+python scripts/plan.py api list --config destination.json --run run --label plans
+python scripts/plan.py api delete --config destination.json --run run --label delete
 ```
 
 ## Preconditions and request content
@@ -147,7 +147,7 @@ For example, to resume an interrupted update or an update whose polling timed
 out, repeat it unchanged:
 
 ```sh
-python plan.py api update --config destination.json --payload candidate.json --run run --label update
+python scripts/plan.py api update --config destination.json --payload candidate.json --run run --label update
 ```
 
 ## Primary sources

@@ -1,6 +1,7 @@
-# graft's local graph cache — regenerable, not committed (run `graft build`).
-/graft/
 __pycache__/
 *.py[cod]
 # Local validation findings against private product code; never commit.
 /findings/
+# Local eval runs: per-developer settings and results stay on each machine.
+/tests/evals/local.config.json
+/vally-results/

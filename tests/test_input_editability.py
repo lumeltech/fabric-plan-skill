@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,unittest
 from pathlib import Path
 from runtime.codec import load
@@ -59,17 +60,17 @@ class InputEditabilityTests(unittest.TestCase):
         self.assertEqual(self.forecast(referenceForecast={'edit_config':{'allow_input':'Edit'}})['edit_config']['allow_input'],'ReadAndEdit')
 
     def test_base_constructor_default_and_existing_condition(self):
-        s=load(ROOT/'fixtures/finance-spec.json')['sheets'][0]
+        s=load(ROOT/'assets/fixtures/finance-spec.json')['sheets'][0]
         s['measures']=[{'kind':'Formula','key':'eligible','label':'Eligibility','formula':'1'},
           {'kind':'DataInput','key':'entry','label':'Entry'},
           {'kind':'DataInput','key':'gated','label':'Gated','allow_input':{'BasedOnFormula':'${eligible} > 0'}}]
-        _,raw,ids=planning(load(ROOT/'fixtures/model.json'),s,Registry())
+        _,raw,ids=planning(load(ROOT/'assets/fixtures/model.json'),s,Registry())
         records=next(v['columns'] for k,v in raw.items() if k.endswith('dataInput.json'))
         self.assertEqual(records[1]['columnMeta']['measure_type']['DataInput']['allow_input'],'ReadAndEdit')
         self.assertEqual(records[2]['columnMeta']['measure_type']['DataInput']['allow_input'],{'BasedOnFormula':'M_'+ids['measures']['eligible']+' > 0'})
 
     def test_conditional_business_request_routes_f30(self):
-        b=load(ROOT/'examples/business-intent/conditional-input.json');p=plan_intent(b)
+        b=load(ROOT/'assets/examples/business-intent/conditional-input.json');p=plan_intent(b)
         self.assertEqual(p['requirements'][0]['modules'],['F30'])
         b['requirements'][0]['details'].pop('expression')
         self.assertFalse(plan_intent(b)['readyForAuthoring'])

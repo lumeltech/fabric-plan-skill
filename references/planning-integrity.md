@@ -15,21 +15,21 @@ the native renderer, calculations or writeback work.
 | Use business wording such as Market for Country | Keep the physical grouping identity and canonical grouping name throughout this authoring path; put business wording in headings or explanatory text |
 
 ```text
-python plan.py check-planning-properties --input properties.json --model current-model.json --out check.json
-python plan.py repair-planning-properties --input properties.json --model current-model.json --out repair.json
+python scripts/plan.py check-planning-properties --input properties.json --model current-model.json --out check.json
+python scripts/plan.py repair-planning-properties --input properties.json --model current-model.json --out repair.json
 ```
 
 Input is one plain Planning properties object, including `pivotAssignments` and
 `visualState`, not an ALM part envelope. Output of repair includes `properties`,
 `changes`, `check` and `runtime: not-run`. Never save the repair wrapper as native
 properties. Keep it in the task audit directory. A repeat repair is idempotent.
-The synthetic `examples/planning-integrity.properties.json` can be repaired without
+The synthetic `assets/examples/planning-integrity.properties.json` can be repaired without
 `--model`; real authoring should pass a current catalog with exact field IDs.
 
 ## Complete defaults, preserve intentional formatting
 
 The complete known `GlobalStyles` initializer is captured in
-`fixtures/matrix-global-defaults.json`, from the bundled feature contracts'
+`assets/fixtures/matrix-global-defaults.json`, from the bundled feature contracts'
 GlobalStyles default profile. It includes body/header typography, hierarchy and
 subtotal typography, header controls, variable color, variance/KPI sizes and chart
 scale. It is a versioned baseline, not a claim to contain every future property.

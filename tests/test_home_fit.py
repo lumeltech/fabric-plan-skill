@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy, math, unittest
 from runtime.surfaces import home_item, home_layout
 from runtime.home_fit import audit_home_fit, readable_home_layout

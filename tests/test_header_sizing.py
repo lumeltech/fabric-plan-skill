@@ -1,4 +1,5 @@
 """Header sizing follows the product's title CSS: span font sizes count, paragraph margins do not."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import unittest
 from runtime.header_sizing import LINE_HEIGHT, Paragraphs, calculate_header_height
 

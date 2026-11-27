@@ -11,8 +11,8 @@ and decide whether row/column totals should be evaluated. Test zero and missing
 separately. A rule that colors every total red can conceal a correct leaf rule.
 
 ```sh
-python plan.py format-matrix --input formatting-request.json --out candidate.json
-python plan.py planning-totals --input totals-request.json --out totals.json
+python scripts/plan.py format-matrix --input formatting-request.json --out candidate.json
+python scripts/plan.py planning-totals --input totals-request.json --out totals.json
 ```
 
 These commands construct local candidates. For formatting, use current state

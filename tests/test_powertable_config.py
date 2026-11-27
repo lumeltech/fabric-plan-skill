@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,importlib.util,unittest
 from pathlib import Path
 from runtime.codec import parts,unpack
@@ -5,7 +6,7 @@ from runtime.powertable_config import repair_definition,enrich_source
 from runtime.powertable_factory import configured_table,existing_source
 from runtime.table_columns import column_config,apply_lookup
 
-spec=importlib.util.spec_from_file_location('lookup_example',Path(__file__).resolve().parents[1]/'examples/powertable-lookups/build.py')
+spec=importlib.util.spec_from_file_location('lookup_example',Path(__file__).resolve().parents[1]/'assets/examples/powertable-lookups/build.py')
 example=importlib.util.module_from_spec(spec);spec.loader.exec_module(example)
 
 class PowerTableConfigTests(unittest.TestCase):

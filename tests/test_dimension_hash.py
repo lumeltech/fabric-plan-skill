@@ -1,4 +1,5 @@
 """Supplied hash vectors, first anchors and completeness of portable construction."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy
 import json
 from pathlib import Path
@@ -21,7 +22,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 def inputs():
-    return runpy.run_path(str(ROOT/'examples/anchor-measures/new-report.py'))['inputs']()
+    return runpy.run_path(str(ROOT/'assets/examples/anchor-measures/new-report.py'))['inputs']()
 
 
 def owner(result):
@@ -153,7 +154,7 @@ class DimensionHashTests(unittest.TestCase):
     def test_new_report_cli_is_self_contained(self):
         with tempfile.TemporaryDirectory() as folder:
             out=Path(folder)/'report.json'
-            proc=subprocess.run([sys.executable,str(ROOT/'examples/anchor-measures/new-report.py'),'--out',str(out)],
+            proc=subprocess.run([sys.executable,str(ROOT/'assets/examples/anchor-measures/new-report.py'),'--out',str(out)],
                                 cwd=folder,capture_output=True,text=True)
             self.assertEqual(proc.returncode,0,proc.stderr)
             result=json.loads(out.read_text())

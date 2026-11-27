@@ -2,7 +2,7 @@ import unittest,copy,json,sys
 from pathlib import Path
 from unittest.mock import patch
 from decimal import Decimal
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from runtime.construct import build
 from runtime.identity import Registry
 from runtime.filters import selection,forward_filters,audit_context,prepare_context

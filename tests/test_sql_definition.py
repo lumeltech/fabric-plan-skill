@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import base64,unittest
 from runtime.sql_definition import read_sql_project,physical_table
 

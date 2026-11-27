@@ -1,4 +1,5 @@
 """Mandatory page navigation is constructed and saved without a repair phase."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy
 import unittest
 from pathlib import Path
@@ -12,7 +13,7 @@ from runtime.navigator_defaults import require_complete_defaults
 ROOT=Path(__file__).resolve().parents[1]
 
 def build(explicit=False):
-    model=load(ROOT/'fixtures/model.json');spec=load(ROOT/'fixtures/finance-spec.json')
+    model=load(ROOT/'assets/fixtures/model.json');spec=load(ROOT/'assets/fixtures/finance-spec.json')
     if explicit:
         owner=spec['sheets'][0]['name']
         spec['dashboards']=[{'name':'Executive review','owner':owner,'slicers':[],'cards':[]},

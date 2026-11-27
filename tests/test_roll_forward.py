@@ -1,4 +1,5 @@
 """Offline presentation/routing regressions; no native calculation assertions."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,hashlib,json,subprocess,sys,tempfile,unittest
 from pathlib import Path
 from runtime.roll_forward import apply_totals_defaults,roll_forward_presentation,TOTALS_DEFAULTS
@@ -10,7 +11,7 @@ from runtime.business_intent import plan_intent
 ROOT=Path(__file__).resolve().parents[1]
 
 class RollForwardTests(unittest.TestCase):
-    def request(self):return load(ROOT/'examples/roll-forward-presentation.request.json')
+    def request(self):return load(ROOT/'assets/examples/roll-forward-presentation.request.json')
 
     def test_totals_defaults_preserve_explicit_user_choices_and_freeze(self):
         p={'visualState':{'totals_config':{'row_grand_total':None,'column_sub_total':'Right','freeze_total':True}}}
@@ -23,7 +24,7 @@ class RollForwardTests(unittest.TestCase):
             with self.assertRaises(ValueError):apply_totals_defaults({'visualState':{'totals_config':{'column_sub_total':invalid}}})
 
     def test_new_build_partial_overrides_and_symbolic_hierarchy(self):
-        model=load(ROOT/'fixtures/model.json');base=load(ROOT/'fixtures/finance-spec.json')
+        model=load(ROOT/'assets/fixtures/model.json');base=load(ROOT/'assets/fixtures/finance-spec.json')
         for overrides in ({},{'column_grand_total':None},{'row_sub_total':'Bottom','column_sub_total':'Right'}):
             spec=copy.deepcopy(base)
             for sheet in spec['sheets']:
@@ -77,14 +78,14 @@ class RollForwardTests(unittest.TestCase):
     def test_varied_prompts_find_the_complete_roll_forward_module(self):
         for prompt in ['cash runway and funding shortfall','stock depletion and replenishment','invoice cohorts and collections timing','staffing exits depend on opening headcount','unearned revenue recognition and cancellations','roll forward','carry forward balances']:
             self.assertIn('ROLL-FORWARD',[m['id'] for m in discover(prompt)['modules'][:3]],prompt)
-        data=plan_intent(load(ROOT/'examples/roll-forward-intent.json'))
+        data=plan_intent(load(ROOT/'assets/examples/roll-forward-intent.json'))
         self.assertIn('ROLL-FORWARD',data['requirements'][0]['modules'])
         self.assertIn('ReadAndEdit',(ROOT/'references/roll-forward-authoring.md').read_text())
-        brief=load(ROOT/'examples/roll-forward-intent.json');del brief['requirements'][0]['details']['seedAuthority']
+        brief=load(ROOT/'assets/examples/roll-forward-intent.json');del brief['requirements'][0]['details']['seedAuthority']
         self.assertIn('seedAuthority',plan_intent(brief)['requirements'][0]['unresolved'])
 
     def test_complete_source_matches_preservation_manifest(self):
-        entries=load(ROOT/'references/preservation-manifest.json')
+        entries=load(ROOT/'assets/preservation-manifest.json')
         entry=entries[0]
         b=b''.join((ROOT/path).read_bytes() for path in entry['preservedFiles'])
         self.assertEqual(hashlib.sha256(b).hexdigest(),entry['sha256'])
@@ -96,7 +97,7 @@ class RollForwardTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             for command,example in [('planning-totals','planning-totals.request.json'),('roll-forward-presentation','roll-forward-presentation.request.json'),('plan-intent','roll-forward-intent.json')]:
                 out=Path(folder)/(command+'.json')
-                run=subprocess.run([sys.executable,str(ROOT/'plan.py'),command,'--input',str(ROOT/'examples'/example),'--out',str(out)],cwd=folder,capture_output=True,text=True)
+                run=subprocess.run([sys.executable,str(ROOT/'scripts/plan.py'),command,'--input',str(ROOT/'assets/examples'/example),'--out',str(out)],cwd=folder,capture_output=True,text=True)
                 self.assertEqual(run.returncode,0,run.stderr);self.assertTrue(out.exists())
 
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,4 @@
+{
+  "description": "The only public Fabric REST routes the skill calls. Python (scripts/runtime/transport.py) and Node (scripts/tools/http.cjs) both load this file and match it against the raw, undecoded URL path. IDs are letters, digits and hyphens, so '.', '..', '%'-encoding and control characters never match.",
+  "pattern": "^/v1(?:|/workspaces/[0-9A-Za-z][0-9A-Za-z-]{0,63}/plans(?:/[0-9A-Za-z][0-9A-Za-z-]{0,63}(?:/(?:getDefinition|updateDefinition))?)?|/workspaces/[0-9A-Za-z][0-9A-Za-z-]{0,63}/semanticModels/[0-9A-Za-z][0-9A-Za-z-]{0,63}(?:/getDefinition)?|/workspaces/[0-9A-Za-z][0-9A-Za-z-]{0,63}/sqlDatabases/[0-9A-Za-z][0-9A-Za-z-]{0,63}/getDefinition|/operations/[0-9A-Za-z][0-9A-Za-z-]{0,63}(?:/result)?)/?$"
+}

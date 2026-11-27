@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import unittest,copy
 from runtime.maintenance_shells import blank_powertable,add_deferred_powertables
 from runtime.codec import pack,parts,unpack

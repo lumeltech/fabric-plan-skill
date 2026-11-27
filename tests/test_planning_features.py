@@ -1,4 +1,5 @@
 """Planning writeback, inserted rows, scenarios and row templates as definition parts."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,json,os,subprocess,sys,tempfile,unittest
 from pathlib import Path
 from runtime.codec import load,pack,parts,unpack
@@ -16,7 +17,7 @@ ARTICLE_FORM={'connectionId':'00000000-0000-4000-8000-000000000001','databaseId'
 
 def fresh_export():
     """One Planning sheet with two Native measures and one DataInput measure."""
-    raw=build(load(ROOT/'fixtures/model.json'),load(ROOT/'fixtures/capacity-spec.json'))['raw']
+    raw=build(load(ROOT/'assets/fixtures/model.json'),load(ROOT/'assets/fixtures/capacity-spec.json'))['raw']
     sheet=raw['definition.json']['sheets'][0];visual=sheet['workloadItemEntityVisuals'][0]['visualId']
     prefix=f"sheets/{sheet['recordGuid']}/visuals/{visual}/"
     measures={c['name']:c['measureGuid'] for c in raw[prefix+'dataInput.json']['columns']}
@@ -349,7 +350,7 @@ class CommandLine(PlanningFeatureTestCase):
         tmp=Path(temporary.name)
         (tmp/'request.json').write_text(json.dumps(request),encoding='utf-8')
         (tmp/'baseline.json').write_text(json.dumps(self.envelope),encoding='utf-8')
-        result=subprocess.run([sys.executable,str(ROOT/'plan.py'),command,'--baseline',str(tmp/'baseline.json'),
+        result=subprocess.run([sys.executable,str(ROOT/'scripts/plan.py'),command,'--baseline',str(tmp/'baseline.json'),
                                '--input',str(tmp/'request.json'),'--out',str(tmp/'out')],capture_output=True,text=True,cwd=ROOT,
                               env={**os.environ,'FABRIC_SKILL_OFFLINE_TEST':'1'})
         return result,tmp/'out'

@@ -15,7 +15,7 @@ color polarity, or explicitly select it from the business requirement for new wo
 For an existing resolved AC/PY chart, create a presentation-only candidate:
 
 ```text
-python plan.py integrated-variance --input chart-properties.json --out chart-candidate.json
+python scripts/plan.py integrated-variance --input chart-properties.json --out chart-candidate.json
 ```
 
 The input is the inner native properties object. `apply_integrated_variance`

@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import unittest
 from runtime.intelligence import rectangles
 
@@ -41,7 +42,7 @@ class ReadingViewportTests(unittest.TestCase):
         from runtime.codec import load
         from runtime.public_alignment import check_placements
         from runtime.planning_presentation import build_application
-        fixture=Path(__file__).resolve().parents[1]/'fixtures'
+        fixture=Path(__file__).resolve().parents[1]/'assets/fixtures'
         spec=load(fixture/'context-dashboard-spec.json')
         for d in spec['dashboards']:
             d['viewport']={'width':1600,'height':1600}

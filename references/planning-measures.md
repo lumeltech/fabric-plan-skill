@@ -14,7 +14,7 @@ IDs, not input column IDs or ordinals. If those facts aren't in the supplied
 metadata, stop rather than invent a binding.
 
 ```sh
-python plan.py resolve-measure-binding --input binding-request.json --out assignment.json
+python scripts/plan.py resolve-measure-binding --input binding-request.json --out assignment.json
 ```
 
 For example, a model binding request contains `model` plus

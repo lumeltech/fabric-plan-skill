@@ -7,17 +7,19 @@
       "README.md",
       "LICENSE",
       "apm.yml",
-      "plan.py",
-      "runtime/",
-      "catalog/",
       "references/",
-      "fixtures/",
-      "schemas/",
-      "tools/",
-      "vendor/"
+      "scripts/plan.py",
+      "scripts/runtime/",
+      "scripts/tools/",
+      "scripts/vendor/",
+      "assets/catalog/",
+      "assets/fixtures/",
+      "assets/schemas/",
+      "assets/examples/five-usecases/",
+      "assets/preservation-manifest.json"
     ],
     "manual-examples": [
-      "examples/"
+      "assets/examples/"
     ],
     "offline-tests": [
       "tests/"
@@ -29,34 +31,32 @@
       ".changeset/",
       ".github/",
       ".trail/",
-      "assets/",
       "build/",
-      "graft/",
       "**/__pycache__/",
       "**/*.pyc",
       "**/*.pyo"
     ]
   },
   "retained-unreferenced-assets": {
-    "examples/business-intent/quarterly-targets.recipe.json": "manual-example",
-    "examples/five-usecases/business-prompts.txt": "manual-example",
-    "examples/five-usecases/destination.example.json": "manual-example",
-    "examples/forecast-repair.request.json": "manual-example",
-    "examples/forecast-review.request.json": "manual-example",
-    "examples/header-fit.request.json": "manual-example",
-    "examples/hierarchy-icons.request.json": "manual-example",
-    "examples/measure-display.request.json": "manual-example",
-    "examples/planning-integrity.properties.json": "manual-example",
-    "examples/planning-presentation.request.json": "manual-example",
-    "fixtures/navigator-spec-*.json": "offline-test",
-    "fixtures/negative-variance-rule.json": "offline-test",
-    "tools/audit_report_definitions.py": "maintenance-tool"
+    "assets/examples/business-intent/quarterly-targets.recipe.json": "manual-example",
+    "assets/examples/five-usecases/business-prompts.txt": "manual-example",
+    "assets/examples/five-usecases/destination.example.json": "manual-example",
+    "assets/examples/forecast-repair.request.json": "manual-example",
+    "assets/examples/forecast-review.request.json": "manual-example",
+    "assets/examples/header-fit.request.json": "manual-example",
+    "assets/examples/hierarchy-icons.request.json": "manual-example",
+    "assets/examples/measure-display.request.json": "manual-example",
+    "assets/examples/planning-integrity.properties.json": "manual-example",
+    "assets/examples/planning-presentation.request.json": "manual-example",
+    "assets/fixtures/navigator-spec-*.json": "offline-test",
+    "assets/fixtures/negative-variance-rule.json": "offline-test",
+    "scripts/tools/audit_report_definitions.py": "maintenance-tool"
   },
   "limits": {
     "references_markdown_max_bytes": 20000,
-    "references_machine_data_allowed": [
-      "references/preservation-manifest.json"
-    ],
     "tracked_bytecode_allowed": false
+  },
+  "notes": {
+    "assets/examples/five-usecases/": "Runtime-required: scripts/runtime/usecases.py reads it. The rest of assets/examples/ is manual."
   }
 }

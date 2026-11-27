@@ -129,7 +129,7 @@ mismatches before filling metadata.
 3. Run the bundled local command:
 
 ```text
-python plan.py repair-powertable-config --baseline current-definition.json --input repair.request.json --out candidate
+python scripts/plan.py repair-powertable-config --baseline current-definition.json --input repair.request.json --out candidate
 ```
 
 It produces candidate/definition.json and candidate/changes.json. It changes only
@@ -151,8 +151,8 @@ Respect a request to skip report/runtime validation; state that limit explicitly
 ## Portable example and evidence boundary
 
 ```text
-python examples/powertable-lookups/build.py draft
-python plan.py repair-powertable-config --baseline draft/baseline.json --input draft/repair.request.json --out repaired
+python assets/examples/powertable-lookups/build.py draft
+python scripts/plan.py repair-powertable-config --baseline draft/baseline.json --input draft/repair.request.json --out repaired
 ```
 
 The example builds its own illustrative schema and creates both a new configured

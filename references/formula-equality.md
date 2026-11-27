@@ -27,8 +27,8 @@ bracket references and comments before checking operators; it preserves
 does not certify function signatures, data types or runtime evaluation.
 
 ```sh
-python plan.py check-formula-syntax --input formula.json --out issues.json
-python plan.py repair-formula-equality --input formula.json --out fixed.json
+python scripts/plan.py check-formula-syntax --input formula.json --out issues.json
+python scripts/plan.py repair-formula-equality --input formula.json --out fixed.json
 ```
 
 Input is `{"formula":"<one native formula>"}`. Checking writes issues with

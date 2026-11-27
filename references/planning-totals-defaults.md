@@ -22,7 +22,7 @@ construction keeps `freeze_total: false`; this is separate from total visibility
 ## Local commands and overrides
 
 ```text
-python plan.py planning-totals --input examples/planning-totals.request.json --out candidate.json
+python scripts/plan.py planning-totals --input assets/examples/planning-totals.request.json --out candidate.json
 ```
 
 Input is `{"properties": <current Planning properties>, "reset": false}`.

@@ -12,7 +12,7 @@ import unittest
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0,str(ROOT/'scripts'))
 from runtime.codec import loads
 from runtime.input_factories import input_create, metadata
 from runtime.powertable_factory import row_save
@@ -21,7 +21,7 @@ from runtime.rule_factories import distribute_rows, min_max, new_rule
 TOKEN_ENV = 'FABRIC_PLAN_BUILDER_TEST_TOKEN'
 
 def decode_roles(payload,node):
-    result=subprocess.run([node,str(ROOT/'tools/decode-lzutf8.cjs')],input=payload,
+    result=subprocess.run([node,str(ROOT/'scripts/tools/decode-lzutf8.cjs')],input=payload,
                           text=True,encoding='utf-8',capture_output=True,timeout=30,check=True)
     return loads(result.stdout)
 

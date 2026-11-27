@@ -1,4 +1,5 @@
 """Independent tests of useful partial provisioning; mocked APIs only."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy
 import tempfile
 import unittest
@@ -11,7 +12,7 @@ from runtime.workflow import SUPPORTED,provision,preflight
 
 ROOT=Path(__file__).resolve().parents[1]
 
-def model():return load(ROOT/'fixtures/model.json')
+def model():return load(ROOT/'assets/fixtures/model.json')
 def base_sheet():
     return {'name':'Workforce','rows':['Employee[Employee]'],'columns':['Period[Month]'],
         'measures':[{'key':'base','kind':'Native','label':'Base','source':'Metrics[BasePay]'},

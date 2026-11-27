@@ -90,15 +90,15 @@ First run the discovery step in the skill instructions on the phrase "OneLake
 From Sheets".
 
 ```text
-python plan.py resolve-measure-binding --input binding-request.json --out assignment.json
-python examples/onelake-linked-values/build.py <new-output-directory>
+python scripts/plan.py resolve-measure-binding --input binding-request.json --out assignment.json
+python assets/examples/onelake-linked-values/build.py <new-output-directory>
 python -m unittest discover -s tests -p "test_onelake*.py"
 ```
 
 The offline example uses only this package, creates new IDs and a new application
 definition, and emits the direct-link native-phase payload. It uses synthetic
 current-catalog responses; it is not a live deployment or a refresh test.
-`fixtures/onelake-linked-values.json` contains a sanitized golden binding shape
+`assets/fixtures/onelake-linked-values.json` contains a sanitized golden binding shape
 from a saved OneLake artifact, with consumer identities matched to the source
 column and query metadata. Its identifiers are test evidence only, never
 templates for a new application's identities.

@@ -1,4 +1,5 @@
 """Regression: large portable IDs must not leak into native source selector slots."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,json,subprocess,sys,tempfile,unittest
 from pathlib import Path
 from runtime.codec import load,pack
@@ -9,7 +10,7 @@ from runtime.connected_components import bridge_consumer
 from runtime.planning_integrity import guard_write,check_properties,default_global_styles
 
 ROOT=Path(__file__).resolve().parents[1]
-EXAMPLE=ROOT/'examples/infobridge-lineage'
+EXAMPLE=ROOT/'assets/examples/infobridge-lineage'
 
 class PlanningLineageTests(unittest.TestCase):
     def request(self):return load(EXAMPLE/'planning-source.request.json')

@@ -66,5 +66,5 @@ override the requested display. Do not clear all formatConfig or replace a full
 globalStyles object with a fragment.
 
 ```sh
-python plan.py planning-display-defaults --input display-request.json --out candidate.json
+python scripts/plan.py planning-display-defaults --input display-request.json --out candidate.json
 ```

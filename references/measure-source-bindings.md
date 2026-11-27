@@ -26,7 +26,7 @@ name. Honor currency, period and grain in addition to identity.
 ## Executable construction
 
 ```text
-python plan.py resolve-measure-binding --input binding-request.json --out assignment.json
+python scripts/plan.py resolve-measure-binding --input binding-request.json --out assignment.json
 ```
 
 The input is an object with `request` and optional `model`, `sheets`, `queries`.

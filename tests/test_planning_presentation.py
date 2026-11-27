@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,json,unittest
 from pathlib import Path
 from runtime.codec import load
@@ -5,7 +6,7 @@ from runtime.construct import build
 from runtime.planning_presentation import apply_presentation,measure_roles,application_defaults,build_application,check_application,PALETTE
 ROOT=Path(__file__).resolve().parents[1]
 def sample():
-    model=load(ROOT/'fixtures/model.json');spec=load(ROOT/'fixtures/finance-spec.json');b=build(model,spec)
+    model=load(ROOT/'assets/fixtures/model.json');spec=load(ROOT/'assets/fixtures/finance-spec.json');b=build(model,spec)
     path=next(k for k in b['raw'] if k.endswith('/dataInput.json'))
     props=b['raw'][path.replace('dataInput.json','properties.json')]['properties'];records=b['raw'][path]['columns']
     return model,spec,b,props,records
@@ -55,7 +56,7 @@ class PresentationTests(unittest.TestCase):
             self.assertEqual(rr['navigator']['x'],rr['slicer:0']['x'])
 
     def test_existing_dashboard_controls_and_filters_retained(self):
-        m=load(ROOT/'fixtures/context-dashboard-model.json');s=load(ROOT/'fixtures/context-dashboard-spec.json');out=application_defaults(m,s)
+        m=load(ROOT/'assets/fixtures/context-dashboard-model.json');s=load(ROOT/'assets/fixtures/context-dashboard-spec.json');out=application_defaults(m,s)
         for a,b in zip(s['dashboards'],out['dashboards']):self.assertEqual(a['slicers'],b['slicers']);self.assertEqual(a['cards'],b['cards']);self.assertTrue(b['charts'])
 
     def test_missing_dashboard_is_explicit_failure(self):

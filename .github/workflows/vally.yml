@@ -1,21 +1,9 @@
 name: Vally skill evaluations
 
+# Manual only. Evals run locally before a PR with tests/run-evals.sh, using each
+# developer's own Copilot model. Run this only from a repository whose Actions
+# token has Copilot access to the models the specs use.
 on:
-  pull_request:
-    paths:
-      - "SKILL.md"
-      - "references/**"
-      - "runtime/**"
-      - "tests/evals/**"
-      - ".github/workflows/vally.yml"
-  push:
-    branches: [main]
-    paths:
-      - "SKILL.md"
-      - "references/**"
-      - "runtime/**"
-      - "tests/evals/**"
-      - ".github/workflows/vally.yml"
   workflow_dispatch:
 
 permissions:
@@ -35,14 +23,31 @@ jobs:
         with:
           node-version: "24"
       - name: Install Vally
-        run: npm install -g @microsoft/vally-cli@0.10.0
+        run: npm install -g @microsoft/vally-cli@0.20.0
       - name: Lint evaluations
-        run: vally lint --eval-spec tests/evals/fabric-plan-skill-fulleval/eval.yaml --strict
+        run: |
+          for spec in tests/evals/fabric-plan-skill/eval.yaml tests/evals/fabric-plan-skill-fulleval/eval.yaml; do
+            vally lint --eval-spec "$spec" --strict
+          done
+      - name: Stage the skill
+        # Vally loads no skills unless --skill-dir names a folder of skill
+        # folders. Copy only the shipped files (never tests/, which holds the
+        # eval rubrics and graders) under the skill's name.
+        run: |
+          mkdir -p "$RUNNER_TEMP/skills/fabric-plan-skill"
+          rsync -aR --exclude __pycache__ SKILL.md README.md LICENSE apm.yml references scripts assets \
+            "$RUNNER_TEMP/skills/fabric-plan-skill/"
       - name: Run evaluations
         run: |
           mkdir -p vally-results
+          status=0
+          vally eval -e tests/evals/fabric-plan-skill/eval.yaml \
+            --skill-dir "$RUNNER_TEMP/skills" \
+            --junit --output-dir vally-results/smoke --workers 1 || status=1
           vally eval -e tests/evals/fabric-plan-skill-fulleval/eval.yaml \
-            --junit --output-dir vally-results --workers 1
+            --skill-dir "$RUNNER_TEMP/skills" \
+            --junit --output-dir vally-results/fulleval --workers 1 || status=1
+          exit $status
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

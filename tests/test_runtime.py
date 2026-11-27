@@ -1,7 +1,7 @@
 import unittest,copy,os,tempfile,socket,sys
 from pathlib import Path
 from decimal import Decimal
-ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT))
+ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT/'scripts'))
 from runtime.codec import *
 from runtime.identity import *
 from runtime.construct import build,navigator,acyclic
@@ -15,8 +15,8 @@ def setUpModule():
     def deny(*a,**k): raise RuntimeError('Network forbidden in offline suite')
     socket.create_connection=deny
     socket.socket.connect=deny
-def model(): return load(ROOT/'fixtures/model.json')
-def finance(): return load(ROOT/'fixtures/finance-spec.json')
+def model(): return load(ROOT/'assets/fixtures/model.json')
+def finance(): return load(ROOT/'assets/fixtures/finance-spec.json')
 def built(): return build(model(),finance())
 def page():
     def p(x,y,w,h): return {'position':{'x':x,'y':y},'dimension':{'width':w,'height':h},'unrelated':{'preserve':True}}
@@ -34,7 +34,7 @@ def contribution(name='Workforce'):
 class IdentityTests(unittest.TestCase):
     def test_synthetic_272_vectors(self):
         # Synthetic byte patterns, not the xxHash project's sanity buffer; they pin XXH3-64, seed 0.
-        for v in load(ROOT/'fixtures/xxh3-vectors.json'):
+        for v in load(ROOT/'assets/fixtures/xxh3-vectors.json'):
             data=v['text'].encode() if 'text' in v else bytes((i*137+19)%256 for i in range(v['length']))
             self.assertEqual(str(xxh3(data)),v['expected'],v.get('length',v.get('text')))
     def test_u64_reject_number(self):
@@ -71,7 +71,7 @@ class ConstructionTests(unittest.TestCase):
         b=built(); r=validate_plan(b['raw']); self.assertEqual(r['sheets'],4); self.assertEqual(r['measureRecords'],15)
         self.assertTrue(all('dataInput' not in p or b['raw'][p]['columns'] for p in b['raw']))
     def test_nonfinance_no_unrequested_features(self):
-        b=build(model(),load(ROOT/'fixtures/capacity-spec.json')); self.assertEqual(len(b['identities']),1)
+        b=build(model(),load(ROOT/'assets/fixtures/capacity-spec.json')); self.assertEqual(len(b['identities']),1)
         self.assertNotIn('connectedPlanning/infobridge.json',b['raw']); self.assertNotIn('bookmarks',b['raw']['planProperties.json']['properties'])
     def test_unknown_model_field(self):
         s=finance(); s['sheets'][0]['rows'][0]='Imaginary[Field]'
@@ -256,16 +256,16 @@ class TransportTests(unittest.TestCase):
         checkpoint=load(Path(self.tmp.name)/'update.operation.json')
         self.assertEqual((checkpoint['lastStatus'],checkpoint['phase'],checkpoint['error']),('Failed','failed',error))
     def test_read_throttle(self):
-        c=self.client([{'status':429,'headers':{'retry-after':'0'},'body':{}},{'status':200,'headers':{},'body':{'value':1}}]); self.assertEqual(c.request('GET','/x')['status'],200)
+        c=self.client([{'status':429,'headers':{'retry-after':'0'},'body':{}},{'status':200,'headers':{},'body':{'value':1}}]); self.assertEqual(c.request('GET','/workspaces/w/plans')['status'],200)
     def test_uncertain_create_not_repeated(self):
         c=self.client([TimeoutError()])
-        with self.assertRaises(RuntimeError): c.request('POST','/plans',{},label='create')
-        with self.assertRaisesRegex(RuntimeError,'UNCERTAIN'): c.request('POST','/plans',{},label='create')
+        with self.assertRaises(RuntimeError): c.request('POST','/workspaces/w/plans',{},label='create')
+        with self.assertRaisesRegex(RuntimeError,'UNCERTAIN'): c.request('POST','/workspaces/w/plans',{},label='create')
         self.assertEqual(len(self.calls),1)
     def test_rejected_write_not_success(self):
         c=self.client([{'status':403,'headers':{},'body':{}}])
         for _ in range(2):
-            with self.assertRaises(HttpError): c.request('POST','/plans',{},label='create')
+            with self.assertRaises(HttpError): c.request('POST','/workspaces/w/plans',{},label='create')
         self.assertEqual(len(self.calls),1)
     def test_untrusted_location(self):
         c=self.client([])
@@ -302,15 +302,27 @@ class TransportTests(unittest.TestCase):
             plan_operation(c,'w','update','p',definition=before,baseline_hash=definition_hash(before))
         self.assertEqual([url.rsplit('/',1)[-1] for _,url,_ in self.calls],['getDefinition'])
     def test_credentials_not_journaled(self):
-        c=self.client([{'status':201,'headers':{},'body':{'id':'new'}}]); c.request('POST','/plans',{},label='create')
+        c=self.client([{'status':201,'headers':{},'body':{'id':'new'}}]); c.request('POST','/workspaces/w/plans',{},label='create')
         self.assertTrue(all('mock-secret' not in f.read_text() for f in Path(self.tmp.name).glob('*')))
     def test_completed_create_resume(self):
-        c=self.client([{'status':201,'headers':{},'body':{'id':'new'}}]); first=c.request('POST','/plans',{},label='create'); self.assertEqual(c.request('POST','/plans',{},label='create'),first); self.assertEqual(len(self.calls),1)
-    def test_child_workload_token_not_persisted(self):
-        c=self.client([{'status':200,'headers':{},'body':{'Token':'child-workload-secret','TargetUriHost':'example.invalid'}}])
-        r=c.request('POST','/token',{},label='token'); self.assertEqual(r['body']['Token'],'child-workload-secret')
-        self.assertTrue(all('child-workload-secret' not in f.read_text() for f in Path(self.tmp.name).glob('*')))
-        with self.assertRaises(RuntimeError): c.request('POST','/token',{},label='token')
+        c=self.client([{'status':201,'headers':{},'body':{'id':'new'}}]); first=c.request('POST','/workspaces/w/plans',{},label='create'); self.assertEqual(c.request('POST','/workspaces/w/plans',{},label='create'),first); self.assertEqual(len(self.calls),1)
+    def test_token_in_response_not_persisted(self):
+        c=self.client([{'status':200,'headers':{},'body':{'Token':'response-secret','TargetUriHost':'example.invalid'}}])
+        r=c.request('POST','/workspaces/w/plans/p/getDefinition',{},label='token'); self.assertEqual(r['body']['Token'],'response-secret')
+        self.assertTrue(all('response-secret' not in f.read_text() for f in Path(self.tmp.name).glob('*')))
+        with self.assertRaises(RuntimeError): c.request('POST','/workspaces/w/plans/p/getDefinition',{},label='token')
+    def test_paging_cursor_is_kept_so_labelled_call_resumes(self):
+        body={'value':[],'continuationToken':'page-2','continuationUri':None}
+        c=self.client([{'status':200,'headers':{},'body':body}])
+        first=c.request('POST','/workspaces/w/plans/p/getDefinition',{},label='paged')
+        self.assertEqual(c.request('POST','/workspaces/w/plans/p/getDefinition',{},label='paged'),first)
+        self.assertEqual(len(self.calls),1)
+    def test_secret_keys_are_matched_by_suffix(self):
+        from runtime.transport import is_secret_key
+        for k in ('Token','accessToken','refresh_token','client_secret','Password','Authorization','mwcToken'):
+            self.assertTrue(is_secret_key(k),k)
+        for k in ('continuationToken','tokenType','secretName','displayName','tokenEnvironment'):
+            self.assertFalse(is_secret_key(k),k)
 class SchemaTests(unittest.TestCase):
     def test_transitive_closure(self):
         s=Schemas()

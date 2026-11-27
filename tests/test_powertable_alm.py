@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import unittest
 from pathlib import Path
 from runtime.powertable_factory import configured_table
@@ -80,7 +81,7 @@ class PowerTableAlmTests(unittest.TestCase):
         with self.assertRaises(ValueError):check_powertable_parts(parts,prefix)
 
     def test_full_plan_validation_checks_configured_powertable_companions(self):
-        model=load(ROOT/'fixtures/model.json');spec=load(ROOT/'fixtures/capacity-spec.json')
+        model=load(ROOT/'assets/fixtures/model.json');spec=load(ROOT/'assets/fixtures/capacity-spec.json')
         table={'name':'DimTest','schema':'dbo','physicalType':'U','primaryKey':['Key'],'columns':['Key']}
         conn={'connectionId':'00000000-0000-4000-8000-000000000001','dbHost':'sql.example.invalid',
             'dbName':'Test','artifactId':'00000000-0000-4000-8000-000000000002',

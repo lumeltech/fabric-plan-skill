@@ -33,7 +33,7 @@ not a template to clone or a source of IDs for another application.
    has no public route here. None of this certifies source connection health or
    row saves.
 
-`python plan.py inspect-reference-views --input inspection.json --out audit.json`
+`python scripts/plan.py inspect-reference-views --input inspection.json --out audit.json`
 accepts `{"raw": <decoded parts>, "home_roles": <optional role metadata>,
 "home_contents": {"<role ID>": <optional role content response>}}`.
 It resolves owner/embed membership, bookmark page/visual references, navigator
@@ -69,7 +69,7 @@ whole report or becomes a prerequisite for future builds.
 
 ## Number parameter construction
 
-`python plan.py construct-native number-parameter --input number.json --out bundle.json`
+`python scripts/plan.py construct-native number-parameter --input number.json --out bundle.json`
 uses `runtime.page_parameters.number_parameter`:
 
 ```json

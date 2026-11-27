@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import unittest,copy,json
 from unittest.mock import patch
 from runtime.application_typography import normalize_arial,font_issues

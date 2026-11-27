@@ -1,4 +1,5 @@
 """Offline route/graph regressions, not tests of agent language understanding."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,json,unittest
 from pathlib import Path
 from runtime.business_intent import plan_intent,ROUTES
@@ -18,7 +19,7 @@ class BusinessIntentTests(unittest.TestCase):
             for op in ops:self.assertIn(op,d['actions'],kind)
 
     def test_hybrid_preserves_clauses_and_dependency_order(self):
-        b=json.loads((ROOT/'examples/business-intent/merit-review.json').read_text())
+        b=json.loads((ROOT/'assets/examples/business-intent/merit-review.json').read_text())
         b['requirements'].reverse() # business prose need not arrive in execution order
         r=plan_intent(b);self.assertTrue(r['readyForAuthoring'])
         self.assertTrue((ROOT/'references'/r['defaultPolicy']['source']).is_file())

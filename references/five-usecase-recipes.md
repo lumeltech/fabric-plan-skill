@@ -67,12 +67,12 @@ Start by running the discovery step in the skill instructions on the business
 phrase, for example "workforce merit salary cost".
 
 ```text
-python plan.py usecase list
-python plan.py usecase show --case 02-workforce-merit
+python scripts/plan.py usecase list
+python scripts/plan.py usecase show --case 02-workforce-merit
 ```
 
 For an authorized destination, copy
-`examples/five-usecases/destination.example.json` to `destination.json` and
+`assets/examples/five-usecases/destination.example.json` to `destination.json` and
 replace every synthetic identity with current metadata.
 It holds synthetic environment, workspace, model and connection identities, and
 no token or Plan IDs. Check that it is the user's intended destination. Set `FABRIC_TOKEN` securely in the process
@@ -81,8 +81,8 @@ For another destination, resolve its actual endpoints, workspace, model URL and
 PowerBIDatasets connection; do not change hostnames by string substitution.
 
 ```text
-python plan.py usecase model --config destination.json --run runs/model
-python plan.py usecase build --case 02-workforce-merit --model runs/model/current-model.json --run runs/merit
+python scripts/plan.py usecase model --config destination.json --run runs/model
+python scripts/plan.py usecase build --case 02-workforce-merit --model runs/model/current-model.json --run runs/merit
 
 ```
 
@@ -105,7 +105,7 @@ name is rejected rather than rebuilt.
 
 To build all five, run `usecase build` once per case with separate run directories:
 `runs/sales`, `runs/merit`, `runs/expense`, `runs/rolling`, and `runs/currency`.
-The original short prompts are in `examples/five-usecases/business-prompts.txt`.
+The original short prompts are in `assets/examples/five-usecases/business-prompts.txt`.
 Do not require a customer to paste a technical specification when these recipes
 match the requested outcome. A changed requirement should be reflected in an
 explicit adapted spec/graph using the same helpers, not hidden agent assumptions.
@@ -145,8 +145,8 @@ export before continuing. Do not blindly replay a whole deployment.
 | Inputs, AverageLeaf and whole static bounds | the numeric input constraints guide | Numeric/Forecast constructors, hidden bound formulas |
 | Forecast and time-axis grain | the forecast authoring guide | `construct.planning`; native Forecast records |
 | From Sheets, commentary, variance | no bundled guide; `forecast-repair` | `resolve-measure-binding`; `runtime.forecast_review` library; formula/input factories |
-| Percentage and matrix styles | `plan.py format-matrix` | `format-matrix`; `compile_formatting` |
-| Negative variance | `plan.py integrated-variance` | `apply_negative_variance` |
+| Percentage and matrix styles | `scripts/plan.py format-matrix` | `format-matrix`; `compile_formatting` |
+| Negative variance | `scripts/plan.py integrated-variance` | `apply_negative_variance` |
 | Leaf identity storage | the dimension leaf keys guide | `leaf-key-mapping`; constructor key groups |
 | Home, headers, source colors and embeds | the application defaults guide; the planning presentation guide; the context intelligence guide | `build_application`; `apply_presentation`; public sheet geometry; public Home visibility |
 | Visible columns and native measure cards | the planning column presentation guide | `planning-column-presentation` |

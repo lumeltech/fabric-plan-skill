@@ -117,12 +117,12 @@ the industry name. Different words can express the same workflow; the same word
 
 ## Executable decision ledger
 
-Create a brief using `examples/business-intent/merit-review.json` as the structure.
+Create a brief using `assets/examples/business-intent/merit-review.json` as the structure.
 Its `intent` values are **the agent's semantic decisions**, not user-facing prompt
 syntax. Preserve the original clauses and evidence; change all business details.
 
 ```text
-python plan.py plan-intent --input business-brief.json --out decision-plan.json
+python scripts/plan.py plan-intent --input business-brief.json --out decision-plan.json
 ```
 
 Route each module id from `decision-plan.json` through the discovery step in the
@@ -139,8 +139,8 @@ For a variation using the shipped five-case pipeline, export an appropriate
 recipe, adapt its `spec`, `post` graph and `expected` structure, then use:
 
 ```text
-python plan.py usecase show --case 01-sales-targets --out adapted-recipe.json
-python plan.py usecase build --recipe adapted-recipe.json --model current-model.json --run runs/adapted
+python scripts/plan.py usecase show --case 01-sales-targets --out adapted-recipe.json
+python scripts/plan.py usecase build --recipe adapted-recipe.json --model current-model.json --run runs/adapted
 
 ```
 
@@ -163,7 +163,7 @@ source/target owners, downstream links, comparison direction, labels, descriptio
 Home text and expected counts. Never reuse run directories or saved registries for
 a changed application. Retain the same directory only when resuming the same plan.
 
-`examples/business-intent/quarterly-targets.recipe.json` is a complete adaptation
+`assets/examples/business-intent/quarterly-targets.recipe.json` is a complete adaptation
 example with Year/Quarter grain, 2027 selection and independently named owner and
 dashboard. Its model fields, currency and horizon are explicit sample choices,
 not defaults for other requests.

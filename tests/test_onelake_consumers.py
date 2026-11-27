@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,unittest
 from pathlib import Path
 from runtime.codec import load
@@ -27,7 +28,7 @@ class OneLakeConsumers(unittest.TestCase):
         q['meta']['selectedMeasures']=[];self.assertEqual(output_catalog(q),[])
     def test_generated_application_has_linked_grid_cards_and_comparison_chart(self):
         from runtime.storage_context import query_contract
-        model=load(ROOT/'fixtures/model.json');q=self.query()
+        model=load(ROOT/'assets/fixtures/model.json');q=self.query()
         proof=query_contract(q,[{'rows':['Region[Region]'],'columns':['Period[Month]'],'context':[]}],{})
         fields=numeric_output_fields(q,storage_context=proof)
         field=fields[0]['id']
@@ -41,7 +42,7 @@ class OneLakeConsumers(unittest.TestCase):
 
     def test_context_key_can_be_native_helper_without_becoming_axis_descriptor(self):
         from runtime.construct import planning,field
-        model=load(ROOT/'fixtures/model.json')
+        model=load(ROOT/'assets/fixtures/model.json')
         model['fields'].append({'id':'Version[Key]','tableName':'Version','columnName':'Key','columnType':'Column','dataType':'Int64'})
         spec={'name':'Context key','rows':['Region[Region]'],'columns':['Period[Month]'],
             'context':[{'field':'Version[Version]','values':['Budget']}],

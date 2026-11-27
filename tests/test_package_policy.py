@@ -55,7 +55,7 @@ class PackagePolicyTests(unittest.TestCase):
         self.assertEqual(findings, [])
 
     def test_shipped_text_names_no_private_service_detail(self):
-        sources = shipped_guides() + sorted((ROOT / "catalog").glob("*.json"))
+        sources = shipped_guides() + sorted((ROOT / "assets/catalog").glob("*.json"))
         findings = [
             path.relative_to(ROOT).as_posix()
             for path in sources
@@ -78,7 +78,7 @@ class PackagePolicyTests(unittest.TestCase):
 
     def test_manifest_covers_public_package_roots(self):
         manifest = json.loads((ROOT / "package-manifest.json").read_text())
-        required = {"runtime/", "references/", "fixtures/", "schemas/", "tools/", "vendor/"}
+        required = {"scripts/runtime/", "references/", "assets/fixtures/", "assets/schemas/", "scripts/tools/", "scripts/vendor/"}
         self.assertTrue(required <= set(manifest["classification"]["runtime-required"]))
         for path in manifest["retained-unreferenced-assets"]:
             if "*" in path:
@@ -111,16 +111,15 @@ class PackagePolicyTests(unittest.TestCase):
             if path.stat().st_size > limit
         ]
         self.assertEqual(oversized, [])
-        self.assertEqual(
-            {path.name for path in (ROOT / "references").glob("*.json")},
-            {"preservation-manifest.json"},
-        )
+        # skills-for-fabric layout: references/ holds markdown only; data lives in assets/.
+        self.assertEqual([p.name for p in (ROOT / "references").iterdir() if p.suffix != ".md"], [])
+        self.assertTrue((ROOT / "assets/preservation-manifest.json").is_file())
 
     def test_request_examples_use_deterministic_synthetic_id_ranges(self):
         examples = [
-            ROOT / "examples/planning-presentation.request.json",
-            ROOT / "examples/measure-display.request.json",
-            ROOT / "examples/five-usecases/destination.example.json",
+            ROOT / "assets/examples/planning-presentation.request.json",
+            ROOT / "assets/examples/measure-display.request.json",
+            ROOT / "assets/examples/five-usecases/destination.example.json",
         ]
         for path in examples:
             relative = path.relative_to(ROOT)
