@@ -1,0 +1,33 @@
+name: CI
+
+# Offline checks only: no Copilot model, Fabric workspace or secret is needed.
+# Agent evals run locally before a PR (tests/run-evals.sh).
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+      - name: Install pytest
+        run: python -m pip install --quiet pytest
+      - name: Unit tests, tool syntax and CLI start-up
+        run: tests/run-evals.sh --static
+      - name: Lint eval specs
+        run: |
+          for spec in tests/evals/*/eval.yaml; do
+            npx --yes @microsoft/vally-cli@0.20.0 lint --eval-spec "$spec" --strict
+          done

@@ -23,7 +23,7 @@ The builder writes chart templates, field bindings, the IBCS chart theme with it
 
 ## Request shape
 
-Add the chart to a dashboard's `charts` list. A chart that names `recipe` or `chartType` is built by `runtime/ibcs_charts.py`. Any other chart stays a plain column chart, or an integrated variance chart when it has `comparisonField`.
+Add the chart to a dashboard's `charts` list. A chart that names `recipe` or `chartType` is built by `scripts/runtime/ibcs_charts.py`. Any other chart stays a plain column chart, or an integrated variance chart when it has `comparisonField`.
 
 ```json
 {
@@ -123,13 +123,13 @@ What the builder saves on the chart:
 
 Series colors are not saved. The chart reads its grey series palette from the IBCS theme, so a stack shows greys in place of the Plan palette. On scatter and bubble charts the buckets are coordinates, so the scenario fills do not apply and groups take the series colors.
 
-- `runtime.ibcs_charts.ibcs_palette()` returns these values. `fixtures/ibcs-chart-theme.json` holds the saved state.
+- `runtime.ibcs_charts.ibcs_palette()` returns these values. `assets/fixtures/ibcs-chart-theme.json` holds the saved state.
 - **Existing chart.** Call `runtime.ibcs_charts.apply_chart_theme(properties)` on the freshly exported chart properties. It keeps every other saved setting, replaces the styles of the bound roles and clears explicit group and category colors, as the chart does on a theme change.
 - The theme's neutral variance color is a light grey (`#DDDDDD`). The standard names blue for neutral or ambiguous variances and blue-green in place of green for readers with a color deficiency. Report that difference when the user asks for strict notation; do not recolor on your own.
 
 ## IBCS dashboard page
 
-Two optional dashboard keys turn a workspace into an IBCS page. Both are built by `runtime/ibcs_report.py`.
+Two optional dashboard keys turn a workspace into an IBCS page. Both are built by `scripts/runtime/ibcs_report.py`.
 
 ```json
 {

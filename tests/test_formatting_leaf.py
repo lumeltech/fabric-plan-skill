@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,json,unittest,subprocess,sys,tempfile
 from pathlib import Path
 from runtime.matrix_formatting import compile_formatting,format_values,pixel_size,SNAPSHOT
@@ -197,10 +198,10 @@ class FormattingTests(unittest.TestCase):
     def test_cli_decimal_roundtrip_and_rule_counts_derived_from_request(self):
         with tempfile.TemporaryDirectory() as directory:
             p=Path(directory)/'candidate.json'
-            result=subprocess.run([sys.executable,str(ROOT/'plan.py'),'format-matrix','--input',str(ROOT/'examples/matrix-formatting.request.json'),'--out',str(p)],capture_output=True,text=True)
+            result=subprocess.run([sys.executable,str(ROOT/'scripts/plan.py'),'format-matrix','--input',str(ROOT/'assets/examples/matrix-formatting.request.json'),'--out',str(p)],capture_output=True,text=True)
             self.assertEqual(result.returncode,0,result.stderr)
             candidate=json.loads(p.read_text())
-            request=json.loads((ROOT/'examples/matrix-formatting.request.json').read_text())
+            request=json.loads((ROOT/'assets/examples/matrix-formatting.request.json').read_text())
             self.assertEqual(len(candidate['state']['jet_cfProps']['rules']),len(request['request']['rules']))
             self.assertEqual(candidate['state']['globalStyles']['columnStyle']['custom']['edit']['fontSize'],13.333333)
 
@@ -245,7 +246,7 @@ class LeafTests(unittest.TestCase):
         with self.assertRaises(ValueError):leaf_key_mapping(model(),assignments(model()),[group()],overrides={'Product[SKU]':None})
 
     def test_new_builder_and_scope_apply_policy(self):
-        m=json.loads((ROOT/'fixtures/model.json').read_text());m['fields'] += [f for f in model()['fields'] if f['id'] not in {x['id'] for x in m['fields']}]
+        m=json.loads((ROOT/'assets/fixtures/model.json').read_text());m['fields'] += [f for f in model()['fields'] if f['id'] not in {x['id'] for x in m['fields']}]
         spec={'name':'Synthetic example','requiredCapabilities':['planning.native-measure','planning.dimension-id-mapping'],'sheets':[{'name':'Plan','rows':['Product[Brand]','Product[Category]','Product[SKU]'],
             'columns':['Calendar[Year]'],'dimensionKeyGroups':[group()],
             'measures':[{'key':'actual','label':'Actual','kind':'Native','source':'Metrics[BasePay]'}]}]}
@@ -255,7 +256,7 @@ class LeafTests(unittest.TestCase):
         self.assertEqual(vs['dimension_id_mapping']['mappings']['Product[Brand]'],{'Skip':{}})
 
     def test_new_forecast_has_no_blanket_background(self):
-        m=json.loads((ROOT/'fixtures/model.json').read_text())
+        m=json.loads((ROOT/'assets/fixtures/model.json').read_text())
         m['fields'].append(dict(id='Calendar[Year]',tableName='Calendar',columnName='Year',columnType='Column',dataType='Text'))
         spec={'name':'Synthetic forecast','sheets':[{'name':'Forecast','rows':['Employee[Employee]'],'columns':['Calendar[Year]'],
             'measures':[{'key':'actual','label':'Actual','kind':'Native','source':'Metrics[BasePay]'},

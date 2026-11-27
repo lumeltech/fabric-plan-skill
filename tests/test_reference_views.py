@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import unittest,copy
 from runtime.reference_views import audit,audit_native_capture
 from runtime.page_parameters import number_parameter

@@ -62,14 +62,14 @@ measurement. No Windows API, external font file, prior report or chat is require
 for the fallback.
 
 ```text
-python plan.py fit-planning-header --input header-fit.request.json --out candidate.json
+python scripts/plan.py fit-planning-header --input header-fit.request.json --out candidate.json
 ```
 
 Input: `{"properties": <current native Planning properties>, "available_width": 1000}`.
 `available_width` is optional and is not written as a new native property.
 Output: `{"properties": <updated properties>, "sizing": <calculation details>}`.
 Apply only `properties` to the visual in a fresh export and publish it with `api update`.
-See `examples/header-fit.request.json` for a synthetic local candidate.
+See `assets/examples/header-fit.request.json` for a synthetic local candidate.
 
 This is dynamic **content-dependent authoring**, not browser runtime auto-resize.
 Recompute when generating or editing the header content, font size or intended
@@ -105,12 +105,12 @@ the defaults; an explicit user-authored icon choice is preserved. For an explici
 request to reset an existing report to the standard, pass `reset: true`:
 
 ```text
-python plan.py planning-hierarchy-icons --input hierarchy-icons.request.json --out candidate.json
+python scripts/plan.py planning-hierarchy-icons --input hierarchy-icons.request.json --out candidate.json
 ```
 
 Input: `{"properties": <current native properties>, "reset": true}`.
 Output is the updated properties object. See
-`examples/hierarchy-icons.request.json`. Existing reports are not bulk-modified
+`assets/examples/hierarchy-icons.request.json`. Existing reports are not bulk-modified
 merely because a new skill default exists. Use these keys only in visual families
 that expose this native hierarchy contract.
 

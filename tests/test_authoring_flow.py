@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,os,runpy,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -12,8 +13,8 @@ ROOT=Path(__file__).resolve().parents[1]
 
 class AuthoringFlowTests(unittest.TestCase):
     def setUp(self):
-        self.model=load(ROOT/'fixtures/model.json')
-        self.spec=load(ROOT/'examples/conditional-formatting/application.json')
+        self.model=load(ROOT/'assets/fixtures/model.json')
+        self.spec=load(ROOT/'assets/examples/conditional-formatting/application.json')
         self.b=build_application(self.model,self.spec)
 
     def test_complete_base_retains_inputs_formulas_and_cf(self):
@@ -64,7 +65,7 @@ class AuthoringFlowTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'UNSUPPORTED_BASE_INPUT'):build_application(self.model,spec)
 
     def test_forecast_and_its_formula_stay_in_base_even_with_separate_commentary(self):
-        sample=runpy.run_path(str(ROOT/'examples/forecast-time-intelligence/build.py'))['sample']
+        sample=runpy.run_path(str(ROOT/'assets/examples/forecast-time-intelligence/build.py'))['sample']
         model,spec,_,_,_,_,commentary=sample()
         built=build_application(model,spec)
         self.assertEqual(require_import_contract(spec,built)['measures'],3)

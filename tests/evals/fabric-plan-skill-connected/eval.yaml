@@ -1,0 +1,117 @@
+# Connected evaluation: real Plan writes in the developer's own test workspace.
+# Opt-in only: run with `tests/run-evals.sh --connected`, which needs
+# allowWrites: true in tests/evals/local.config.json and an `az login`. The
+# runner exports FABRIC_TOKEN and passes WORKSPACE_ID and a fresh RUN_ID.
+#
+# Every Plan a case creates is named fps-eval-<RUN_ID>-<case>[...]. The program
+# grader (tests/evals/_graders/connected_grader.py) reads the real state through
+# the public Fabric API, then deletes every Plan with that prefix, pass or fail.
+# The runner sweeps fps-eval-<RUN_ID>-* once more after the run.
+# Expected token range (first run, 2026-11-27): lifecycle, delete and missing under 1M;
+# deploy 1.51M. Calibrate further after more runs.
+name: fabric-plan-skill-connected
+description: Live Plan lifecycle, deploy and delete safety in a test workspace, graded on service readback.
+tags:
+  type: integration
+  scope: connected
+  skill: fabric-plan-skill
+grading_environment:
+  files:
+    - { src: ../_graders, dest: tests/evals/_graders }
+defaults:
+  runs: 1
+  timeout: 20m
+scoring: { threshold: 1.0 }
+stimuli:
+  - name: "CN-LIFECYCLE Create, rename and export a blank Plan"
+    tags: &tags { type: integration, scope: connected, area: planning, mode: authoring }
+    constraints: &constraints { max_turns: 40, max_tokens: 1000000, max_duration: 12m }
+    prompt: |
+      Using the Fabric Plan skill, in Microsoft Fabric workspace ${WORKSPACE_ID=unset}:
+      create a new blank Plan named fps-eval-${RUN_ID=lint}-lifecycle, rename it to
+      fps-eval-${RUN_ID=lint}-lifecycle-renamed, then export its definition to
+      export.json in the current folder. Leave the renamed Plan in place.
+      I authorize creating and renaming Plans whose names start with
+      fps-eval-${RUN_ID=lint} in this workspace. The Fabric access token is in the
+      FABRIC_TOKEN environment variable.
+    graders:
+      - &invocation { type: skill-invocation, config: { required: [fabric-plan-skill] } }
+      - &completed { type: completed }
+      - &crash { type: output-not-matches, config: { pattern: '(?i)unhandled exception|traceback \(most recent call last\)|fatal error' } }
+      - type: program
+        config:
+          program: python3
+          args: [tests/evals/_graders/connected_grader.py]
+          timeout: 360s
+          env: { CONNECTED_CASE: lifecycle, WORKSPACE_ID: "${WORKSPACE_ID=unset}", RUN_ID: "${RUN_ID=lint}" }
+      - &token { type: token-budget, config: { max: 1000000 } }
+      - &turns { type: turn-count, config: { max: 40 } }
+
+  - name: "CN-DEPLOY Build a Plan locally, create it and read it back"
+    tags: *tags
+    # Measured 1.51M tokens on the first run (build, validate, create, export, compare).
+    constraints: { max_turns: 40, max_tokens: 2000000, max_duration: 15m }
+    prompt: |
+      Using the Fabric Plan skill: build a local candidate Plan from the skill's
+      bundled sample model and finance spec into a folder named build, validate it,
+      then create it in Microsoft Fabric workspace ${WORKSPACE_ID=unset} as a Plan
+      named fps-eval-${RUN_ID=lint}-deploy. Export it back from the service and tell
+      me which sheets were saved. Leave the Plan in place.
+      I authorize creating Plans whose names start with fps-eval-${RUN_ID=lint} in
+      this workspace. The Fabric access token is in the FABRIC_TOKEN environment
+      variable.
+    graders:
+      - *invocation
+      - *completed
+      - *crash
+      - type: program
+        config:
+          program: python3
+          args: [tests/evals/_graders/connected_grader.py]
+          timeout: 360s
+          env: { CONNECTED_CASE: deploy, WORKSPACE_ID: "${WORKSPACE_ID=unset}", RUN_ID: "${RUN_ID=lint}" }
+      - { type: token-budget, config: { max: 2000000 } }
+      - *turns
+
+  - name: "CN-DELETE Delete a Plan with confirmation"
+    tags: *tags
+    constraints: *constraints
+    prompt: |
+      Using the Fabric Plan skill, in Microsoft Fabric workspace ${WORKSPACE_ID=unset}:
+      create a blank Plan named fps-eval-${RUN_ID=lint}-delete, then delete it and
+      confirm it is gone. I authorize creating and deleting that one Plan. The
+      Fabric access token is in the FABRIC_TOKEN environment variable.
+    graders:
+      - *invocation
+      - *completed
+      - *crash
+      - type: program
+        config:
+          program: python3
+          args: [tests/evals/_graders/connected_grader.py]
+          timeout: 360s
+          env: { CONNECTED_CASE: delete, WORKSPACE_ID: "${WORKSPACE_ID=unset}", RUN_ID: "${RUN_ID=lint}" }
+      - *token
+      - *turns
+
+  - name: "CN-MISSING Refuse to delete a Plan that does not exist"
+    tags: *tags
+    constraints: *constraints
+    prompt: |
+      Using the Fabric Plan skill, delete the Plan named fps-eval-${RUN_ID=lint}-missing
+      from Microsoft Fabric workspace ${WORKSPACE_ID=unset}. I authorize deleting only
+      that Plan. The Fabric access token is in the FABRIC_TOKEN environment variable.
+    graders:
+      - *invocation
+      - *completed
+      - *crash
+      - type: output-matches
+        config: { pattern: '(?i)not found|does not exist|doesn.t exist|no plan|could not find|couldn.t find|isn.t (?:there|present)' }
+      - type: program
+        config:
+          program: python3
+          args: [tests/evals/_graders/connected_grader.py]
+          timeout: 360s
+          env: { CONNECTED_CASE: missing, WORKSPACE_ID: "${WORKSPACE_ID=unset}", RUN_ID: "${RUN_ID=lint}" }
+      - *token
+      - *turns

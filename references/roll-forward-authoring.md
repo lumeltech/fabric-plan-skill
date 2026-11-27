@@ -23,7 +23,7 @@ For a Measures-in-Rows layout group opening, drivers, closing and diagnostics;
 the hierarchy should not change arithmetic, measure IDs or storage.
 
 ```sh
-python plan.py roll-forward-presentation --input presentation.json --out candidate.json
+python scripts/plan.py roll-forward-presentation --input presentation.json --out candidate.json
 ```
 
 This applies a resolved presentation locally. Check opening/closing continuity,

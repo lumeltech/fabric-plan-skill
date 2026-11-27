@@ -1,0 +1,151 @@
+{
+  "evidence": "Sanitized saved OneLake native and ALM binding shapes, captured 2026-11-17; fixture IDs only, not new-report defaults.",
+  "storageProfile": "OneLake",
+  "sourceRecord": {
+    "measureGuid": "4898815674451314253",
+    "name": "forecast",
+    "columnMeta": {
+      "id": "4898815674451314253",
+      "label": "forecast",
+      "measure_type": {
+        "DataInput": {
+          "id": "",
+          "column_type": {
+            "Number": {
+              "min_value": null,
+              "max_value": null,
+              "distribute_parent_value_to_children": true,
+              "default_value": null
+            }
+          },
+          "title": "forecast",
+          "disable_write_access": false,
+          "on_change_formula": "",
+          "allow_input": "ReadAndEdit",
+          "bound_to_filter_context": true
+        }
+      },
+      "data_type": "Number",
+      "description": ""
+    }
+  },
+  "nativeAssignments": {
+    "Visual": {
+      "id": "4898815674451314253",
+      "sourceId": "4898815674451314253",
+      "bucketId": "ameasure",
+      "columnName": "forecast",
+      "dataType": "Double",
+      "order": 0,
+      "columnType": "Column",
+      "formatString": null,
+      "contents": null,
+      "sourceType": "Visual",
+      "name": "Sum of forecast",
+      "customName": "fromsheets",
+      "isRenamed": true,
+      "aggregationType": "sum",
+      "isFlatHierarchy": false,
+      "distinctValueCount": null,
+      "visualId": "1",
+      "tableName": "Planning 1",
+      "dataRoleType": "Measure",
+      "measureGuid": "3631942492440468500"
+    },
+    "InfoBridge": {
+      "id": "10000000-0000-4000-8000-000000000301[dc67b36c74eb8666f91a2a80cc7002c27c2ca14f93955bbbd1c5086c3631d51d]",
+      "sourceId": "10000000-0000-4000-8000-000000000301[dc67b36c74eb8666f91a2a80cc7002c27c2ca14f93955bbbd1c5086c3631d51d]",
+      "bucketId": "ameasure",
+      "columnName": "bridge",
+      "dataType": "Double",
+      "order": 1,
+      "columnType": "Column",
+      "formatString": "",
+      "contents": null,
+      "sourceType": "InfoBridge",
+      "name": "Sum of bridge",
+      "customName": "fromqueries",
+      "isRenamed": true,
+      "aggregationType": "sum",
+      "isFlatHierarchy": false,
+      "distinctValueCount": null,
+      "tableName": "Query 1 -  Planning 1",
+      "dataRoleType": "Measure",
+      "queryId": "10000000-0000-4000-8000-000000000301",
+      "measureGuid": "5366211425043852021"
+    }
+  },
+  "exportAssignments": {
+    "Visual": {
+      "aggregationType": "sum",
+      "bucketId": "ameasure",
+      "columnName": "forecast",
+      "columnType": "Column",
+      "contents": null,
+      "customName": "fromsheets",
+      "customSource": true,
+      "dataRoleType": "Measure",
+      "dataType": "Double",
+      "distinctValueCount": null,
+      "formatString": null,
+      "id": "4898815674451314253",
+      "isFlatHierarchy": false,
+      "isRenamed": true,
+      "measureGuid": "3631942492440468500",
+      "name": "Sum of forecast",
+      "order": 0,
+      "sourceId": "4898815674451314253",
+      "sourceType": "Visual",
+      "tableName": "Planning 1",
+      "visualId": "10000000-0000-4000-8000-000000000303"
+    },
+    "InfoBridge": {
+      "aggregationType": "sum",
+      "bucketId": "ameasure",
+      "columnName": "bridge",
+      "columnType": "Column",
+      "contents": null,
+      "customName": "fromqueries",
+      "customSource": true,
+      "dataRoleType": "Measure",
+      "dataType": "Double",
+      "distinctValueCount": null,
+      "formatString": "",
+      "id": "10000000-0000-4000-8000-000000000301[dc67b36c74eb8666f91a2a80cc7002c27c2ca14f93955bbbd1c5086c3631d51d]",
+      "isFlatHierarchy": false,
+      "isRenamed": true,
+      "measureGuid": "5366211425043852021",
+      "name": "Sum of bridge",
+      "order": 1,
+      "queryId": "10000000-0000-4000-8000-000000000301",
+      "sourceId": "10000000-0000-4000-8000-000000000301[dc67b36c74eb8666f91a2a80cc7002c27c2ca14f93955bbbd1c5086c3631d51d]",
+      "sourceType": "InfoBridge",
+      "tableName": "Query 1 -  Planning 1"
+    }
+  },
+  "query": {
+    "id": "10000000-0000-4000-8000-000000000301",
+    "sourceId": "10000000-0000-4000-8000-000000000302",
+    "name": "Query 1 -  Planning 1",
+    "status": 200,
+    "meta": {
+      "selectedMeasures": [
+        {
+          "id": "4898815674451314253",
+          "name": "forecast",
+          "alias": "forecast",
+          "type": "DOUBLE",
+          "dataType": "NUMERIC",
+          "measureGuid": "4898815674451314253"
+        },
+        {
+          "id": "dc67b36c74eb8666f91a2a80cc7002c27c2ca14f93955bbbd1c5086c3631d51d",
+          "name": "bridge",
+          "alias": "bridge",
+          "type": "DOUBLE",
+          "dataType": "NUMERIC"
+        }
+      ]
+    }
+  }
+}

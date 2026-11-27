@@ -1,4 +1,5 @@
 """OneLake and SQL routing through the public constructors and recipe phases."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,json,subprocess,sys,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch,Mock
@@ -14,7 +15,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 class OneLakeSheetBindings(unittest.TestCase):
     def setUp(self):
-        self.fixture=load(ROOT/'fixtures/onelake-linked-values.json')
+        self.fixture=load(ROOT/'assets/fixtures/onelake-linked-values.json')
         self.record=self.fixture['sourceRecord'];self.query=self.fixture['query']
         self.props={'pivotAssignments':[],'visualState':{'manage_measures':[{'id':self.record['measureGuid']}],
             'rowDimensions':[],'columnDimensions':[]}}
@@ -112,7 +113,7 @@ class OneLakeSheetBindings(unittest.TestCase):
             ids=[]
             for run in ('first','second'):
                 out=Path(tmp)/run
-                r=subprocess.run([sys.executable,str(ROOT/'examples/onelake-linked-values/build.py'),str(out)],cwd=tmp,capture_output=True,text=True)
+                r=subprocess.run([sys.executable,str(ROOT/'assets/examples/onelake-linked-values/build.py'),str(out)],cwd=tmp,capture_output=True,text=True)
                 self.assertEqual(r.returncode,0,r.stderr)
                 b=load(out/'construction.json');ids.append(b['identities'][0]['visualId'])
                 self.assertEqual(b['defaultsCheck']['hiddenPlanningOwners'],2)

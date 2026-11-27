@@ -1,4 +1,5 @@
 """IBCS recipe charts: native template selectors plus bucket bindings the template accepts."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import unittest
 from pathlib import Path
 from runtime.chart_filters import audit_chart_filters
@@ -14,7 +15,7 @@ VALUES = {'AC': 'Metrics[Units]', 'PY': 'Metrics[Price]', 'PL': 'Metrics[Cost]',
 
 
 def model():
-    return load(ROOT / 'fixtures/model.json')
+    return load(ROOT / 'assets/fixtures/model.json')
 
 
 def spec(code, *buckets, **extra):

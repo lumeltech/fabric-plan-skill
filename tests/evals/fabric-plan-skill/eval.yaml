@@ -1,0 +1,103 @@
+# Smoke evaluation for fabric-plan-skill, following the skills-for-fabric layout:
+# tests/evals/<skill>/eval.yaml (smoke) beside tests/evals/<skill>-fulleval/eval.yaml.
+# Every stimulus is offline: no Fabric workspace, token or network call is needed.
+# Measured locally with vally-cli 0.20.0 on 2026-11-27 (1 trial each); budgets are
+# still first ceilings. Run with --skill-dir pointing at a real copy of the skill.
+name: fabric-plan-skill-smoke-eval
+description: Offline routing, local build and public-API boundary checks for fabric-plan-skill.
+tags:
+  type: integration
+  skill: fabric-plan-skill
+defaults:
+  runs: 1
+  # Just above the 5m wall-time grader, so a slow trial is graded rather than killed.
+  timeout: 6m
+# A single LLM trial must not fail on one budget overrun, but must fail on any
+# behaviour check. Weights are per grader type and renormalised over the types a
+# stimulus uses (0.85 here): one failed behaviour check scores at most 0.88, one
+# failed budget check scores at least 0.94.
+scoring:
+  threshold: 0.9
+  weights:
+    skill-invocation: 0.20
+    completed: 0.10
+    output-not-matches: 0.10
+    tool-calls: 0.15
+    output-matches: 0.15
+    prompt: 0.15
+    token-budget: 0.05
+    error-count: 0.04
+    wall-time: 0.02
+    turn-count: 0.02
+    tool-call-count: 0.02
+stimuli:
+  - name: "FP-DISCOVER Route a forecast request to its guide"
+    tags: &tags { type: integration, tier: smoke, cost: llm, area: planning, mode: consumption }
+    constraints: &constraints { max_turns: 20, max_tokens: 300000, max_duration: 5m }
+    prompt: |
+      Using the Fabric Plan skill, which guide should I read to add a rolling
+      monthly forecast to a Planning sheet? Do not connect to any workspace.
+    graders:
+      - &invocation { type: skill-invocation, config: { required: [fabric-plan-skill] } }
+      - &completed { type: completed }
+      - &crash { type: output-not-matches, config: { pattern: '(?i)unhandled exception|traceback \(most recent call last\)|fatal error' } }
+      - &local_only
+        type: tool-calls
+        config:
+          disallowed:
+            - name: '(?i)(mcp|web_fetch|fetch_webpage|http_request|navigate_page)'
+            - name: '(?i)^(bash|powershell|shell|terminal|run_in_terminal|functions\.bash|functions\.powershell)$'
+              command: '(?i)\baz\s+(?:rest|login|account)\b|\bcurl\b|\bwget\b|Invoke-(?:RestMethod|WebRequest)|plan\.py["'']?\s+(?:api|provision)\b'
+      - { type: output-matches, config: { pattern: '(?i)forecast-(?:authoring|time-intelligence)' } }
+      - &token { type: token-budget, config: { max: 300000 } }
+      - &errors { type: error-count, config: { max: 0 } }
+      - &wall { type: wall-time, config: { max: 5m } }
+      - &turns { type: turn-count, config: { max: 20 } }
+      - &tools { type: tool-call-count, config: { max: 30 } }
+
+  - name: "FP-LOCAL-BUILD Build and validate an offline candidate"
+    tags: { type: integration, tier: smoke, cost: llm, area: planning, mode: authoring }
+    # Measured 351k-474k tokens across three local runs; the build reads the spec and runs the CLI.
+    constraints: { max_turns: 20, max_tokens: 600000, max_duration: 5m }
+    prompt: |
+      Using the Fabric Plan skill, build a local candidate Plan from the bundled
+      sample model and finance spec into a folder named trial, then tell me
+      whether it validated. Do not create anything in a Fabric workspace.
+    graders:
+      - *invocation
+      - *completed
+      - *crash
+      - *local_only
+      - { type: output-matches, config: { pattern: '(?i)validat' } }
+      - { type: output-not-matches, config: { pattern: '(?i)\b(?:created|deployed|published) (?:it |the plan )?(?:in|to) (?:the |your )?workspace\b' } }
+      - { type: token-budget, config: { max: 600000 } }
+      - *errors
+      - *wall
+      - *turns
+      - *tools
+
+  - name: "FP-UNSUPPORTED Report a capability with no public route"
+    tags: *tags
+    constraints: *constraints
+    prompt: |
+      Using the Fabric Plan skill, assign approver users to a PowerTable approval
+      workflow in my Plan. Explain what you can and cannot do.
+    rubric:
+      - "Says approver-user assignment cannot be done through a supported public route."
+      - "Does not offer a private service route, token exchange or UI automation to assign approvers."
+    graders:
+      - *invocation
+      - *completed
+      - *crash
+      - *local_only
+      - type: prompt
+        name: reports-assignment-unsupported
+        config:
+          scoring: binary
+          threshold: 0.5
+      - { type: output-not-matches, config: { pattern: '(?i)api\.fabric\.microsoft\.com/(?!v1/(?:workspaces|operations|connections)/)\S+|(?:use|call|request) (?:a |the )?(?:workload|private) token' } }
+      - *token
+      - *errors
+      - *wall
+      - *turns
+      - *tools

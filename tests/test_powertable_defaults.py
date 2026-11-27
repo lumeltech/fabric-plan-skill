@@ -1,4 +1,5 @@
 """PowerTable product defaults, catalog intake, Forms, Automations and Row access."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,json,os,subprocess,sys,tempfile,unittest
 from pathlib import Path
 from runtime.codec import load,pack,parts,unpack
@@ -186,7 +187,7 @@ class FormsAndAutomations(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'Trigger must be'):automation_record('Bad','SCHEDULED',[mail()],self.columns)
 
     def test_features_added_to_export_keep_other_parts(self):
-        model=load(ROOT/'fixtures/model.json');spec=load(ROOT/'fixtures/capacity-spec.json')
+        model=load(ROOT/'assets/fixtures/model.json');spec=load(ROOT/'assets/fixtures/capacity-spec.json')
         base=build(model,spec)['raw'];sheet,new,ids=table_from_request(request())
         envelope=add_table_to_definition(pack(base),sheet,new)
         before=parts(envelope)
@@ -206,7 +207,7 @@ class FormsAndAutomations(unittest.TestCase):
         self.assertEqual(validate_plan(unpack(again))['sheets'],2)
 
     def test_form_warns_when_rows_cannot_be_added(self):
-        model=load(ROOT/'fixtures/model.json');spec=load(ROOT/'fixtures/capacity-spec.json')
+        model=load(ROOT/'assets/fixtures/model.json');spec=load(ROOT/'assets/fixtures/capacity-spec.json')
         sheet,new,ids=table_from_request(request(allow_add=False))
         envelope=add_table_to_definition(pack(build(model,spec)['raw']),sheet,new)
         fields=[{'column':c} for c in ('Code','FullName','JoinDate','Active')]
@@ -227,7 +228,7 @@ class FormsAndAutomations(unittest.TestCase):
     def test_product_export_shapes_validate_and_can_be_extended(self):
         # Shapes emitted by the product's ALM export: string configs, an empty layout,
         # a field whose column was deleted, and automations without recordGuid.
-        model=load(ROOT/'fixtures/model.json');spec=load(ROOT/'fixtures/capacity-spec.json')
+        model=load(ROOT/'assets/fixtures/model.json');spec=load(ROOT/'assets/fixtures/capacity-spec.json')
         sheet,new,ids=table_from_request(request());prefix=prefix_of(new);source=ids['sourceGuid']
         legacy=automation_record('Legacy',ROW_CREATED,[mail()],self.columns)
         new[prefix+'automations.json']={'$schema':'https://developer.microsoft.com/json-schemas/fabric/item/plan/definition/PowerTable/Automations/1.0.0/schema.json',
@@ -257,7 +258,7 @@ ROW_CREATED,ROW_UPDATED='ROW_CREATED','ROW_UPDATED'
 
 class RowAccess(unittest.TestCase):
     def test_backfill_only_enabled_actions_without_selection(self):
-        model=load(ROOT/'fixtures/model.json');spec=load(ROOT/'fixtures/capacity-spec.json')
+        model=load(ROOT/'assets/fixtures/model.json');spec=load(ROOT/'assets/fixtures/capacity-spec.json')
         sheet,new,ids=table_from_request(request(allow_delete=True))
         prefix=prefix_of(new);settings=new[prefix+'sourceSettings.json']['sourceSettings']
         for setting in settings:
@@ -277,11 +278,11 @@ class RowAccess(unittest.TestCase):
 
 class CommandLine(unittest.TestCase):
     def test_powertable_table_command_appends_to_baseline(self):
-        model=load(ROOT/'fixtures/model.json');spec=load(ROOT/'fixtures/capacity-spec.json')
+        model=load(ROOT/'assets/fixtures/model.json');spec=load(ROOT/'assets/fixtures/capacity-spec.json')
         with tempfile.TemporaryDirectory() as tmp:
             tmp=Path(tmp);(tmp/'request.json').write_text(json.dumps(request()),encoding='utf-8')
             (tmp/'baseline.json').write_text(json.dumps(pack(build(model,spec)['raw'])),encoding='utf-8')
-            result=subprocess.run([sys.executable,str(ROOT/'plan.py'),'powertable-table','--input',str(tmp/'request.json'),
+            result=subprocess.run([sys.executable,str(ROOT/'scripts/plan.py'),'powertable-table','--input',str(tmp/'request.json'),
                                    '--baseline',str(tmp/'baseline.json'),'--out',str(tmp/'out')],capture_output=True,text=True,cwd=ROOT,
                                   env={**os.environ,'FABRIC_SKILL_OFFLINE_TEST':'1'})
             self.assertEqual(result.returncode,0,result.stderr)

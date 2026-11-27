@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,unittest
 from runtime.consumer_bindings import audit_visual_consumers,restore_import_bindings
 from runtime.chart_filters import ensure_chart_filters

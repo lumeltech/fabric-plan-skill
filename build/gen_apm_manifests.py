@@ -48,7 +48,7 @@ def render_manifest():
         "targets:",
         *(f"  - {target}" for target in TARGETS),
         "scripts:",
-        "  test: python plan.py test",
+        "  test: python scripts/plan.py test",
     ]
     return "\n".join(lines) + "\n"
 

@@ -1,4 +1,5 @@
 """Regression for the disabled-icon topPadding dashboard crash."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy
 import unittest
 from pathlib import Path
@@ -31,11 +32,11 @@ class NavigatorDefaultsTests(unittest.TestCase):
                 self.assert_renderable(value)
 
     def test_current_fixture_is_complete_without_runtime_repair(self):
-        fixture = load(Path(__file__).resolve().parents[1] / 'fixtures/navigator-builder-20261112.json')
+        fixture = load(Path(__file__).resolve().parents[1] / 'assets/fixtures/navigator-builder-20261112.json')
         self.assert_renderable(fixture)
 
     def test_recipes_and_builder_use_the_stored_corner_keys(self):
-        fixture = load(Path(__file__).resolve().parents[1] / 'fixtures/navigator-builder-20261112.json')
+        fixture = load(Path(__file__).resolve().parents[1] / 'assets/fixtures/navigator-builder-20261112.json')
         self.assertIn('radiusTopLeft', fixture['style']['DEFAULT']['shapeState']['cornerRadius'])
         for recipe in range(1, 6):
             with self.subTest(recipe=recipe):
@@ -101,7 +102,7 @@ class NavigatorDefaultsTests(unittest.TestCase):
         from runtime.application_defaults import check_application_defaults
         from runtime.planning_presentation import build_application
         root = Path(__file__).resolve().parents[1]
-        built = build_application(load(root/'fixtures/model.json'), load(root/'fixtures/finance-spec.json'))
+        built = build_application(load(root/'assets/fixtures/model.json'), load(root/'assets/fixtures/finance-spec.json'))
         name = next(k for k,v in built['raw'].items() if 'navigatorState' in v.get('properties',{}).get('visualState',{}))
         result = check_application_defaults(built['raw'], built['home'])
         self.assertEqual(result['navigatorDefaultsChecked'], len(built['dashboardIdentities']))

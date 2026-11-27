@@ -1,4 +1,4 @@
-"""Nothing in the routing catalog may name a private or native endpoint.
+"""The routing catalog and guides may name only public routes and shipped modules.
 
 test_discovery.py already proves the catalog resolves to shipped guides,
 registered commands and existing callables. This guards the other direction:
@@ -10,15 +10,18 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-# Endpoint shapes and private runtime modules only. Prose may still disclaim a
-# route in words, and tests/test_discovery.py requires POWERTABLE to do exactly
-# that; naming one as a usable path is what this forbids.
-ROUTE = re.compile(
-    r"/v1/workload|/v1/rules|/v1/access/|/webapi/|planningproxy|generatemwctokenv2|"
-    r"\bruntime\.(native|session|home_api|builder_api|intelligence_api|activation|"
-    r"assets_api|dashboard_readback|navigation_publish|planning_rule_state|"
-    r"powertable_readiness)\b"
-)
+# Routing text may name only public Fabric REST routes and runtime modules this
+# package ships. Prose may still say in words that a capability has no public route.
+API_PATH = re.compile(r"/v1/[A-Za-z0-9_{}./-]*")
+PUBLIC_PREFIXES = ("/v1/workspaces/", "/v1/connections/", "/v1/operations/")
+MODULE = re.compile(r"\bruntime\.([a-z_]+)\b")
+SHIPPED = {p.stem for p in (ROOT / "scripts/runtime").glob("*.py")}
+
+
+def unsupported_references(text):
+    paths = [p for p in API_PATH.findall(text) if not p.startswith(PUBLIC_PREFIXES)]
+    modules = [m for m in MODULE.findall(text) if m not in SHIPPED]
+    return paths + modules
 
 
 GUIDE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]*\.md\b")
@@ -28,25 +31,25 @@ GAPS_EXEMPT = {"documentationNotBundled"}
 
 class RoutingCatalogBoundaries(unittest.TestCase):
     def test_catalog_names_no_private_route(self):
-        text = (ROOT / "catalog" / "module-routing.json").read_text(encoding="utf-8")
-        self.assertIsNone(ROUTE.search(text.lower()))
+        text = (ROOT / "assets/catalog" / "module-routing.json").read_text(encoding="utf-8")
+        self.assertEqual(unsupported_references(text), [])
 
     def test_guides_name_no_private_route(self):
         for path in sorted((ROOT / "references").glob("*.md")):
             with self.subTest(guide=path.name):
-                self.assertIsNone(ROUTE.search(path.read_text(encoding="utf-8").lower()))
+                self.assertEqual(unsupported_references(path.read_text(encoding="utf-8")), [])
 
     def test_shipped_text_points_only_at_bundled_guides(self):
         bundled = {path.name for path in (ROOT / "references").glob("*.md")}
         sources = {
-            "catalog/module-routing.json": (ROOT / "catalog" / "module-routing.json").read_text(
+            "assets/catalog/module-routing.json": (ROOT / "assets/catalog" / "module-routing.json").read_text(
                 encoding="utf-8"
             ),
             "SKILL.md": (ROOT / "SKILL.md").read_text(encoding="utf-8"),
             "README.md": (ROOT / "README.md").read_text(encoding="utf-8"),
         }
-        gaps = json.loads((ROOT / "catalog" / "api-contract-gaps.json").read_text(encoding="utf-8"))
-        sources["catalog/api-contract-gaps.json"] = json.dumps(
+        gaps = json.loads((ROOT / "assets/catalog" / "api-contract-gaps.json").read_text(encoding="utf-8"))
+        sources["assets/catalog/api-contract-gaps.json"] = json.dumps(
             {key: value for key, value in gaps.items() if key not in GAPS_EXEMPT}
         )
         for name, text in sources.items():

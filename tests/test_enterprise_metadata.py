@@ -76,7 +76,7 @@ class EnterpriseMetadataTests(unittest.TestCase):
         self.assertIn("x-ms-fabric-skill: fabric-plan-skill", skill)
         self.assertIn("public Fabric APIs", skill)
         self.assertIn("explicit write authorization", skill)
-        self.assertIn("python plan.py build", skill)
+        self.assertIn("python scripts/plan.py build", skill)
 
     def test_fulleval_tags_cover_suite_and_every_stimulus(self):
         spec = (ROOT / "tests/evals/fabric-plan-skill-fulleval/eval.yaml").read_text(

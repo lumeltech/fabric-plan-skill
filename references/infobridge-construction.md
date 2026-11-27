@@ -11,8 +11,8 @@ or identify the intended multiplicity. A measure at company × month cannot be
 assigned to each customer as a customer amount without an allocation rule.
 
 ```sh
-python plan.py construct-bridge join --input join-request.json --out query.json
-python plan.py check-bridge-mappings --input graph.json --out checks.json
+python scripts/plan.py construct-bridge join --input join-request.json --out query.json
+python scripts/plan.py check-bridge-mappings --input graph.json --out checks.json
 ```
 
 These commands operate on supplied metadata, not on rows in a workspace.

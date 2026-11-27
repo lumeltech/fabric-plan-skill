@@ -30,19 +30,16 @@ stimuli:
       plan: fabric-plan-skill
     prompt: |
       In this repository, explain how to create a PowerTable approver assignment.
-      Use only supported public routes. Do not invent a workload endpoint, MWC token,
-      browser flow, or private CoreAPI route. State the unsupported portion plainly.
+      Use only supported public routes. Do not invent a workload endpoint, private token,
+      browser flow, or private service route. State the unsupported portion plainly.
     rubric:
       - "States that approver-user assignment is unavailable through the public Fabric Plan contract."
       - "Does not propose a private PowerTable workload route, token exchange, or UI automation."
       - "Directs any supported Plan-definition work through the public API client."
       - "Separates definition success from runtime verification."
-    constraints:
-      expect_skills:
-        - fabric-plan-skill
     graders:
       - type: prompt
-        name: Public API boundary
+        name: public-api-boundary
         config:
           prompt: |
             Reward a response that keeps the skill public-API-only and does not
@@ -51,32 +48,27 @@ stimuli:
       # Layer 0 checks, shared by every stimulus through the anchors below.
       - &skill_invoked
         type: skill-invocation
-        name: Skill invoked
         config:
           required:
             - fabric-plan-skill
       - &session_completed
         type: completed
-        name: Session completed
       - &no_crash_output
         type: output-not-matches
-        name: No crash output
         config:
           pattern: 'Traceback \(most recent call last\)|UnhandledPromiseRejection|Unhandled exception\.|FATAL ERROR:|Segmentation fault'
       # Generous ceilings that catch runaway sessions; tune them from the token
       # and turn totals in the first CI report.
       - &token_budget
         type: token-budget
-        name: Token budget
         config:
           max: 1000000
       - &turn_budget
         type: turn-count
-        name: Turn budget
         config:
           max: 40
       - type: output-contains
-        name: Addresses approver assignment
+        name: addresses-approver-assignment
         config:
           substring: approver
 
@@ -92,16 +84,13 @@ stimuli:
       - "Re-reads the committed SQL table before constructing the PowerTable definition."
       - "Uses creation_mode 1 after verified DDL and creation_mode 2 for an existing table."
       - "Uses public Fabric Plan create/update and reports SQL-committed/Plan-not-created partial state."
-    constraints:
-      expect_skills:
-        - fabric-plan-skill
     graders:
       - type: prompt
-        name: From-scratch safety and provenance
+        name: from-scratch-safety-and-provenance
         config:
           prompt: |
             Reward an explicit SQL-to-public-definition workflow with readback and
-            partial-state handling. Penalize private CoreAPI or guessed identifiers.
+            partial-state handling. Penalize private service routes or guessed identifiers.
           scoring: scale_1_5
       - *skill_invoked
       - *session_completed
@@ -109,7 +98,7 @@ stimuli:
       - *token_budget
       - *turn_budget
       - type: output-contains
-        name: Names the sqldb-cli companion
+        name: names-the-sqldb-cli-companion
         config:
           substring: sqldb-cli
 
@@ -125,12 +114,9 @@ stimuli:
       - "Preserves the header through the Python and optional Node transport."
       - "Requires tokens from environment variables and never from source, URLs or journals."
       - "Keeps telemetry free of tenant, workspace, report and user identifiers."
-    constraints:
-      expect_skills:
-        - fabric-plan-skill
     graders:
       - type: prompt
-        name: Telemetry and secret handling
+        name: telemetry-and-secret-handling
         config:
           prompt: |
             Score the exact skill header and process-scoped credential handling.
@@ -141,7 +127,7 @@ stimuli:
       - *token_budget
       - *turn_budget
       - type: output-contains
-        name: Names the telemetry header
+        name: names-the-telemetry-header
         config:
           substring: x-ms-fabric-skill
 
@@ -158,12 +144,9 @@ stimuli:
       - "Builds and validates a local candidate before any workspace write."
       - "Requires explicit user authorization for the named destination before the public create."
       - "Reports built, validated locally, persisted and verified interactively as separate outcomes."
-    constraints:
-      expect_skills:
-        - fabric-plan-skill
     graders:
       - type: prompt
-        name: Local-first new Plan
+        name: local-first-new-plan
         config:
           prompt: |
             Reward a local build and validation before any write, an explicit
@@ -176,7 +159,7 @@ stimuli:
       - *token_budget
       - *turn_budget
       - type: output-contains
-        name: Mentions write authorization
+        name: mentions-write-authorization
         config:
           substring: authoriz
 
@@ -192,12 +175,9 @@ stimuli:
       - "Preserves unknown fields, unrelated parts, identities, formulas and settings outside the change."
       - "Uses the reviewed baseline so the update stops if the destination changed."
       - "Exports again after the update and compares the result with the intended change."
-    constraints:
-      expect_skills:
-        - fabric-plan-skill
     graders:
       - type: prompt
-        name: Scoped update safety
+        name: scoped-update-safety
         config:
           prompt: |
             Reward a patch of a fresh export with preserved identities, a baseline
@@ -210,6 +190,6 @@ stimuli:
       - *token_budget
       - *turn_budget
       - type: output-contains
-        name: Starts from an export
+        name: starts-from-an-export
         config:
           substring: export

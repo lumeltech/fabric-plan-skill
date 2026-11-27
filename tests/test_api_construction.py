@@ -1,6 +1,6 @@
 import unittest,copy,os,tempfile,sys
 from pathlib import Path
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from runtime.pivots import compile_pivots,select_pivot
 from runtime.identity import Registry
 from runtime.layout import inventory,placement_batch

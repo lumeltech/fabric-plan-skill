@@ -31,7 +31,7 @@ optional enhancements that depend on the business prompt mentioning them:
 5. A native Page Navigator on every Intelligence dashboard, including explicitly
    authored dashboards. Use complete render defaults and all visible normal
    pages, with reserved space above the grid. Buttons/bookmark tabs are different
-   controls. Use `plan.py construct-native navigator` for them and `check-application-defaults` to verify coverage; no separate navigation guide is bundled here.
+   controls. Use `scripts/plan.py construct-native navigator` for them and `check-application-defaults` to verify coverage; no separate navigation guide is bundled here.
 
 Do not silently omit any default or call an application complete if a required
 phase failed. Native Home is not an ordinary sheet named Home and is not the same
@@ -80,7 +80,7 @@ through the documented phases. There is no reference-only staging shortcut or
 automatic reduced-scope deployment; the original request and import-contract
 checks stay authoritative.
 
-`plan.py build` / `build_application` produce these requirements with hidden
+`scripts/plan.py build` / `build_application` produce these requirements with hidden
 underlying Planning owners and dashboard access. The result
 includes `home.json`, `homeSpec.json`, and `defaultsCheck.json` in addition to the
 existing definition, dashboard and identity files. The generated Plan properties
@@ -101,7 +101,7 @@ not percentages. Read the Home layout fit guide, whose contract the runtime guid
 fake images, temporary asset URLs or external links as substitutes for navigation.
 
 ```text
-python plan.py check-application-defaults --input decoded.json --home home.json --out defaults-check.json
+python scripts/plan.py check-application-defaults --input decoded.json --home home.json --out defaults-check.json
 ```
 
 This command checks Arial plus all five requirements in the supplied definition/content.

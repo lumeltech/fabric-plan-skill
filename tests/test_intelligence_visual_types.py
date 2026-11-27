@@ -4,6 +4,7 @@ The tree family is a visual type a real dashboard can hold. This package names i
 protects it, and builds decomposition and organization trees; row and measure trees
 stay recognition-only.
 """
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import json
 import unittest
 from pathlib import Path
@@ -47,7 +48,7 @@ class TreeVisualCoverageTests(unittest.TestCase):
         self.assertEqual(props["chartType"], "ORGANIZATION_TREE")
 
     def test_tree_construction_is_no_longer_recorded_as_a_gap(self):
-        gaps = json.loads((ROOT / "catalog" / "api-contract-gaps.json").read_text(encoding="utf-8"))
+        gaps = json.loads((ROOT / "assets/catalog" / "api-contract-gaps.json").read_text(encoding="utf-8"))
         self.assertNotIn("tree-visual-authoring", {item["id"] for item in gaps["capabilities"]})
         module = next(item for item in discover(query="create tree visual")["modules"]
                       if item["id"] == "INTELLIGENCE-VISUAL-TYPES")

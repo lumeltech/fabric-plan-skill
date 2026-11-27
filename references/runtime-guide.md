@@ -13,8 +13,8 @@ a `Native` measure with `{"key":"base","kind":"Native","label":"Base pay",
 "source":"Metrics[BasePay]"}`. The caption is not a substitute for the source.
 
 ```sh
-python plan.py build --model current-model.json --spec application.json --out draft
-python plan.py check-import-contract --spec application.json --construction draft/construction.json --out coverage.json
+python scripts/plan.py build --model current-model.json --spec application.json --out draft
+python scripts/plan.py check-import-contract --spec application.json --construction draft/construction.json --out coverage.json
 ```
 
 `validation.json` can report `passed-native-extension` for the reviewed native
@@ -39,7 +39,7 @@ confirming its ID and current display name.
 Use an authorized identity and explicit destination config. For example:
 
 ```sh
-python plan.py api export --config destination.json --run run --label baseline
+python scripts/plan.py api export --config destination.json --run run --label baseline
 ```
 
 Export, list and get are reads; create, update, rename and delete are writes. For asynchronous operations,

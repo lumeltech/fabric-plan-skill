@@ -62,7 +62,7 @@ that a particular report's reparenting, data refresh or persistence was tested.
 ## Guide to command
 
 ```text
-python plan.py leaf-key-mapping --input examples/leaf-key-mapping.request.json --out mapping.json
+python scripts/plan.py leaf-key-mapping --input assets/examples/leaf-key-mapping.request.json --out mapping.json
 ```
 
 Input: current `model`, actual semantic `assignments`, and resolved `groups`:

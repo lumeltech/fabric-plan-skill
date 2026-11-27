@@ -67,9 +67,9 @@ PowerTable/EDITABLE, SQL, Append, Join and Merge sources retain their own contra
 From the installed/extracted skill directory:
 
 ```text
-python plan.py construct-bridge planning-source --input examples/infobridge-lineage/planning-source.request.json --out source.json
-python examples/infobridge-lineage/build.py draft
-python plan.py check-bridge-mappings --input draft/infobridge.json --out mappings.json
+python scripts/plan.py construct-bridge planning-source --input assets/examples/infobridge-lineage/planning-source.request.json --out source.json
+python assets/examples/infobridge-lineage/build.py draft
+python scripts/plan.py check-bridge-mappings --input draft/infobridge.json --out mappings.json
 ```
 
 The example uses clearly illustrative owner records and builds fresh source/query
@@ -128,7 +128,7 @@ use the existing `consumer_bindings` helpers for that case.
 The packaged CLI demonstrates this phase without live calls:
 
 ```text
-python plan.py resolve-bridge-output --input examples/infobridge-lineage/resolve-output.request.json --out field.json
+python scripts/plan.py resolve-bridge-output --input assets/examples/infobridge-lineage/resolve-output.request.json --out field.json
 ```
 
 For a new consumer, register all four objects returned by `bridge_consumer` through

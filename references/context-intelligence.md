@@ -51,7 +51,7 @@ The Context field is absent from visible `pivotAssignments` Rows/Columns, `rowDi
 
 Do not copy `filterContextHashMap`, `filterContextHash`, `filterContextJson`, last selection caches or historical input coordinates into a new application. They are not prerequisites to author the external Context registration. Let native initialization build runtime state. Never change context identity on an existing populated sheet without a separate input-migration and retention check.
 
-`runtime/filters.py` provides typed selection DTOs, `registration`, `prepare_context`, `apply_context`, and `audit_context`. `construct.planning` consumes the symbolic `context` list automatically; `scope` and `workflow` retain it.
+`scripts/runtime/filters.py` provides typed selection DTOs, `registration`, `prepare_context`, `apply_context`, and `audit_context`. `construct.planning` consumes the symbolic `context` list automatically; `scope` and `workflow` retain it.
 
 ```json
 {
@@ -73,7 +73,7 @@ Resolve fields, relationships, uniqueness and selected members from the current 
 
 For each requested business workspace derive relevant controls from its grain. Workforce commonly needs planning year, region, department and employee; Commercial commonly needs period, region, product and channel. Finance commonly needs period, region, account and scenario Context. Use actual available dimensions; do not invent missing fields. Aim for three or four useful slicers and two or three meaningful KPIs when the model supports them. Do not add controls merely to reach a count.
 
-The observed reference workspace has four native slicers, three native KPI cards, a banner, a workbench note, and one embedded Planning owner. `runtime/intelligence.py` constructs these active branches parametrically:
+The observed reference workspace has four native slicers, three native KPI cards, a banner, a workbench note, and one embedded Planning owner. `scripts/runtime/intelligence.py` constructs these active branches parametrically:
 
 | Visual | Declaration / native type | Relevant state |
 |---|---|---|
@@ -105,10 +105,10 @@ Default native interactions are retained (`visualInteractions: {}`). Do not inve
 
 ## Composition and geometry
 
-The normal spec supports a top-level `dashboards` list referencing source owners by this run's sheet names. See `fixtures/context-dashboard-model.json` and `fixtures/context-dashboard-spec.json` for a complete offline example. Use:
+The normal spec supports a top-level `dashboards` list referencing source owners by this run's sheet names. See `assets/fixtures/context-dashboard-model.json` and `assets/fixtures/context-dashboard-spec.json` for a complete offline example. Use:
 
 ```text
-python plan.py build --model fixtures/context-dashboard-model.json --spec fixtures/context-dashboard-spec.json --out trial/context-dashboard
+python scripts/plan.py build --model assets/fixtures/context-dashboard-model.json --spec assets/fixtures/context-dashboard-spec.json --out trial/context-dashboard
 ```
 
 When layout is unspecified, use a full-width header, a left rail with vertical page navigation above the slicers, and a wide matrix above a balanced chart row. KPI cards form rows above the matrix when present. The compiler uses a 1920-unit default width, 24-unit outer margins and 16-unit gutters. It sizes navigation for the page count, divides available filter height across the rail, and aligns the last filter with the bottom of the chart area. Odd final rows fill the available width. For an explicit design, pass dashboard.layout as a pixel layout with width, height and rectangles keyed by header, navigator, note, grid, slicer:0, card:0, chart:0 and subsequent indices as applicable. Use the stacked preset for the former full-width lower matrix. The builder checks bounds and separation before import.

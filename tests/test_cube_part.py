@@ -1,4 +1,5 @@
 """Cube partitions, partition measures and their mappings as cube/cube.json records."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,json,os,subprocess,sys,tempfile,unittest,uuid
 from pathlib import Path
 from runtime.codec import load,pack,parts,unpack
@@ -24,7 +25,7 @@ def measure(**extra):
 
 class CubePart(unittest.TestCase):
     def setUp(self):
-        raw=build(load(ROOT/'fixtures/model.json'),load(ROOT/'fixtures/capacity-spec.json'))['raw']
+        raw=build(load(ROOT/'assets/fixtures/model.json'),load(ROOT/'assets/fixtures/capacity-spec.json'))['raw']
         sheet=raw['definition.json']['sheets'][0]
         self.sheet,self.visual=sheet['recordGuid'],sheet['workloadItemEntityVisuals'][0]['visualId']
         columns=raw[f'sheets/{self.sheet}/visuals/{self.visual}/dataInput.json']['columns']
@@ -128,7 +129,7 @@ class CubePart(unittest.TestCase):
         request={'partitions':[partition()],'measures':[measure()],'measure_mappings':[{'partition':'Breakdown 1','measure':'Available Hours'}]}
         (tmp/'request.json').write_text(json.dumps(request),encoding='utf-8')
         (tmp/'baseline.json').write_text(json.dumps(self.envelope),encoding='utf-8')
-        result=subprocess.run([sys.executable,str(ROOT/'plan.py'),'cube-part','--baseline',str(tmp/'baseline.json'),
+        result=subprocess.run([sys.executable,str(ROOT/'scripts/plan.py'),'cube-part','--baseline',str(tmp/'baseline.json'),
                                '--input',str(tmp/'request.json'),'--out',str(tmp/'out')],capture_output=True,text=True,cwd=ROOT,
                               env={**os.environ,'FABRIC_SKILL_OFFLINE_TEST':'1'})
         self.assertEqual(result.returncode,0,result.stderr)

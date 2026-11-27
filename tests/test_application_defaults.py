@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy,unittest
 from pathlib import Path
 from runtime.codec import load
@@ -12,8 +13,8 @@ class RequiredDefaultsTests(unittest.TestCase):
         from runtime.construct import build
         from runtime.planning_presentation import application_defaults
         from runtime.codec import unpack
-        model = load(ROOT/'fixtures/model.json')
-        spec = application_defaults(model, load(ROOT/'fixtures/finance-spec.json'))
+        model = load(ROOT/'assets/fixtures/model.json')
+        spec = application_defaults(model, load(ROOT/'assets/fixtures/finance-spec.json'))
         dashboard = spec['dashboards'][0]
         spec['dashboards'] = [dashboard]
         for sheet in spec['sheets']:
@@ -26,7 +27,7 @@ class RequiredDefaultsTests(unittest.TestCase):
             self.assertEqual(owner['isHidden'], owner['displayName'] == dashboard['owner'])
         self.assertEqual(len(require_business_navigation(raw)), 1)
 
-    def build(self):return build_application(load(ROOT/'fixtures/model.json'),load(ROOT/'fixtures/finance-spec.json'))
+    def build(self):return build_application(load(ROOT/'assets/fixtures/model.json'),load(ROOT/'assets/fixtures/finance-spec.json'))
     def test_all_four_defaults_built_without_optional_flags(self):
         b=self.build();r=check_application_defaults(b['raw'],b['home'])
         self.assertTrue(b['raw']['planProperties.json']['properties']['homeLayout']['show'])
@@ -58,7 +59,7 @@ class RequiredDefaultsTests(unittest.TestCase):
         raw['definition.json']['sheets'][0]['isHidden']=True
         with self.assertRaisesRegex(ValueError,'PowerTable must be visible'):require_business_navigation(raw)
     def test_home_cannot_silently_be_hidden(self):
-        s=load(ROOT/'fixtures/finance-spec.json');s['home']={'show':False}
+        s=load(ROOT/'assets/fixtures/finance-spec.json');s['home']={'show':False}
         with self.assertRaisesRegex(ValueError,'cannot be hidden'):home_defaults(s)
     def test_home_content_and_visibility_are_independent_requirements(self):
         b=self.build()
@@ -73,7 +74,7 @@ class RequiredDefaultsTests(unittest.TestCase):
         p['visualState']['chartCustomTitle']=before;p['visualState']['formatConfig']['measure']={}
         with self.assertRaisesRegex(ValueError,'source-role'):check_application_defaults(b['raw'],b['home'])
     def test_existing_home_blocks_are_preserved_and_missing_cards_added(self):
-        s=load(ROOT/'fixtures/finance-spec.json');s['home']={'blocks':[{'key':'kept','type':'text','title':'Keep me','description':'Existing business guidance'}],'rows':[{'blocks':['kept']}],'order':4}
+        s=load(ROOT/'assets/fixtures/finance-spec.json');s['home']={'blocks':[{'key':'kept','type':'text','title':'Keep me','description':'Existing business guidance'}],'rows':[{'blocks':['kept']}],'order':4}
         a=home_defaults(s);self.assertEqual(a['home']['blocks'][0],s['home']['blocks'][0]);self.assertEqual(a['home']['order'],4)
         self.assertEqual(home_defaults(a),a)
 
@@ -92,7 +93,7 @@ class RequiredDefaultsTests(unittest.TestCase):
 
     def test_component_only_construction_is_never_application_complete(self):
         from runtime.construct import build
-        b=build(load(ROOT/'fixtures/model.json'),load(ROOT/'fixtures/finance-spec.json'))
+        b=build(load(ROOT/'assets/fixtures/model.json'),load(ROOT/'assets/fixtures/finance-spec.json'))
         self.assertTrue(b['raw']['planProperties.json']['properties']['homeLayout']['show'])
         self.assertFalse(b['evidence']['applicationComplete'])
         with self.assertRaisesRegex(ValueError,'missing rich'):require_delivery_phases(b,home_visible=True,dashboard_geometry=[],dashboard_visibility=[])

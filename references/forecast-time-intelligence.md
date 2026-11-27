@@ -115,5 +115,5 @@ column is appended. Preserve existing missing/FX guards and balance aggregation.
 The helper defaults row aggregation to None and column aggregation to None.
 
 ```sh
-python plan.py planning-time-column --baseline definition.json --input time-column.request.json --out candidate
+python scripts/plan.py planning-time-column --baseline definition.json --input time-column.request.json --out candidate
 ```

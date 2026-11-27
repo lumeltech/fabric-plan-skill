@@ -1,4 +1,5 @@
 """Decomposition and organization trees: TREE visuals with both selectors and the tree's own roles."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import unittest
 from pathlib import Path
 from runtime.codec import load
@@ -10,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def model():
-    return load(ROOT / 'fixtures/model.json')
+    return load(ROOT / 'assets/fixtures/model.json')
 
 
 def roles(p):

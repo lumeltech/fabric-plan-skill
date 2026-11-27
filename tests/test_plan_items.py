@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0,str(ROOT/'scripts'))
 from runtime.codec import save
 from runtime.transport import Client, plan_operation
 
@@ -103,7 +103,7 @@ class PlanItemCommandTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             destination = Path(directory) / 'destination.json'
             save(destination, {'apiBase': BASE, 'tokenEnvironment': 'TEST_TOKEN', 'workspaceId': 'w', **config})
-            argv = ['plan.py', 'api', action, '--config', str(destination), '--run', str(Path(directory) / 'run'),
+            argv = ['scripts/plan.py', 'api', action, '--config', str(destination), '--run', str(Path(directory) / 'run'),
                     '--label', action]
             with patch.object(sys, 'argv', argv), patch('runtime.transport.Client'), \
                     patch('runtime.transport.plan_operation', return_value={'status': 200, 'body': {}}) as operation, \

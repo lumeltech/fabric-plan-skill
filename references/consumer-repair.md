@@ -49,7 +49,7 @@ fresh export. Use final `selectedDimensions`, `selectedColumns`, and
 error or null output means configuration evidence only, not successful
 materialization.
 
-`runtime/consumer_bindings.py` supplies `output_catalog`, `resolve_assignment` and `assert_resolved`. Match the intended query first, then its proven output ID, then assert name/type/aggregation consistency. Do not accept a matching label, an ordinal, or an ID copied from another Plan. Resolve portable-to-native prefixes after import. Numeric query prefixes are not automatically valid in GUID-based metadata routes.
+`scripts/runtime/consumer_bindings.py` supplies `output_catalog`, `resolve_assignment` and `assert_resolved`. Match the intended query first, then its proven output ID, then assert name/type/aggregation consistency. Do not accept a matching label, an ordinal, or an ID copied from another Plan. Resolve portable-to-native prefixes after import. Numeric query prefixes are not automatically valid in GUID-based metadata routes.
 
 For new query measures, the native internal identity is XXH3 of `SUM__<native-qualified-field>` (or the explicitly selected aggregation); semantic measures use their own contract. A stored measureGuid matches the native qualified key, not its portable GUID spelling. Use the bundled lossless identity implementation. Before provision of dependent Planning formulas, resolve the runtime external-key map and register companions consistently.
 
@@ -74,7 +74,7 @@ A successful restore proves persistence and catalog identity, not rendering or f
 
 Use `intelligence.card` / `complete_card_state`, not a partial KPI object. Set outer `properties.chartType:"CARD"`, `visualState.chartType:"CARD"` and JSON-string `hiddenProperties_!!!_chartsMode` consistently. Outer mode omission can leave a visual presenting as the default bar/column chart.
 
-The fixture `fixtures/card-defaults.json` includes complete identity-free active KPI controls and number-format defaults. The theme update reads `variance.style.color` even when variance is disabled. Keep title prefix/suffix, total style/value, variance icon/colors/style/border/accent settings, tooltip, image defaults, group containers, and default flags. Replacing a slice with `{variance:{showVariance:false}}` loses required members. The factory fills defaults while retaining intended labels, fonts, display options and layout. Dynamic Title/Value tokens display the assigned measure; never insert financial totals as literal text.
+The fixture `assets/fixtures/card-defaults.json` includes complete identity-free active KPI controls and number-format defaults. The theme update reads `variance.style.color` even when variance is disabled. Keep title prefix/suffix, total style/value, variance icon/colors/style/border/accent settings, tooltip, image defaults, group containers, and default flags. Replacing a slice with `{variance:{showVariance:false}}` loses required members. The factory fills defaults while retaining intended labels, fonts, display options and layout. Dynamic Title/Value tokens display the assigned measure; never insert financial totals as literal text.
 
 Do not copy fieldsMeta, historical measure keys, cached chart data, success flags or entire reference store bags. For presentational repair, start from a fresh export, preserve current visual identity and complete unrelated settings, publish with `api update`, and export again to compare exact properties. Existing page-local embed rectangles must remain unchanged.
 

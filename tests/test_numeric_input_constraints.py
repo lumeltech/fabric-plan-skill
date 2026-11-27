@@ -1,7 +1,7 @@
 import copy,sys,unittest
 from decimal import Decimal
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
+ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 from runtime.codec import load,pack
 from runtime.construct import planning
 from runtime.identity import Registry
@@ -11,12 +11,12 @@ from runtime.planning_integrity import guard_write
 
 class NumericInputContracts(unittest.TestCase):
     def spec(self):
-        s=load(ROOT/'fixtures/finance-spec.json')['sheets'][0]
+        s=load(ROOT/'assets/fixtures/finance-spec.json')['sheets'][0]
         s['measures']=[{'kind':'Formula','key':'limit','label':'Limit','formula':'0.15','visible':False},
             {'kind':'DataInput','key':'rate','label':'Rate','aggregation':'AverageLeaf','min_value':{'Static':0},
              'max_value':{'Measure':'limit'},'default_value':{'Static':Decimal('0.03')}}]
         return s
-    def build(self,s):return planning(load(ROOT/'fixtures/model.json'),s,Registry())
+    def build(self,s):return planning(load(ROOT/'assets/fixtures/model.json'),s,Registry())
     def test_rate_preserves_fraction_default_and_resolves_limit(self):
         _,raw,ids=self.build(self.spec())
         records=next(v['columns'] for k,v in raw.items() if k.endswith('dataInput.json'))

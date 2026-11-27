@@ -13,4 +13,4 @@ targets:
   - codex
   - claude
 scripts:
-  test: python plan.py test
+  test: python scripts/plan.py test

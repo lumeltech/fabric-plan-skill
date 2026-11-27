@@ -1,3 +1,4 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import unittest
 from unittest.mock import patch
 from runtime.transport import Client
@@ -11,8 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class PublicDashboardDelivery(unittest.TestCase):
     def test_default_definition_contains_all_visual_rectangles(self):
-        built = build_application(load(ROOT/'fixtures/context-dashboard-model.json'),
-                                  load(ROOT/'fixtures/context-dashboard-spec.json'))
+        built = build_application(load(ROOT/'assets/fixtures/context-dashboard-model.json'),
+                                  load(ROOT/'assets/fixtures/context-dashboard-spec.json'))
         for dashboard in built['dashboardIdentities']:
             self.assertEqual(check_placements(built['raw'], dashboard)['visualCount'], len(dashboard['placements']))
             vid = dashboard['ownerGuid']
@@ -27,7 +28,7 @@ class PublicDashboardDelivery(unittest.TestCase):
 
     def test_ten_pages_share_two_sources_and_keep_page_specific_rectangles(self):
         from copy import deepcopy
-        spec = load(ROOT/'fixtures/context-dashboard-spec.json')
+        spec = load(ROOT/'assets/fixtures/context-dashboard-spec.json')
         source = deepcopy(spec['sheets'][0])
         source['name'] = 'Second planning sheet'
         spec['sheets'].append(source)
@@ -36,7 +37,7 @@ class PublicDashboardDelivery(unittest.TestCase):
             {**deepcopy(template), 'name': f'Page {i + 1}', 'owner': spec['sheets'][i % 2]['name'],
              'width': 1400 + 32 * i, 'viewport': {'width': 1600, 'height': 1000}}
             for i in range(10)]
-        app = build_application(load(ROOT/'fixtures/context-dashboard-model.json'), spec)
+        app = build_application(load(ROOT/'assets/fixtures/context-dashboard-model.json'), spec)
         raw = app['raw']
         owners = raw['definition.json']['sheets'][:2]
         self.assertEqual(len(app['dashboardIdentities']), 10)
@@ -65,9 +66,9 @@ class PublicDashboardDelivery(unittest.TestCase):
             'a': {'originEntityId': '1', 'visualId': '2'},
             'b': {'originEntityId': '2', 'visualId': '3'}})
 
-    def test_internal_endpoints_rejected_before_credentials_or_submission(self):
+    def test_unlisted_endpoints_rejected_before_credentials_or_submission(self):
         client = Client('https://api.fabric.microsoft.com/v1', 'UNSET_TEST_TOKEN', journal=ROOT,
                         adapter=lambda *args: self.fail('Unexpected submission'))
-        for route in ('/CoreAPI/v1/access/roles/layout/', '/metadata/v201606/generatemwctokenv2'):
+        for route in ('/admin/tenants', '/workspaces/w/items/i/unlisted', '/metadata/x'):
             with self.subTest(route=route), self.assertRaisesRegex(ValueError, 'public Fabric'):
                 client.request('POST',route,label='forbidden')

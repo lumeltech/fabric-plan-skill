@@ -165,5 +165,5 @@ For offline authoring, pass exact current owner properties plus requests:
 ```
 
 ```sh
-python plan.py construct-native anchor --input anchor-request.json --out anchor-candidate.json
+python scripts/plan.py construct-native anchor --input anchor-request.json --out anchor-candidate.json
 ```

@@ -31,7 +31,7 @@ Classification reads current exported or locally built properties. It never cont
 
 ## Build a tree
 
-Add the tree to a dashboard's `charts` list, so it takes a chart slot. A spec with `tree` is built by `runtime/tree_visuals.py`:
+Add the tree to a dashboard's `charts` list, so it takes a chart slot. A spec with `tree` is built by `scripts/runtime/tree_visuals.py`:
 
 ```json
 {"label": "Revenue drivers", "tree": "decomposition",

@@ -1,4 +1,5 @@
 """Offline preservation, owner evidence, business routing and native save boundary."""
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 import copy
 import json
 from pathlib import Path
@@ -16,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def fixture():
-    p = json.loads((ROOT/'examples/anchor-measures/saved-profile.json').read_text(encoding='utf-8'))['properties']
+    p = json.loads((ROOT/'assets/examples/anchor-measures/saved-profile.json').read_text(encoding='utf-8'))['properties']
     s = p['visualState']
     # Independent records must remain untouched regardless of anchor display.
     p['sentinelDataInput'] = {'formula': '["9007199254742020"] * 2',
@@ -156,12 +157,12 @@ class AnchorTests(unittest.TestCase):
     def test_cli_and_example_work_from_empty_directory(self):
         with tempfile.TemporaryDirectory() as t:
             out = Path(t)/'out.json'
-            run = subprocess.run([sys.executable, str(ROOT/'examples/anchor-measures/example.py'),'--out',str(out)], cwd=t,capture_output=True,text=True)
+            run = subprocess.run([sys.executable, str(ROOT/'assets/examples/anchor-measures/example.py'),'--out',str(out)], cwd=t,capture_output=True,text=True)
             self.assertEqual(run.returncode,0,run.stderr)
             self.assertEqual(json.loads(out.read_text())['status'], 'local-candidate')
             p = fixture(); source = Path(t)/'input.json'
             source.write_text(json.dumps({'properties':p,'owner_visual_id':'owner','requests':[request(p)]}))
-            run = subprocess.run([sys.executable,str(ROOT/'plan.py'),'construct-native','anchor','--input',str(source),'--out',str(out)],cwd=t,capture_output=True,text=True)
+            run = subprocess.run([sys.executable,str(ROOT/'scripts/plan.py'),'construct-native','anchor','--input',str(source),'--out',str(out)],cwd=t,capture_output=True,text=True)
             self.assertEqual(run.returncode,0,run.stderr)
             self.assertFalse(json.loads(out.read_text())['changes'][0]['after']['display_at_all_levels'])
 
