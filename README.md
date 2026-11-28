@@ -158,6 +158,9 @@ shared workspace: [the evals guide in tests/evals/](tests/evals/).
   with their reason and the public part that remains in
   [`assets/catalog/api-contract-gaps.json`](assets/catalog/api-contract-gaps.json); report them as
   unavailable rather than routing around them.
+- Plan item create, rename and delete overlap with the enterprise `plan-cli` skill. Prefer
+  `plan-cli` for those item operations when it is installed; `python scripts/plan.py api` keeps
+  them available for standalone use under the same authorization and confirmation rules.
 - Public Fabric requests include
   `x-ms-fabric-skill: fabric-plan-skill` for skill-level telemetry.
 - Credentials come only from environment variables; none are stored.
@@ -171,4 +174,19 @@ shared workspace: [the evals guide in tests/evals/](tests/evals/).
 MIT; see [LICENSE](LICENSE). `scripts/vendor/lzutf8` is Copyright (c) 2014-2018 Rotem Dan,
 under the MIT license in `scripts/vendor/lzutf8/LICENSE.txt`.
 
-Microsoft and Microsoft Fabric are trademarks of the Microsoft group of companies.
+### IBCS
+
+The chart conventions in [references/ibcs-charts.md](references/ibcs-charts.md) follow the
+International Business Communication Standards (IBCS), the notation also published as
+ISO 24896. The standards, their figures and their documents belong to the IBCS Institute;
+this skill restates no IBCS document and distributes no IBCS licensing text, and the
+implementations in `scripts/runtime/ibcs_charts.py` and `scripts/runtime/ibcs_report.py`
+apply the notation's published rules to Microsoft Fabric Plan report parts.
+
+Whether the IBCS standards carry a share-alike or other redistribution condition is **not
+verified**. The statements above are attribution, not a licence grant; clear the terms with
+the IBCS Institute before redistributing the guide outside this repository.
+
+Microsoft and Microsoft Fabric are trademarks of the Microsoft group of companies. IBCS is a
+registered trademark (IBCS®) owned and overseen by HICHERT+FAISST GmbH, IBCS Institute.
+Mention of either marks does not imply endorsement or a sponsorship.

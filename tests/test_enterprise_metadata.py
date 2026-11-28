@@ -53,7 +53,7 @@ class EnterpriseMetadataTests(unittest.TestCase):
             "teams:\n"
             "  planning:\n"
             "    displayName: Microsoft Fabric Planning\n"
-            "    scope: Fabric Plan item authoring (create/rename/delete), definition inspection and read-only narratives\n"
+            "    scope: Fabric Plan item authoring (create/rename/delete; the plan-cli skill takes precedence where it is installed), definition inspection and read-only narratives\n"
             "skills:\n"
             "  fabric-plan-skill:\n"
             "    owningTeam: planning\n"
@@ -76,6 +76,7 @@ class EnterpriseMetadataTests(unittest.TestCase):
         self.assertIn("x-ms-fabric-skill: fabric-plan-skill", skill)
         self.assertIn("public Fabric APIs", skill)
         self.assertIn("explicit write authorization", skill)
+        self.assertIn("plan-cli", skill)
         self.assertIn("python scripts/plan.py build", skill)
 
     def test_fulleval_tags_cover_suite_and_every_stimulus(self):

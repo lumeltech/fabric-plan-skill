@@ -1,7 +1,9 @@
+import argparse
 import hashlib
 import json
 import re
 import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -15,6 +17,21 @@ ISO_DATE = re.compile(r"\b20\d\d-[01]\d-[0-3]\d\b")
 # Private PowerTable service route, request header and error-code family.
 PRIVATE_DETAIL = re.compile(r"/v2/powertable|x-target-visual|\bPT_WB_\d+", re.I)
 TEXT_SUFFIXES = {".md", ".json", ".py", ".yml", ".yaml", ".txt", ".cjs", ".js"}
+RUNTIME_CEILINGS = {"modules": 73, "lines": 9687, "subcommands": 49}
+
+
+def cli_subcommands():
+    """Map each plan.py subcommand to the summary it advertises in `plan.py -h`."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        from plan import build_parser
+    finally:
+        sys.path.pop(0)
+    subparsers = next(
+        action for action in build_parser()._actions
+        if isinstance(action, argparse._SubParsersAction)
+    )
+    return {action.dest: (action.help or "") for action in subparsers._choices_actions}
 
 
 def shipped_guides():
@@ -134,6 +151,33 @@ class PackagePolicyTests(unittest.TestCase):
                 self.assertTrue(
                     identifier.startswith(("100000000000000", "200000000000000")),
                                 f"{relative}: non-synthetic numeric identity")
+
+    def test_cli_sums_up_every_command_uniquely(self):
+        # An agent picks a subcommand from this text, so it must be present and must differ
+        # from every other command's summary.
+        subcommands = cli_subcommands()
+        findings = sorted(name for name, summary in subcommands.items() if not summary)
+        summaries = {}
+        for name, summary in subcommands.items():
+            summaries.setdefault(summary, []).append(name)
+        findings += sorted(", ".join(sorted(names)) for names in summaries.values() if len(names) > 1)
+        self.assertEqual(findings, [])
+
+    def test_runtime_stays_within_its_frozen_budget(self):
+        # Nothing in the runtime is dead, so growth needs an argument: raise a ceiling only in
+        # a pull request that says which capability needed the room.
+        modules = sorted((ROOT / "scripts/runtime").glob("*.py"))
+        actual = {
+            "modules": len(modules),
+            "lines": sum(len(path.read_text(encoding="utf-8").splitlines()) for path in modules),
+            "subcommands": len(cli_subcommands()),
+        }
+        over = [
+            f"{label}: {count} > {RUNTIME_CEILINGS[label]}"
+            for label, count in actual.items()
+            if count > RUNTIME_CEILINGS[label]
+        ]
+        self.assertEqual(over, [])
 
 
 if __name__ == "__main__":

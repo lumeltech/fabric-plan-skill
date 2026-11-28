@@ -9,6 +9,8 @@ Use this guide when a dashboard needs IBCS content:
 
 The builder writes chart templates, field bindings, the IBCS chart theme with its colors, the Matrix, story text and, when asked, the Plan theme. See [IBCS chart theme and colors](#ibcs-chart-theme-and-colors). The rest of each chart's IBCS styling is a separate concern; see [The IBCS look](#the-ibcs-look).
 
+**Attribution.** IBCS, the International Business Communication Standards, is the notation also published as ISO 24896. IBCS is a registered trademark of HICHERT+FAISST GmbH, IBCS Institute, which owns and oversees the marks. This guide applies the notation's published rules to Microsoft Fabric Plan report parts and restates no IBCS document. Its redistribution terms are not verified here; see the License section of this package's README.
+
 ## Contents
 
 - [Request shape](#request-shape)
