@@ -9,9 +9,10 @@ derives its template state on first render.
 
 Every chart built here also saves the chart's own IBCS theme with that theme's
 measure and variance colors, so it keeps IBCS scenario notation under any Plan
-theme; "theme": "plan" opts a chart out. The rest of the IBCS look (data labels,
-ranking, deviation callouts, number format) is not written here; see
-references/ibcs-charts.md.
+theme; "theme": "plan" opts a chart out. A "style" on the chart spec is written
+separately as the chart's AI chart schema (runtime.chart_styling): plot background,
+global font and data-label formatting. The rest of the IBCS look (ranking, deviation
+callouts, number format) is not written here; see references/ibcs-charts.md.
 """
 import copy
 from functools import lru_cache
@@ -70,7 +71,7 @@ RECIPES = {
 
 # A panel recipe is one chart per measure: related drivers have their own scales, so each gets its own panel.
 PANEL_RECIPES = {'C11'}
-SPEC_KEYS = {'label', 'recipe', 'chartType', 'category', 'stack', 'measures', 'theme'}
+SPEC_KEYS = {'label', 'recipe', 'chartType', 'category', 'stack', 'measures', 'theme', 'style'}
 MEASURE_KEYS = {'field', 'aggregation', 'label'}
 
 
@@ -266,10 +267,12 @@ def recipe_chart(model, spec, registry, *, query_fields=()):
 
     spec: {"label", "recipe" and/or "chartType", "category", optional "stack",
     "measures": {"AC": field or {"field", "aggregation", "label"} (a list for
-    LINE/AREA), "PY"/"PL"/"FC": ...}, optional "theme"}. Field IDs come from the
-    current model or a registered query catalog; nothing is inferred from labels.
+    LINE/AREA), "PY"/"PL"/"FC": ...}, optional "theme" and optional "style"}.
+    Field IDs come from the current model or a registered query catalog; nothing is
+    inferred from labels.
     The chart keeps the IBCS chart theme, whether it names a recipe or only a
-    "chartType"; "theme": "plan" leaves it on the Plan theme.
+    "chartType"; "theme": "plan" leaves it on the Plan theme. "style" is the chart's
+    background, font and data-label formatting; see runtime.chart_styling.
     """
     from .chart_filters import ensure_chart_filters
     from .construct import field
@@ -323,11 +326,17 @@ def recipe_chart(model, spec, registry, *, query_fields=()):
     p['visualState']['chartType'] = chart_type
     p['pivotAssignments'] = assignments
     p = ensure_chart_filters(p)
-    return apply_chart_theme(p) if theme == 'ibcs' else p
+    if theme == 'ibcs':
+        p = apply_chart_theme(p)
+    if spec.get('style'):
+        from .chart_styling import apply_chart_style
+        p = apply_chart_style(p, spec['style'])
+    return p
 
 
 def describe(properties):
     """Summarize a chart's template, bucket bindings and theme for a design brief or readback."""
+    from .chart_styling import chart_style
     vs = properties.get('visualState', {})
     chart_type = properties.get('chartType', vs.get('chartType'))
     buckets = {}
@@ -336,4 +345,4 @@ def describe(properties):
     codes = [code for code, (_, types, _) in RECIPES.items() if chart_type in types]
     return {'chartType': chart_type, 'recipes': codes, 'buckets': copy.deepcopy(buckets),
             'selectorsAgree': properties.get('chartType') == vs.get('chartType'),
-            'theme': chart_theme(properties)}
+            'theme': chart_theme(properties), 'style': chart_style(properties)}

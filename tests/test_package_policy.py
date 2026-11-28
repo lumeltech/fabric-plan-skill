@@ -17,7 +17,9 @@ ISO_DATE = re.compile(r"\b20\d\d-[01]\d-[0-3]\d\b")
 # Private PowerTable service route, request header and error-code family.
 PRIVATE_DETAIL = re.compile(r"/v2/powertable|x-target-visual|\bPT_WB_\d+", re.I)
 TEXT_SUFFIXES = {".md", ".json", ".py", ".yml", ".yaml", ".txt", ".cjs", ".js"}
-RUNTIME_CEILINGS = {"modules": 73, "lines": 9687, "subcommands": 49}
+# Chart styling needed its own module: background, font and data labels had no authoring route,
+# and their keys come from the product's schema validator rather than any IBCS recipe.
+RUNTIME_CEILINGS = {"modules": 74, "lines": 9884, "subcommands": 49}
 
 
 def cli_subcommands():

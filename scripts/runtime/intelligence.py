@@ -142,7 +142,7 @@ def rich_text(paragraphs, *, name, banner=False, background=None):
     return p
 
 def card(model,spec,registry, *, query_fields=()):
-    if set(spec)-{'field','label','aggregation'}: raise ValueError('Unconsumed card options')
+    if set(spec)-{'field','label','aggregation','style'}: raise ValueError('Unconsumed card options')
     key=spec['field'];source=next((f for f in model['fields'] if f['id']==key),None)
     if source:
         a=semantic_value(model,key,registry,aggregation=spec.get('aggregation'))
@@ -182,7 +182,9 @@ def card(model,spec,registry, *, query_fields=()):
          'responsiveFontSize':True,'individualKpiControls':{},'groups':{},'framesMapping':{},'individualImageMeta':{}}
     vs['hiddenProperties_!!!_kpiControls']=dumps(kpi).strip()
     from .chart_filters import ensure_chart_filters
-    return ensure_chart_filters(complete_card_state(p))
+    from .chart_styling import apply_chart_style
+    p=ensure_chart_filters(complete_card_state(p))
+    return apply_chart_style(p,spec['style']) if spec.get('style') else p
 
 def chart(model,spec,registry,*,query_fields=()):
     """Dashboard chart: a tree, an IBCS recipe or named native template, else a column chart."""
@@ -195,6 +197,7 @@ def chart(model,spec,registry,*,query_fields=()):
 def column_chart(model,spec,registry,*,query_fields=()):
     """Native column chart; comparisonField selects integrated variance by default."""
     from .chart_filters import ensure_chart_filters
+    from .chart_styling import apply_chart_style
     from .linked_values import value_assignment
     p=base(50,spec['label'])
     # Fabric loads a chart without chartType as COLUMN_VERTICAL; name it so the buckets match a known template.
@@ -209,8 +212,10 @@ def column_chart(model,spec,registry,*,query_fields=()):
         from .forecast_review import comparison_chart
         baseline=value_assignment(model,spec['comparisonField'],registry,query_fields=query_fields,aggregation=spec.get('comparisonAggregation'))
         baseline['customName']=spec.get('comparisonLabel',baseline['columnName'])
-        return comparison_chart(p,measure,baseline)
-    return ensure_chart_filters(p)
+        p=comparison_chart(p,measure,baseline)
+    else:
+        p=ensure_chart_filters(p)
+    return apply_chart_style(p,spec['style']) if spec.get('style') else p
 
 def note_height(footnote_lines):
     """Height of the note slot: 44 units, or enough for the IBCS footnote lines."""
@@ -320,8 +325,15 @@ def rectangles(slicers, cards, *, width=1920, grid_height=560, charts=0, pages=1
             raise ValueError('Layout collision or insufficient gutter: '+key)
     return dict(width=width,height=height,unit='pixel',rectangles=r)
 
+def styled_spec(spec,page_style):
+    """Return a card or chart spec with the page style under its own."""
+    from .chart_styling import merge_styles
+    style=merge_styles(page_style,spec.get('style'))
+    return {**spec,'style':style} if style else spec
+
 def dashboard(model,spec,owners,registry, *, query_fields=(),page_count=1):
-    allowed={'name','owner','title','description','note','slicers','cards','charts','width','gridHeight','layout','viewport','table','ibcs'}
+    """Build one report page; a page "style" reaches every card and chart on it."""
+    allowed={'name','owner','title','description','note','slicers','cards','charts','width','gridHeight','layout','viewport','table','ibcs','style'}
     if set(spec)-allowed: raise ValueError('Unconsumed dashboard options')
     if spec['owner'] not in owners: raise ValueError('Dashboard source Planning owner unavailable')
     from .ibcs_report import check_story,footnote_text,matrix_table,message_title
@@ -361,8 +373,9 @@ def dashboard(model,spec,owners,registry, *, query_fields=(),page_count=1):
         slot=f'slicer:{i}'
         p=slicer(model,s,placement=slicer_placement(layout['rectangles'],slot))
         all_filters+=copy.deepcopy(p['visualState']['slicerFilterAssignments']);add('SUPER_FILTER',slot,p)
+    page_style=spec.get('style')
     for i,c in enumerate(spec['cards']):
-        p=card(model,c,registry,query_fields=query_fields)
+        p=card(model,styled_spec(c,page_style),registry,query_fields=query_fields)
         # KPI consumers receive selected scenario scope. This is a hidden filter
         # registration; only the Planning owner defines input Context identity.
         hidden=copy.deepcopy(context)
@@ -370,7 +383,7 @@ def dashboard(model,spec,owners,registry, *, query_fields=(),page_count=1):
         p['visualState']['embeddedSuperFilter']={'superFilterAssignments':hidden}
         forward_filters(p,all_filters);add('ANALYTICS_PLUS',f'card:{i}',p)
     for i,c in enumerate(spec.get('charts',[])):
-        p=chart(model,c,registry,query_fields=query_fields)
+        p=chart(model,styled_spec(c,page_style),registry,query_fields=query_fields)
         if p['visualType']==25:
             # Initial slicer scope is not seeded into a tree; that state is unobserved for trees.
             trees[add('TREE',f'chart:{i}',p)]=tree_requirements(p);continue

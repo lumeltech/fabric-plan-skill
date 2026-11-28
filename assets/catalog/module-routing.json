@@ -504,6 +504,18 @@
         "runtime.chart_filters.audit_chart_filters"
       ]
     },
+    "chart-styling": {
+      "phase": "local",
+      "description": "Give a chart its own background, global font and data-label formatting through the chart's AI chart schema, saved in the definition and applied by the chart before its first render.",
+      "inputs": "Chart style: theme, background, font and dataLabels (all, measures keyed by measure label, variance). See ibcs-charts.md.",
+      "command": null,
+      "symbols": [
+        "runtime.chart_styling.ai_chart_state",
+        "runtime.chart_styling.apply_chart_style",
+        "runtime.chart_styling.chart_style",
+        "runtime.chart_styling.merge_styles"
+      ]
+    },
     "bind-bridge-outputs": {
       "phase": "local",
       "description": "Prepare scoped post-import consumer and filter/sort bindings while preserving internal Native aliases.",
@@ -2704,7 +2716,8 @@
       ],
       "operations": [
         "intelligence",
-        "chart-filter-audit"
+        "chart-filter-audit",
+        "chart-styling"
       ],
       "aliases": [
         "IBCS",
@@ -2742,6 +2755,12 @@
         "IBCS color codes",
         "scenario notation",
         "chart theme",
+        "chart styling",
+        "data labels",
+        "data label formatting",
+        "value labels",
+        "chart background",
+        "chart font",
         "IBCS matrix",
         "Intelligence Matrix",
         "IBCS table",
@@ -2757,10 +2776,11 @@
         "Give IBCS charts the IBCS scenario colors: solid actual, lighter previous year, outlined plan and hatched forecast.",
         "Show IBCS table templates in an Intelligence Matrix instead of the embedded Planning grid.",
         "Give an IBCS dashboard a message title and footnotes.",
+        "Apply a chart's background color, global font color and data-label formatting to every chart and card of an Intelligence page.",
         "Use the IBCS theme for the whole Plan, including Matrix and Planning visuals."
       ],
       "prerequisites": "A resolved category dimension and the measures for each required bucket of a recipe; row dimensions and an AC value for a Matrix table; an explicit request before setting the Plan-wide theme.",
-      "limitations": "Writes chart templates and bindings, the IBCS chart theme with its measure and variance colors on recipe and template charts, Matrix tables, message titles, footnotes and, on explicit request, the Plan theme type. Other IBCS chart styling (data labels, title and number settings, ranking, deviation callouts) is not written. Planning grids follow the Plan theme only when the tenant enables it. Threaded comments are not authorable. Rendering is not tested.",
+      "limitations": "Writes chart templates and bindings, the IBCS chart theme with its measure and variance colors on recipe and template charts, a chart's own background, global font and data-label formatting as the chart's AI chart schema, Matrix tables, message titles, footnotes and, on explicit request, the Plan theme type. That schema is applied by the chart only while the tenant has the Planning AI assistant enabled, so styling is saved rather than proven. Other IBCS chart styling (title and number settings, ranking, deviation callouts) is not written. Planning grids follow the Plan theme only when the tenant enables it. Threaded comments are not authorable. Rendering is not tested.",
       "coverage": "local"
     }
   ]

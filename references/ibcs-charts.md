@@ -21,6 +21,7 @@ The builder writes chart templates, field bindings, the IBCS chart theme with it
 - [IBCS dashboard page](#ibcs-dashboard-page)
 - [Plan theme](#plan-theme)
 - [The IBCS look](#the-ibcs-look)
+- [Chart styling](#chart-styling)
 - [Check and report](#check-and-report)
 
 ## Request shape
@@ -48,7 +49,8 @@ Add the chart to a dashboard's `charts` list. A chart that names `recipe` or `ch
 - Fields come from the current model or a registered query output. Never derive them from labels or from example names.
 - `recipe` alone selects the recipe's default template. Give `chartType` as well only to pick one of the recipe's alternatives (C08 mixed uses AREA). `chartType` without `recipe` builds that template with its own rules.
 - `theme` selects the chart's theme: `ibcs` or `plan`. Every chart built here keeps the IBCS chart theme, whether it names a `recipe` or only a `chartType`. Give `"theme": "plan"` for a chart that should follow the Plan theme and its palette instead.
-- Unknown options are refused, including every styling key other than `theme`.
+- `style` gives the chart's own background, global font and data-label formatting; see [Chart styling](#chart-styling).
+- Unknown options are refused, including every styling key other than `theme` and `style`.
 
 ## Recipe catalog
 
@@ -192,24 +194,36 @@ A readback of the definition proves only that the value was saved. It does not p
 
 ## The IBCS look
 
-Each recipe pairs its template with styling: the IBCS theme, data labels, measure fill patterns, ranking, deviation callouts and number format. The builder writes the theme selection, the measure fills and patterns and the variance colors. **It does not write the rest.**
+Each recipe pairs its template with styling: the IBCS theme, data labels, measure fill patterns, ranking, deviation callouts and number format. The builder writes the theme selection, the measure fills and patterns and the variance colors. **It does not write the rest**, except what a chart style carries.
 
-- **Other theme-owned settings.** Picking a theme in the product also recomputes settings outside the chart's appearance: title mode, comparison notation, data label defaults, number scaling and more. The builder does not reproduce that cascade. A built chart has IBCS colors and scenario fills with default labels, title and scaling.
-- **AI chart state.** The in-product AI chart state is applied by the running chart in the session that sets it. Fabric does not read it back from a saved definition.
-- **Settings with no saved-definition route.** Top-N ranking, deviation callouts, number format, forecast population, axis breaks, reference bands, bubble sizes, explicit group colors, series labels, and line and sorting options have no saved-definition route in the current product.
+- **Other theme-owned settings.** Picking a theme in the product also recomputes settings outside the chart's appearance: title mode, comparison notation, data label defaults, number scaling and more. `apply_chart_theme` does not reproduce that cascade; a built chart has IBCS colors and scenario fills with default labels, title and scaling. `"style": {"theme": ...}` runs the real cascade instead, within the limits below.
+- **Settings with no authoring route.** Top-N ranking, deviation callouts, number format, forecast population, axis breaks, reference bands, bubble sizes, explicit group colors, series labels, and line and sorting options have no saved-definition route in the current product.
+
+## Chart styling
+
+`runtime.chart_styling` writes a chart's background, global font and data-label formatting as `visualAiSchemaState`, a top-level object of the chart's properties beside `visualState`. Before its first render the chart hands that object to its schema compiler, which applies each section through the same store services the format panels use, and the field is then cleared. So the styling neither imitates those panels nor stays behind to overwrite what the user changes afterwards.
+
+- A chart spec takes `"style"`: `{"theme", "background", "font": {"family", "size", "color", "responsive", "autoColor"}, "dataLabels": {"all", "measures": {<measure label>: ...}, "variance"}}`. `runtime.intelligence.card` takes the same key, and a dashboard's page-level `"style"` defaults every card and chart on the page; a visual's own style replaces only the options it names.
+- Address a data label by the measure label the chart shows: the measure's `label` in the spec, or its `valueLabel` on a plain column chart. A label the chart does not have is skipped.
+- `ai_chart_state` refuses an option the product's schema validator does not accept, so a wrong key fails the build. Only an ANALYTICS_PLUS chart carries a style; a tree, slicer or text visual is refused.
+- On an existing chart, call `runtime.chart_styling.apply_chart_style(properties, style)` on freshly exported properties. It merges into the sections the chart already carries and leaves the rest alone.
+- The compiler loads only while the host's `planningAIAssistant` feature switch is on. With it off the saved object is inert, so styling is proven in the browser, not in the definition. Not yet checked in a running Plan.
+- `axis`, `legend`, `measureSeries` and `rows` share the channel and are not written here.
 
 Report these as **not applied**, and name them per chart. The user can apply them in the product. Or the user can export a Plan with a chart already styled in the product, so that its saved state can be reused as observed state for the same template.
 
 ## Check and report
 
 1. Before the build, confirm that every required binding resolves to a current model or query field.
-2. After building, `runtime.ibcs_charts.describe(properties)` lists the template, the matching recipes, the bucket bindings, whether the two template selectors agree, and the chart theme (`ibcs`, or `plan` when the chart follows the Plan theme). `runtime.chart_filters.audit_chart_filters(properties)` checks the filter cards.
+2. After building, `runtime.ibcs_charts.describe(properties)` lists the template, the matching recipes, the bucket bindings, whether the two template selectors agree, the chart theme (`ibcs`, or `plan` when the chart follows the Plan theme) and the chart's own style. `runtime.chart_styling.chart_style(properties)` reads that style back. `runtime.chart_filters.audit_chart_filters(properties)` checks the filter cards.
 3. After an authorized update, export the Plan and compare it with what was built:
    - each chart's two `chartType` values;
    - the assignments of each chart and Matrix, by field ID and bucket;
    - each IBCS chart's theme, and the fill color and pattern of its bound roles. The chart saves more appearance settings once it has rendered, so compare these members only;
+   - each styled chart's `visualAiSchemaState`, and whether the chart cleared it on the next export after it rendered;
    - the Plan theme `type`.
 4. Report outcomes separately:
    - templates, bindings, the IBCS chart theme and colors, the Matrix, story text and the Plan theme value as saved;
+   - chart background, global font and data-label formatting as saved through the chart's own schema; claim them as rendered only from the browser;
    - the rest of the IBCS chart styling as not applied;
    - rendering as not tested.
