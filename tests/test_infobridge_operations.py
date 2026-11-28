@@ -12,6 +12,8 @@ def branch(title='one',extra=False):
 def sources_for(*queries):
     extra=any(any(f['name']=='Variance' for f in q['meta']['measures']) for q in queries)
     s=planning_source('People','visual',catalog(extra),[{'id':'Pay-id','name':'Pay'}],[]);s['sourceGuid']='src';s['queries']=list(queries);return s
+def selected_catalog(query):
+    return {g:copy.deepcopy(query['meta'].get(k,[])) for g,k in GROUPS.items()}
 
 class InfoBridgeOperations(unittest.TestCase):
     def test_query_has_complete_null_writeback_and_string_identity(self):

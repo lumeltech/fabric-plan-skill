@@ -12,8 +12,6 @@ TOKEN=re.compile(r'\{\{query_id:([^}]+)\}\}')
 DERIVED={'APPEND':(140,'Append Query'),'MERGE':(150,'Merge Query'),'JOIN':(230,'Join Query'),'SQL_SOURCE':(10,'Query from SQL')}
 
 def name(f):return f.get('alias') or f['name']
-def selected_catalog(query):
-    return {g:copy.deepcopy(query['meta'].get(k,[])) for g,k in GROUPS.items()}
 def projected_signature(query,*,measures=False):
     groups=('dimensions','columns')+ (('measures',) if measures else ())
     return [(g,name(f),field_family(f)) for g in groups for f in query['meta'].get(GROUPS[g],[])]

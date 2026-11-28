@@ -158,7 +158,8 @@
       "inputs": "Source amount, target grain, weight measure and total policy.",
       "command": "python scripts/plan.py construct-native weighted-rule --input weighted-rule.request.json --out rule.payload.json",
       "symbols": [
-        "runtime.rule_factories.measure_weighted_rule"
+        "runtime.rule_factories.measure_weighted_rule",
+        "runtime.rule_factories.verify_saved_rule"
       ]
     },
     "bridge-source": {
@@ -185,7 +186,8 @@
       "inputs": "Compatible supplied source schemas.",
       "command": "python scripts/plan.py construct-bridge append --input bridge.request.json --out bridge.json",
       "symbols": [
-        "runtime.bridge_operations.append_queries"
+        "runtime.bridge_operations.append_queries",
+        "runtime.bridge.append_source"
       ]
     },
     "bridge-merge": {
@@ -230,7 +232,12 @@
       "inputs": "Graph with current source and output identities.",
       "command": "python scripts/plan.py check-bridge-mappings --input request.json --out result.json",
       "symbols": [
-        "runtime.bridge_identity.check_planning_graph"
+        "runtime.bridge_identity.check_planning_graph",
+        "runtime.bridge.reconcile_assignments",
+        "runtime.bridge.reconcile_execution",
+        "runtime.bridge_operations.reconcile_meta",
+        "runtime.bridge_operations.lookup_key_check",
+        "runtime.bridge_operations.audit_step_columns"
       ]
     },
     "powertable": {
@@ -259,7 +266,8 @@
       "inputs": "Physical column metadata, optional kind, key role and editing policy.",
       "command": "python scripts/plan.py construct-native table-column --input column.request.json --out column.json",
       "symbols": [
-        "runtime.table_columns.column_config"
+        "runtime.table_columns.column_config",
+        "runtime.table_columns.apply_lookup"
       ]
     },
     "table-config-repair": {
@@ -268,7 +276,8 @@
       "inputs": "Current definition, destination metadata and approved change.",
       "command": "python scripts/plan.py repair-powertable-config --baseline current-definition.json --input repair.request.json --out candidate",
       "symbols": [
-        "runtime.powertable_config.repair_definition"
+        "runtime.powertable_config.repair_definition",
+        "runtime.surfaces.reconcile_column_configs"
       ]
     },
     "powertable-forms": {
@@ -366,7 +375,8 @@
       "inputs": "Current state, selected measures, conditions and requested appearance.",
       "command": "python scripts/plan.py format-matrix --input assets/examples/matrix-formatting.request.json --out candidate.json",
       "symbols": [
-        "runtime.matrix_formatting.compile_formatting"
+        "runtime.matrix_formatting.compile_formatting",
+        "runtime.forecast_review.negative_variance_rule"
       ]
     },
     "leaf-key-mapping": {
@@ -533,7 +543,8 @@
       "inputs": "catalog, owner_columns; optional identity_mode portable/native.",
       "command": "python scripts/plan.py bridge-planning-catalog --input request.json --out result.json",
       "symbols": [
-        "runtime.bridge_identity.planning_catalog"
+        "runtime.bridge_identity.planning_catalog",
+        "runtime.bridge.portable"
       ]
     },
     "check-application-defaults": {
@@ -623,7 +634,9 @@
       "symbols": [
         "runtime.navigator_api.state",
         "runtime.navigator_defaults.complete_defaults",
-        "runtime.navigator_defaults.require_complete_defaults"
+        "runtime.navigator_defaults.require_complete_defaults",
+        "runtime.navigator_api.validate_targets",
+        "runtime.surfaces.bookmark"
       ]
     },
     "number-parameter": {
@@ -805,7 +818,8 @@
       "symbols": [
         "runtime.home_fit.readable_home_layout",
         "runtime.home_fit.audit_home_fit",
-        "runtime.home_fit.assert_home_fit"
+        "runtime.home_fit.assert_home_fit",
+        "runtime.application_defaults.public_home_layout"
       ]
     },
     "maintenance-shell": {
@@ -816,6 +830,16 @@
       "symbols": [
         "runtime.maintenance_shells.blank_powertable",
         "runtime.maintenance_shells.add_deferred_powertables"
+      ]
+    },
+    "definition-readback": {
+      "phase": "local",
+      "description": "Compare a fresh export against the intended definition, part by part, without rewriting either side.",
+      "inputs": "The built candidate and the exported definition parts from the named destination.",
+      "command": null,
+      "symbols": [
+        "runtime.readback.contains",
+        "runtime.readback.verify_authored"
       ]
     }
   },
@@ -834,7 +858,8 @@
         "check-import-contract",
         "export",
         "create",
-        "update"
+        "update",
+        "definition-readback"
       ],
       "aliases": [
         "getDefinition",

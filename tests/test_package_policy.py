@@ -17,13 +17,13 @@ ISO_DATE = re.compile(r"\b20\d\d-[01]\d-[0-3]\d\b")
 # Private PowerTable service route, request header and error-code family.
 PRIVATE_DETAIL = re.compile(r"/v2/powertable|x-target-visual|\bPT_WB_\d+", re.I)
 TEXT_SUFFIXES = {".md", ".json", ".py", ".yml", ".yaml", ".txt", ".cjs", ".js"}
-# Chart styling needed its own module: background, font and data labels had no authoring route,
-# and their keys come from the product's schema validator rather than any IBCS recipe. The store
-# slice for data labels is the switch-free half of that route and added 155 lines to the runtime.
-# Keying that slice the way the product reads it (measure field name, plus `default`, and the
-# theme-stripped fields reported back) is the rest, along with matching a visual's exported part
-# path case-insensitively so a Plan read back from the service still passes its invariants.
-RUNTIME_CEILINGS = {"modules": 74, "lines": 10086, "subcommands": 49}
+# Baseline after chart styling, whose data-label store slice is keyed the way the product reads it
+# (measure field name, plus `default`, and the theme-stripped fields reported back) and whose
+# exported part path is matched case-insensitively. Four test-only helpers then left the runtime:
+# a Navigator fixture, a catalog-slice copy, a global-styles wrapper and a placement solver whose
+# live twin is scripts/tools/visual-placement.cjs. Guards that carry product knowledge stayed and
+# are advertised as catalog symbols or recorded in the capability gaps ledger.
+RUNTIME_CEILINGS = {"modules": 74, "lines": 10054, "subcommands": 49}
 
 
 def cli_subcommands():

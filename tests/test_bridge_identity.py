@@ -7,7 +7,7 @@ from runtime.bridge import Query,planning_source,portable
 from runtime.bridge_identity import planning_catalog,check_planning_graph,resolve_planning_output,rebind_planning_outputs
 from runtime.bridge_operations import editable_source
 from runtime.connected_components import bridge_consumer
-from runtime.planning_integrity import guard_write,check_properties,default_global_styles
+from runtime.planning_integrity import guard_write,check_properties,DEFAULTS
 
 ROOT=Path(__file__).resolve().parents[1]
 EXAMPLE=ROOT/'assets/examples/infobridge-lineage'
@@ -91,7 +91,7 @@ class PlanningLineageTests(unittest.TestCase):
     def test_query_sort_uses_output_caption_not_opaque_id(self):
         f=resolve_planning_output(**load(EXAMPLE/'resolve-output.request.json'))
         a=bridge_consumer(f,'v','12','Revenue')['assignment']
-        p={'pivotAssignments':[a],'visualState':{'globalStyles':default_global_styles()},'superFilterAssignments':[{'pivotAssignments':[a],'configuration':{'sort':[{'columnId':'77[12]','queryId':'77','columnName':'Revenue Plan'}]}}]}
+        p={'pivotAssignments':[a],'visualState':{'globalStyles':copy.deepcopy(DEFAULTS)},'superFilterAssignments':[{'pivotAssignments':[a],'configuration':{'sort':[{'columnId':'77[12]','queryId':'77','columnName':'Revenue Plan'}]}}]}
         check_properties(p)
         p['superFilterAssignments'][0]['configuration']['sort'][0]['columnName']='Wrong'
         with self.assertRaisesRegex(ValueError,'Query sort descriptor'):check_properties(p)

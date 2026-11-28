@@ -301,20 +301,3 @@ def build(model,spec,registry=None):
       'evidence':{'construction':'generated','applicationComplete':False,
           'requiredCompletionGate':'runtime.application_defaults.require_delivery_phases',
           'liveImport':'not-run','runtimeCalculation':'not-run','rendered':'not-run'}}
-def navigator(recipe=1,patch=None):
-    fixtures=ASSETS/'fixtures'
-    state=load(fixtures/'navigator-spec-1.json')
-    if recipe!=1:
-        p=load(fixtures/f'navigator-spec-{recipe}.json')
-        if not isinstance(p,dict) or not any(k in p for k in ('type','style','navigatorTabsState','navigatorButtonState')):
-            raise ValueError('That spec example is not a Navigator-state recipe')
-        state=merge(state,p)
-    state['style']['DEFAULT']['shapeState']['text']['fontFamily']='Arial'
-    state=merge(state,patch or {})
-    if state['type'] not in ('NAVIGATOR_BUTTON','PAGE_NAVIGATOR_TABS','BOOKMARK_TABS'): raise ValueError('Navigator type')
-    if not state['style'].get('DEFAULT',{}).get('shapeState'): raise ValueError('Missing Navigator base style')
-    tabs=state['navigatorTabsState']
-    for k in ('selectedPages','hiddenBookmarks'):
-        if k in tabs and (not isinstance(tabs[k],list) or any(not isinstance(x,str) for x in tabs[k])): raise ValueError(k+' must be string array')
-    from .navigator_defaults import complete_defaults
-    return complete_defaults(state)

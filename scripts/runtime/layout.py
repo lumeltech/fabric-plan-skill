@@ -53,16 +53,6 @@ def audit(response,gap=0,reserved=(),backgrounds=(),alignment_groups=()):
         if max(values)-min(values)>tolerance: errors.append('Misalignment '+','.join(ids))
     if errors: raise ValueError('; '.join(errors))
     return {'status':'passed-static-geometry','count':len(v),'unit':inv['unit'],'rendered':'not-run'}
-def find(bounds,dimension,occupied,gap=16,margin=24):
-    if min(dimension.values())<=0 or gap<0 or margin<0: raise ValueError('Invalid placement request')
-    xs={margin,bounds['width']-margin-dimension['width']}; ys={margin,bounds['height']-margin-dimension['height']}
-    for a in occupied:
-        rect({'position':a,'dimension':a}); xs.update([a['x']+a['width']+gap,a['x']-dimension['width']-gap]); ys.update([a['y']+a['height']+gap,a['y']-dimension['height']-gap])
-    for y in sorted(ys):
-        for x in sorted(xs):
-            r={'x':x,'y':y,**dimension}
-            if x>=margin and y>=margin and x+dimension['width']<=bounds['width']-margin and y+dimension['height']<=bounds['height']-margin and not any(overlap(r,a,gap) for a in occupied): return r
-    return None
 def placement_batch(response,page_id,visual_id,intended,expected_fingerprint):
     inv=inventory(response)
     if inv['fingerprint']!=expected_fingerprint: raise ValueError('Stale inventory')

@@ -4,9 +4,34 @@ import copy
 import unittest
 from pathlib import Path
 from runtime.codec import load
-from runtime.construct import navigator
+from runtime.construct import merge
 from runtime.navigator_api import state
 from runtime.navigator_defaults import complete_defaults, require_complete_defaults
+
+ASSETS = Path(__file__).resolve().parents[1] / 'assets'
+
+
+def navigator(recipe=1, patch=None):
+    fixtures = ASSETS / 'fixtures'
+    value = load(fixtures / 'navigator-spec-1.json')
+    if recipe != 1:
+        override = load(fixtures / f'navigator-spec-{recipe}.json')
+        if not isinstance(override, dict) or not any(
+            k in override for k in ('type', 'style', 'navigatorTabsState', 'navigatorButtonState')
+        ):
+            raise ValueError('That spec example is not a Navigator-state recipe')
+        value = merge(value, override)
+    value['style']['DEFAULT']['shapeState']['text']['fontFamily'] = 'Arial'
+    value = merge(value, patch or {})
+    if value['type'] not in ('NAVIGATOR_BUTTON', 'PAGE_NAVIGATOR_TABS', 'BOOKMARK_TABS'):
+        raise ValueError('Navigator type')
+    if not value['style'].get('DEFAULT', {}).get('shapeState'):
+        raise ValueError('Missing Navigator base style')
+    tabs = value['navigatorTabsState']
+    for key in ('selectedPages', 'hiddenBookmarks'):
+        if key in tabs and (not isinstance(tabs[key], list) or any(not isinstance(x, str) for x in tabs[key])):
+            raise ValueError(key + ' must be string array')
+    return complete_defaults(value)
 
 
 class NavigatorDefaultsTests(unittest.TestCase):

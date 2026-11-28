@@ -1,13 +1,14 @@
-import unittest,copy,os,tempfile,socket,sys
+import unittest,copy,os,shutil,subprocess,tempfile,socket,sys
 from pathlib import Path
 from decimal import Decimal
 ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT/'scripts'))
 from runtime.codec import *
 from runtime.identity import *
-from runtime.construct import build,navigator,acyclic
+from runtime.construct import build,acyclic
+from test_navigator_defaults import navigator
 from runtime.bridge import *
 from runtime.surfaces import *
-from runtime.layout import inventory,audit,find,placement_batch,verify_unchanged
+from runtime.layout import inventory,audit,placement_batch,verify_unchanged
 from runtime.validate import validate_plan,Schemas,SchemaGap,Invalid,schema_report,require_public_schema_acceptance
 from runtime.transport import Client,HttpError,plan_operation
 def setUpModule():
@@ -222,8 +223,16 @@ class LayoutTests(unittest.TestCase):
         for mode in ('missing','duplicate'):
             p=page(); a=p['payload']['properties']['properties']['reactiveVisualProperties']; a.clear() if mode=='missing' else a.append(copy.deepcopy(a[0]))
             with self.assertRaises(ValueError): inventory(p)
-    def test_no_fit_never_origin(self):
-        self.assertIsNone(find({'width':100,'height':100},{'width':100,'height':100},[],margin=10))
+    def test_placement_solver_rejects_no_fit(self):
+        # The Node placement tool is the maintained solver route; its self-test covers the
+        # exact-fit and no-fit cases that used to have a second Python implementation.
+        node = os.environ.get('FABRIC_PLAN_NODE') or shutil.which('node')
+        if not node:
+            self.skipTest('Node.js not installed')
+        done = subprocess.run([node, str(ROOT / 'scripts/tools/visual-placement.cjs'), '--self-test'],
+                              capture_output=True, text=True)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn('no-fit', done.stdout)
     def test_empty_and_mixed_unit_rejected(self):
         p=page(); p['payload']['visuals']=[]
         with self.assertRaises(ValueError): inventory(p)

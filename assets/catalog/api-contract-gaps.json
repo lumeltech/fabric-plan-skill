@@ -31,7 +31,7 @@
       "status": "no-public-route",
       "request": "Read, write or bind report bookmarks.",
       "reason": "Bookmark state is held outside the public Plan definition.",
-      "publicPart": "Page Navigator destinations expressed as definition parts."
+      "publicPart": "Page Navigator destinations expressed as definition parts; runtime.surfaces.bookmark builds the bookmark record shape the definition holds."
     },
     {
       "id": "infobridge-query-execution",
@@ -45,7 +45,7 @@
       "status": "no-public-route",
       "request": "Place or restyle a visual through the native page API.",
       "reason": "Native page writes require the proxy this skill does not use.",
-      "publicPart": "construct-native and audit-layout for placement expressed in the definition."
+      "publicPart": "construct-native and audit-layout for placement expressed in the definition. runtime.layout.inventory, placement_batch and verify_unchanged prepare and check the batch shape locally."
     },
     {
       "id": "pivot-activation",

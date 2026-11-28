@@ -92,9 +92,9 @@ def validate_forecast_config(config):
                 raise ValueError('Forecast distribution setting must be Boolean')
     from .cube_contract import saved_cube_binding
     cube=saved_cube_binding(config.get('cube_partition_measure_id'),config.get('cube_model'))
-    if config.get('cube_partition_measure_id')!=cube.get('cube_partition_measure_id'):
+    if config.get('cube_partition_measure_id')!=cube.get('cube_partition_measure_id'):  # pragma: no cover  saved_cube_binding echoes the text it validated
         raise ValueError('Invalid Forecast Cube identity')
-    if config.get('cube_model')!=cube.get('cube_model'):
+    if config.get('cube_model')!=cube.get('cube_model'):  # pragma: no cover  only DYNAMIC is accepted, so the binding cannot drift here
         raise ValueError('Invalid Forecast Cube model')
     return config
 

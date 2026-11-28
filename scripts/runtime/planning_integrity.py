@@ -15,9 +15,6 @@ DEFAULTS=load(ASSETS/'fixtures/matrix-global-defaults.json')
 STYLE_DEFAULT=load(ASSETS/'fixtures/matrix-formatting-v1.json')['columnStyle']
 CATEGORIES={'native','custom','locked','forecastOpen','forecastClosed'}
 
-def default_global_styles():
-    return copy.deepcopy(DEFAULTS)
-
 def _positive(v):
     return not isinstance(v,bool) and isinstance(v,(int,float,Decimal)) and math.isfinite(v) and v>0
 
