@@ -1,8 +1,8 @@
 # Smoke evaluation for fabric-plan-skill, following the skills-for-fabric layout:
 # tests/evals/<skill>/eval.yaml (smoke) beside tests/evals/<skill>-fulleval/eval.yaml.
 # Every stimulus is offline: no Fabric workspace, token or network call is needed.
-# Measured locally with vally-cli 0.20.0 on 2026-11-27 (1 trial each); budgets are
-# still first ceilings. Run with --skill-dir pointing at a real copy of the skill.
+# Budgets are first ceilings, set above the work each case does; recalibrate them
+# from your own runs. Run with --skill-dir pointing at a real copy of the skill.
 name: fabric-plan-skill-smoke-eval
 description: Offline routing, local build and public-API boundary checks for fabric-plan-skill.
 tags:
@@ -57,7 +57,7 @@ stimuli:
 
   - name: "FP-LOCAL-BUILD Build and validate an offline candidate"
     tags: { type: integration, tier: smoke, cost: llm, area: planning, mode: authoring }
-    # Measured 351k-474k tokens across three local runs; the build reads the spec and runs the CLI.
+    # The build reads the spec and drives the CLI, so it needs more than the routing cases.
     constraints: { max_turns: 20, max_tokens: 600000, max_duration: 5m }
     prompt: |
       Using the Fabric Plan skill, build a local candidate Plan from the bundled

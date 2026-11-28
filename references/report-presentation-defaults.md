@@ -1,6 +1,7 @@
 # Content-sized headers and hierarchy icons
 
-These user-approved defaults apply to every new applicable report, regardless of
+These defaults are this package's own presentation choices, not a Fabric
+requirement, and they apply to every new applicable report regardless of
 business use case. They are not roll-forward-only rules. Keep all previous
 presentation, input, calculation, source-identity, expansion and totals defaults.
 

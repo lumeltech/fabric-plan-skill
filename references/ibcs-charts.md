@@ -9,7 +9,7 @@ Use this guide when a dashboard needs IBCS content:
 
 The builder writes chart templates, field bindings, the IBCS chart theme with its colors, the Matrix, story text and, when asked, the Plan theme. See [IBCS chart theme and colors](#ibcs-chart-theme-and-colors). The rest of each chart's IBCS styling is a separate concern; see [The IBCS look](#the-ibcs-look).
 
-**Attribution.** IBCS, the International Business Communication Standards, is the notation also published as ISO 24896. IBCS is a registered trademark of HICHERT+FAISST GmbH, IBCS Institute, which owns and oversees the marks. This guide applies the notation's published rules to Microsoft Fabric Plan report parts and restates no IBCS document. Its redistribution terms are not verified here; see the License section of this package's README.
+**Attribution.** IBCS, the International Business Communication Standards, is the notation also published as ISO 24896. Its rules come from the IBCS® Standards, which the IBCS Association provides under the Creative Commons Attribution Share-Alike 4.0 licence. This guide restates those rules in its own words and names their sections only as pointers; it reproduces no IBCS document and no other ibcs.com material. The colors and patterns below come from the product's own IBCS chart theme. IBCS® is a registered trademark of the IBCS Institute, which oversees its use; see the License section of this package's README for how both licences apply here.
 
 ## Contents
 
@@ -21,7 +21,6 @@ The builder writes chart templates, field bindings, the IBCS chart theme with it
 - [IBCS dashboard page](#ibcs-dashboard-page)
 - [Plan theme](#plan-theme)
 - [The IBCS look](#the-ibcs-look)
-- [Chart styling](#chart-styling)
 - [Check and report](#check-and-report)
 
 ## Request shape
@@ -49,7 +48,7 @@ Add the chart to a dashboard's `charts` list. A chart that names `recipe` or `ch
 - Fields come from the current model or a registered query output. Never derive them from labels or from example names.
 - `recipe` alone selects the recipe's default template. Give `chartType` as well only to pick one of the recipe's alternatives (C08 mixed uses AREA). `chartType` without `recipe` builds that template with its own rules.
 - `theme` selects the chart's theme: `ibcs` or `plan`. Every chart built here keeps the IBCS chart theme, whether it names a `recipe` or only a `chartType`. Give `"theme": "plan"` for a chart that should follow the Plan theme and its palette instead.
-- `style` gives the chart's own background, global font and data-label formatting; see [Chart styling](#chart-styling).
+- `style` gives the chart's own background, global font and data-label formatting; the Chart styling guide holds its channels and keys.
 - Unknown options are refused, including every styling key other than `theme` and `style`.
 
 ## Recipe catalog
@@ -196,35 +195,20 @@ A readback of the definition proves only that the value was saved. It does not p
 
 Each recipe pairs its template with styling: the IBCS theme, data labels, measure fill patterns, ranking, deviation callouts and number format. The builder writes the theme selection, the measure fills and patterns and the variance colors. **It does not write the rest**, except what a chart style carries.
 
-- **Other theme-owned settings.** Picking a theme in the product also recomputes settings outside the chart's appearance: title mode, comparison notation, data label defaults, number scaling and more. `apply_chart_theme` does not reproduce that cascade; a built chart has IBCS colors and scenario fills with default labels, title and scaling. `"style": {"theme": ...}` runs the real cascade instead, within the limits below.
+- **Other theme-owned settings.** Picking a theme also recomputes settings outside the chart's appearance: title mode, comparison notation, data label defaults, number scaling and more. `apply_chart_theme` does not reproduce that cascade, so a built chart has IBCS colors and scenario fills with default labels, title and scaling. `"style": {"theme": ...}` runs the real cascade, within the limits below.
 - **Settings with no authoring route.** Top-N ranking, deviation callouts, number format, forecast population, axis breaks, reference bands, bubble sizes, explicit group colors, series labels, and line and sorting options have no saved-definition route in the current product.
-
-## Chart styling
-
-`runtime.chart_styling` writes on two channels of unequal reliability; say which one each part used.
-
-**Data labels go to the chart store, and this route renders.** `apply_chart_style` writes the store's `dataLabel` slice as the stringified `hiddenProperties_!!!_dataLabel` member of `visualState`; the host re-reads it on load and merges it over the theme defaults. No switch is on that path, and `data_labels` reads it back.
-
-**Background, global font, theme and variance labels go to the AI schema channel**, as `visualAiSchemaState` beside `visualState`: the chart hands it to its schema compiler before its first render, which then clears it. It loads only while the host's `planningAIAssistant` switch is on, which is off by default; with it off the object is inert — no error, no styling, indistinguishable from a broken write.
-
-- A chart spec takes `"style"`: `{"theme", "background", "font": {"family", "size", "color", "responsive", "autoColor"}, "dataLabels": {"all", "measures": {<measure label>: ...}, "variance"}}`. `runtime.intelligence.card` and a page-level `"style"` take the same key, the latter as the page default; a visual's own style overrides only the options it names.
-- Address a data label by the label the chart shows (the spec's `label`, an export's `customName`); the writer resolves it to the store key, the measure's **role** (`AC`, `PY`, …), because `savePropertyAgainstRole` is on by default. A name the chart does not bind, or an option the product rejects, **fails the build** rather than quietly doing nothing.
-- `color` clears `contrastColor`, or the theme's auto-contrast color wins; `background` sets `showBackground`, or it reads as transparent; `show` alone toggles labels.
-- `axis`, `legend`, `measureSeries` and `rows` share the AI channel and are not written here. Only an ANALYTICS_PLUS chart carries a style, and `apply_chart_style` merges with what an export already carries.
 
 ## Check and report
 
 1. Before the build, confirm that every required binding resolves to a current model or query field.
-2. After building, `runtime.ibcs_charts.describe(properties)` lists the template, matching recipes, bucket bindings, whether the two template selectors agree, the chart theme (`ibcs` or `plan`), the AI schema style and the data-label slice; `runtime.chart_styling.chart_style` and `data_labels` read the two back. `runtime.chart_filters.audit_chart_filters(properties)` checks the filter cards.
+2. After building, `runtime.ibcs_charts.describe(properties)` lists the template, matching recipes, bucket bindings, whether the template selectors agree, the chart theme (`ibcs` or `plan`) and the style; `runtime.chart_filters.audit_chart_filters(properties)` checks the filter cards.
 3. After an authorized update, export the Plan and compare it with what was built:
    - each chart's two `chartType` values;
    - the assignments of each chart and Matrix, by field ID and bucket;
    - each IBCS chart's theme, and the fill color and pattern of its bound roles. The chart saves more appearance settings once it has rendered, so compare these members only;
-   - each styled chart's `hiddenProperties_!!!_dataLabel`, role by role, and its `visualAiSchemaState`, including whether the chart cleared the latter after it rendered;
    - the Plan theme `type`.
 4. Report outcomes separately:
    - templates, bindings, the IBCS chart theme and colors, the Matrix, story text and the Plan theme value as saved;
-   - data labels as written to the chart store, switch-free, pending the browser check;
-   - chart background, global font, theme and variance labels as saved through the AI schema only, rendering only where `planningAIAssistant` is on; claim them rendered only from the browser;
+   - chart styling, channel by channel, as the Chart styling guide reports it;
    - the rest of the IBCS chart styling as not applied;
    - rendering as not tested.

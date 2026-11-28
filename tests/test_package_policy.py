@@ -20,10 +20,10 @@ TEXT_SUFFIXES = {".md", ".json", ".py", ".yml", ".yaml", ".txt", ".cjs", ".js"}
 # Chart styling needed its own module: background, font and data labels had no authoring route,
 # and their keys come from the product's schema validator rather than any IBCS recipe. The store
 # slice for data labels is the switch-free half of that route and added 155 lines to the runtime.
-# slice for data labels is the switch-free half of that route and added 155 lines to the runtime.
-# Matching a visual's exported part path case-insensitively, so a Plan read back from the service
-# still passes its invariants, is the rest.
-RUNTIME_CEILINGS = {"modules": 74, "lines": 10045, "subcommands": 49}
+# Keying that slice the way the product reads it (measure field name, plus `default`, and the
+# theme-stripped fields reported back) is the rest, along with matching a visual's exported part
+# path case-insensitively so a Plan read back from the service still passes its invariants.
+RUNTIME_CEILINGS = {"modules": 74, "lines": 10086, "subcommands": 49}
 
 
 def cli_subcommands():

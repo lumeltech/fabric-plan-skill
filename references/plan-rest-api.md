@@ -33,6 +33,11 @@ All seven operations accept users, service principals and managed identities. A
 delegated scope and a workspace or item permission are separate requirements: a
 token with the right scope still fails without the role, and the reverse.
 
+How to obtain that token — Entra flows, the API audience and the `az` recipes — is
+owned by the shared Fabric skills docs, not this guide: file COMMON-CORE section
+Authentication & Token Acquisition, and file COMMON-CLI section Authentication
+Recipes, in [microsoft/skills-for-fabric](https://github.com/microsoft/skills-for-fabric/tree/main/common).
+
 Applying `.platform` metadata through the generic item update with metadata
 enabled is not run here; keep the exported `.platform` part unchanged in an
 update.
@@ -164,3 +169,5 @@ python scripts/plan.py api update --config destination.json --payload candidate.
   https://learn.microsoft.com/en-us/rest/api/fabric/core/long-running-operations/get-operation-result
 - Supported identities:
   https://learn.microsoft.com/en-us/rest/api/fabric/articles/identity-support
+- Shared token acquisition and CLI auth recipes:
+  https://github.com/microsoft/skills-for-fabric/tree/main/common

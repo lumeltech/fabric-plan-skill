@@ -4,11 +4,22 @@ Two channels, and they are not equally reliable.
 
 **Data labels go to the chart store.** The format panel writes `dataLabel.labelStyle` in the
 chart store, and that slice persists as the stringified `hiddenProperties_!!!_dataLabel` member
-of the chart's `visualState` (`ap-web-client/src/pages/Fabric/Fabric.service.ts:114,905-931`,
-`ap-core/src/store/utils/StatePersistHelper.ts:1653-1663`). On load the host re-reads it and deep
-merges it over the theme defaults (`Fabric.service.ts:672-786`, `ModuleProps.builder.ts:76`,
-`ap-core/src/store/utils/StoreUtils.ts:683-709`). Nothing on that path checks a feature switch, so
-this is the route that changes what a planner sees.
+of the chart's `visualState` (`ap-web-client/src/pages/Fabric/Fabric.service.ts:92,846-848`,
+`ap-core/src/store/utils/StatePersistHelper.ts:1625-1634`). On load the host re-reads it
+(`ModuleProps.builder.ts:71`) and the state service deep merges it over the theme defaults
+(`ap-core/src/services/DataLabelState/DataLabelStateService.ts:780-810`). No feature switch is on
+that path, so this is the route that reaches the planner.
+
+Two things it does not survive. A `labelStyle` key the built defaults do not have is dropped
+without a word (`DataLabelStateService.ts:791`), which is why entries are keyed by the measure's
+**field name** and by `default`, never by the bucket (`AC`, `PY`): `savePropertyAgainstRole` is
+false in the product's defaults (`ap-core/src/store/models/commonSettings.ts:379`), so
+`getDataLabelMeasureList` builds name keys (`ap-core/src/store/models/dataLabel.ts:107`). And
+`applyThemeDefaults` strips `fontColor`, `background`, `fontSize` and `fontStyle.isBold` from the
+saved slice each time a Fabric theme is applied, then persists the stripped version
+(`DataLabelStateService.ts:937-1032`, `ap-web-client/src/services/FabricTheme.service.ts:82,104-113`).
+Those four are claimed as saved and theme-strippable, not as rendered; `theme_owned_fields` lists
+the ones a chart carries.
 
 **Background, global font and theme go to the AI schema channel.** `visualAiSchemaState` is a
 top-level object of a chart's saved properties, beside `visualState`. Before its first render the
@@ -30,8 +41,8 @@ import copy
 from .codec import dumps, loads
 
 FIELD = 'visualAiSchemaState'
-# The persisted chart-store slice the Data Label panel writes. A bare `dataLabel` key in
-# visualState is dropped: the host only splits `_!!!_` keys (Fabric.service.ts:767-777).
+# The persisted chart-store slice the Data Label panel writes; a bare `dataLabel` key is dropped,
+# as the host only hydrates `<section>_!!!_<property>` keys (Fabric.service.ts:92,699-708).
 DATALABELS = 'hiddenProperties_!!!_dataLabel'
 THEMES = ('dark', 'midNight', 'colorBlindDark', 'colorBlindWhite', 'whiteAndBlue', 'ibcs',
           'inforiver', 'native', 'lumel', 'custom')
@@ -53,6 +64,12 @@ LABEL_STORE = {'show': 'enabled', 'display': 'display', 'position': 'position',
                'showBackground': 'showBackgroundColor'}
 # Bold, italic and underline live in a nested group, not beside the other fields.
 LABEL_FONT_STORE = {'bold': 'isBold', 'italic': 'isItalic', 'underline': 'isUnderLine'}
+# The panel's entry for every measure without one of its own (constants.ts:477 ADDITIONAL_MEASURES).
+DEFAULT_LABEL = 'default'
+# Fields applyThemeDefaults strips from the saved slice whenever a Fabric theme is applied
+# (ap-core/src/services/DataLabelState/DataLabelStateService.ts:981-1032). They save; they do not
+# survive a theme change, and the strip is re-persisted (FabricTheme.service.ts:104-113).
+THEME_LABEL_FIELDS = ('background', 'fontColor', 'fontSize', 'fontStyle.isBold')
 
 
 def _option(value, key, where):
@@ -138,37 +155,45 @@ def _label_entry(options, where):
     # background is only read when the label's background is switched on.
     if 'background' in entry and 'showBackgroundColor' not in entry:
         entry['showBackgroundColor'] = True
+    # A bare fontSize is replaced by the bar-width-based size unless the user changed it.
+    if 'fontSize' in entry:
+        entry['isUserChangedFontSize'] = True
     if font:
         entry['fontStyle'] = font
     return entry
 
 
-def _bound_measures(properties):
-    """Return the chart's value roles in order, and every name each role answers to.
+def _label_keys(properties):
+    """Return the measure keys the data-label panel writes, and every name each answers to.
 
-    The store keys labels by role, because `commonSettings.savePropertyAgainstRole` is on in the
-    product's defaults (`ap-core/src/store/models/commonSettings.ts:383`). Authoring stays with the
-    name the chart shows, so both the `customName` and the model column name are accepted.
+    With `commonSettings.savePropertyAgainstRole` false, which is the product's default
+    (`ap-core/src/store/models/commonSettings.ts:379`), `getDataLabelMeasureList` keys labelStyle by
+    the measure's field name rather than its bucket (`ap-core/src/store/models/dataLabel.ts:107`,
+    `measureKeyFieldMapping.set(fieldName, role)` at `DataParserService.ts:2274`). The name is used
+    verbatim, so a model column that carries a leading space needs it. Authoring stays with the label
+    the chart shows, so `customName` resolves onto the same key.
     """
-    roles, by_name = [], {}
+    keys, by_name = [], {}
     for a in properties.get('pivotAssignments', []):
         if a.get('dataRoleType') != 'Measure':
             continue
-        role = a.get('bucketId')
-        if not role or role in roles:
+        key = a.get('name') or a.get('columnName')
+        if not key or key in keys:
             continue
-        roles.append(role)
-        for name in (a.get('customName'), a.get('name'), a.get('columnName')):
-            if name and name not in by_name:
-                by_name[name] = role
-    return roles, by_name
+        keys.append(key)
+        for alias in (a.get('customName'), a.get('name'), a.get('columnName')):
+            if alias and alias not in by_name:
+                by_name[alias] = key
+    return keys, by_name
 
 
 def data_label_entries(labels, properties):
-    """Return {role: store entry} for a friendly dataLabels section, variance excepted.
+    """Return {store key: entry} for a friendly dataLabels section, variance excepted.
 
-    Variance labels are keyed by a name the data layer resolves while the chart renders, so they
-    stay on the AI schema channel and are not returned here.
+    `all` writes the panel's `default` entry and each bound measure, since `default` is only a
+    renderer fallback for measures that carry no entry of their own. Variance labels are keyed by a
+    name the data layer resolves while the chart renders, so they stay on the AI schema channel and
+    are not returned here.
     """
     if not isinstance(labels, dict):
         raise ValueError('dataLabels takes all, measures and variance')
@@ -176,28 +201,28 @@ def data_label_entries(labels, properties):
     if unknown:
         raise ValueError('dataLabels has no section ' + ', '.join(sorted(unknown))
                          + '; use all, measures or variance')
-    roles, by_name = _bound_measures(properties)
+    keys, by_name = _label_keys(properties)
     out = {}
     if 'all' in labels:
-        if not roles:
+        if not keys:
             raise ValueError('The chart has no bound measures, so its data labels cannot be addressed')
         entry = _label_entry(labels['all'], 'data label all')
-        out = {role: entry for role in roles}
+        out = {key: copy.deepcopy(entry) for key in (DEFAULT_LABEL, *keys)}
     if 'measures' in labels:
         measures = labels['measures']
         if not isinstance(measures, dict) or not measures:
             raise ValueError('data label measures names at least one measure label')
-        if not roles:
+        if not keys:
             raise ValueError('The chart has no bound measures, so its data labels cannot be addressed')
         for name, style in measures.items():
             if not isinstance(name, str) or not name.strip():
                 raise ValueError('data label measures are keyed by the measure label the chart shows')
             name = name.strip()
-            role = by_name.get(name, name if name in roles else None)
-            if role is None:
+            key = by_name.get(name, name if name in keys else None)
+            if key is None:
                 raise ValueError('The chart has no measure named ' + repr(name) + '; it binds '
                                  + ', '.join(sorted(by_name)))
-            out[role] = _deep(out.get(role) or {}, _label_entry(style, 'data label ' + repr(name)))
+            out[key] = _deep(out.get(key) or {}, _label_entry(style, 'data label ' + repr(name)))
     return out
 
 
@@ -213,8 +238,23 @@ def data_labels(properties):
     return copy.deepcopy(value)
 
 
+def _holds(entry, field):
+    if not isinstance(entry, dict):
+        return False
+    if '.' in field:
+        head, tail = field.split('.', 1)
+        return isinstance(entry.get(head), dict) and tail in entry[head]
+    return field in entry
+
+
+def theme_owned_fields(properties):
+    """Return the sorted label fields this chart's slice carries that a theme change strips away."""
+    entries = ((data_labels(properties) or {}).get('labelStyle') or {}).values()
+    return sorted(field for field in THEME_LABEL_FIELDS if any(_holds(e, field) for e in entries))
+
+
 def with_data_labels(properties, entries):
-    """Return chart properties whose data-label slice carries these role entries."""
+    """Return chart properties whose data-label slice carries these store-keyed entries."""
     if not entries:
         raise ValueError('Data labels set nothing; give all or measures')
     out = copy.deepcopy(properties)

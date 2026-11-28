@@ -54,7 +54,7 @@ One-time set-up:
 | `githubAccount` | The `gh` login to use for Copilot. Empty uses the active login. |
 | `model` | Agent model, for example `claude-sonnet-5`. `auto` lets Copilot choose. |
 | `judgeModel` | Model for LLM-judge graders. Must be a named model, not `auto`. |
-| `workspaceName` / `workspaceId` | T3 test workspace. The ID wins when both are set. |
+| `workspaceName` / `workspaceId` | Your own T3 test workspace; set one of the two. The ID wins when both are set. |
 | `allowWrites` | Must be `true` for T3, which creates and deletes Plans. |
 
 Then:
@@ -216,9 +216,8 @@ It never prints the token and never touches a Plan outside its own prefix.
 | Private API use | The skill's client allows only public routes (`scripts/runtime/public_routes.json`); smoke and connected graders fail on raw REST, `curl` or non-public paths |
 | Cost | Token, turn and time budgets on every case; `--runs` defaults to 1 |
 
-A shared workspace such as Planning-Test holds other people's Plans; the
-prefix rule is what keeps the evals away from them. Prefer a dedicated empty
-test workspace where you can.
+A shared workspace holds other people's Plans; the prefix rule is what keeps the
+evals away from them. Prefer a dedicated empty test workspace where you can.
 
 ## Reading results
 

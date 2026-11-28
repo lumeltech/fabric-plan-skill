@@ -53,7 +53,7 @@ class EnterpriseMetadataTests(unittest.TestCase):
             "teams:\n"
             "  planning:\n"
             "    displayName: Microsoft Fabric Planning\n"
-            "    scope: Fabric Plan item authoring (create/rename/delete; the plan-cli skill takes precedence where it is installed), definition inspection and read-only narratives\n"
+            "    scope: Fabric Plan definition authoring, validation and repair, definition inspection and read-only narratives. Plan item create/rename/delete belong to the plan-cli skill and are not claimed here.\n"
             "skills:\n"
             "  fabric-plan-skill:\n"
             "    owningTeam: planning\n"

@@ -336,7 +336,7 @@ def recipe_chart(model, spec, registry, *, query_fields=()):
 
 def describe(properties):
     """Summarize a chart's template, bucket bindings and theme for a design brief or readback."""
-    from .chart_styling import chart_style, data_labels
+    from .chart_styling import chart_style, data_labels, theme_owned_fields
     vs = properties.get('visualState', {})
     chart_type = properties.get('chartType', vs.get('chartType'))
     buckets = {}
@@ -346,5 +346,6 @@ def describe(properties):
     return {'chartType': chart_type, 'recipes': codes, 'buckets': copy.deepcopy(buckets),
             'selectorsAgree': properties.get('chartType') == vs.get('chartType'),
             'theme': chart_theme(properties), 'style': chart_style(properties),
-            # Read back apart: the store slice renders without a feature switch, the schema does not.
-            'dataLabels': data_labels(properties)}
+            # Read back apart: the labels need no feature switch, but a theme change strips the
+            # fields named in labelThemeFields. The schema needs the switch.
+            'dataLabels': data_labels(properties), 'labelThemeFields': theme_owned_fields(properties)}

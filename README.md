@@ -31,7 +31,7 @@ folder or `_build/`.
 
 | Area | Coverage |
 |---|---|
-| Plan lifecycle | Discover workspaces and models, create a new Plan, export and update its definition, deploy and read back; list, inspect, rename and delete Plans |
+| Plan definition | Discover workspaces and models, export, update and read back a Plan definition, and validate a local candidate. Plan item create, rename and delete belong to the enterprise `plan-cli` skill; this package keeps its own copies only so a standalone install with no `plan-cli` can finish a write (see [Safety](#safety)) |
 | Planning sheets | Input measures (number, text, checkbox, person, select, date), formulas and formula equality, forecasts and time intelligence, roll-forward balances, totals, measure hierarchies, anchors for business-grain assumptions, measure-weighted allocation rules, numeric input constraints |
 | Intelligence dashboards | Page Navigators, integrated variance charts, chart visual filters, Matrix formatting, conditional formatting, typography and layout defaults, embedded Planning and PowerTable visuals |
 | Home | Home content and business navigation within the public Plan definition |
@@ -41,6 +41,11 @@ folder or `_build/`.
 | Dimensions | Dimension ID mapping, leaf keys and native XXH3 dimension hashing |
 | Checks and repair | Definition validation, import-contract checks, layout and presentation audits, formatting and property repair that preserves IDs and stored values |
 | Business recipes | Five local construction examples (below); building a recipe does not verify live behavior |
+
+`build` and `provision` also apply this package's own authoring baseline: Arial on authored
+text, a visible Home page, an Intelligence dashboard per Planning sheet and a Page Navigator
+per dashboard. Fabric does not require those, and no option declines them; a Plan that skips
+part of the baseline fails `check-application-defaults` rather than passing with a note.
 
 ### Business use cases
 
@@ -60,9 +65,14 @@ folder or `_build/`.
   executable when it is not on `PATH`.
 - A Fabric workspace on a capacity that supports Plan, a Power BI semantic model,
   and permission to create or edit Plan items.
-- For live operations, an access token in the `FABRIC_TOKEN` environment variable
-  (for example from `az account get-access-token`). Local and offline commands
-  need no token. Never write tokens into files.
+- For live operations, an access token in the `FABRIC_TOKEN` environment variable, issued for
+  `https://api.fabric.microsoft.com` (for example from `az account get-access-token --resource
+  https://api.fabric.microsoft.com`). Token acquisition is owned by the shared Fabric skills
+  docs: in the [common folder of
+  microsoft/skills-for-fabric](https://github.com/microsoft/skills-for-fabric/tree/main/common),
+  file COMMON-CORE section "Authentication & Token Acquisition" and file COMMON-CLI section
+  "Authentication Recipes".
+  Local and offline commands need no token. Never write tokens into files.
 
 ## Install
 
@@ -158,9 +168,10 @@ shared workspace: [the evals guide in tests/evals/](tests/evals/).
   with their reason and the public part that remains in
   [`assets/catalog/api-contract-gaps.json`](assets/catalog/api-contract-gaps.json); report them as
   unavailable rather than routing around them.
-- Plan item create, rename and delete overlap with the enterprise `plan-cli` skill. Prefer
-  `plan-cli` for those item operations when it is installed; `python scripts/plan.py api` keeps
-  them available for standalone use under the same authorization and confirmation rules.
+- Plan item create, rename and delete are owned by the enterprise `plan-cli` skill. When it is
+  installed, route those writes through it; this skill keeps `python scripts/plan.py api
+  create|rename|delete` only for a standalone install, under the same authorization and
+  confirmation rules.
 - Public Fabric requests include
   `x-ms-fabric-skill: fabric-plan-skill` for skill-level telemetry.
 - Credentials come only from environment variables; none are stored.
@@ -178,15 +189,21 @@ under the MIT license in `scripts/vendor/lzutf8/LICENSE.txt`.
 
 The chart conventions in [references/ibcs-charts.md](references/ibcs-charts.md) follow the
 International Business Communication Standards (IBCS), the notation also published as
-ISO 24896. The standards, their figures and their documents belong to the IBCS Institute;
-this skill restates no IBCS document and distributes no IBCS licensing text, and the
-implementations in `scripts/runtime/ibcs_charts.py` and `scripts/runtime/ibcs_report.py`
-apply the notation's published rules to Microsoft Fabric Plan report parts.
+ISO 24896. The IBCS® Standards are provided by the IBCS Association and published under the
+[Creative Commons Attribution Share-Alike 4.0 International licence](https://creativecommons.org/licenses/by-sa/4.0/).
+[The publisher's terms](https://www.ibcs.com/terms-of-use/) state that the Standards may be
+used and shared without a licence fee under that licence's conditions, and that all other
+material on that site is for personal use only. This package copies neither Standards text nor
+other ibcs.com material: the guides restate the notation's rules in their own words and name
+their sections only as pointers, and the colors, patterns and fills that
+`scripts/runtime/ibcs_charts.py` and `scripts/runtime/ibcs_report.py` save are the values the
+product's own IBCS chart theme uses.
 
-Whether the IBCS standards carry a share-alike or other redistribution condition is **not
-verified**. The statements above are attribution, not a licence grant; clear the terms with
-the IBCS Institute before redistributing the guide outside this repository.
+The code and guides therefore stay under the MIT licence above. Anyone extending this material
+by quoting IBCS® Standards text, figures or tables creates a derivative of that work, which the
+share-alike term requires be credited to the IBCS Association, linked to that licence and
+published under it rather than under MIT; do not add IBCS documents, manuals or posters here.
 
-Microsoft and Microsoft Fabric are trademarks of the Microsoft group of companies. IBCS is a
-registered trademark (IBCS®) owned and overseen by HICHERT+FAISST GmbH, IBCS Institute.
-Mention of either marks does not imply endorsement or a sponsorship.
+Microsoft and Microsoft Fabric are trademarks of the Microsoft group of companies. IBCS® is a
+registered trademark of the IBCS Institute, which owns and oversees the mark. Mention of either
+mark does not imply endorsement, certification or sponsorship.

@@ -75,7 +75,7 @@ class SchemaState(unittest.TestCase):
         self.assertEqual(p[FIELD]['canvas']['background'], '#fafafa')
         self.assertIn(FIELD, p)                      # beside visualState, not inside it
         self.assertIn(DATALABELS, p['visualState'])  # and labels inside visualState
-        self.assertEqual(data_labels(p)['labelStyle']['AC']['fontStyle'], {'isBold': True})
+        self.assertEqual(data_labels(p)['labelStyle'][' Sales']['fontStyle'], {'isBold': True})
         self.assertIsNone(chart_style(props()))
         self.assertIsNone(data_labels(props()))
 
@@ -108,9 +108,8 @@ class StoreSliceDataLabels(unittest.TestCase):
         p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {
             'bold': True, 'color': 'red', 'background': 'green'}}})
         saved = saved_labels(p)
-        self.assertEqual(sorted(saved['labelStyle']), ['AC', 'PY'])
-        for role in ('AC', 'PY'):
-            entry = saved['labelStyle'][role]
+        for key in ('default', ' Sales', 'Gross Sales'):
+            entry = saved['labelStyle'][key]
             self.assertEqual(entry['fontStyle'], {'isBold': True})
             self.assertEqual(entry['fontColor'], 'red')
             self.assertFalse(entry['contrastColor'])
@@ -118,13 +117,30 @@ class StoreSliceDataLabels(unittest.TestCase):
             self.assertTrue(entry['showBackgroundColor'])
         self.assertNotIn(FIELD, p)
 
+    def test_the_store_keys_labels_by_measure_name_not_by_bucket(self):
+        """savePropertyAgainstRole is false in the product's defaults, so AC/PY are dead keys.
+
+        A key absent from the built default labelStyle is dropped on load
+        (DataLabelStateService.ts:791), which is how a role-keyed write saves cleanly and renders
+        as nothing.
+        """
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'bold': True}}})
+        self.assertEqual(sorted(saved_labels(p)['labelStyle']), [' Sales', 'Gross Sales', 'default'])
+        self.assertNotIn('AC', saved_labels(p)['labelStyle'])
+        self.assertNotIn('PY', saved_labels(p)['labelStyle'])
+
+    def test_the_measure_field_name_is_used_exactly_as_the_model_spells_it(self):
+        """The key is the measure's fieldName (' Sales', leading space), not its display label."""
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'measures': {'Sales': {'bold': True}}}})
+        self.assertEqual(list(saved_labels(p)['labelStyle']), [' Sales'])
+
     def test_the_slice_is_a_stringified_value_like_the_other_sections(self):
         p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'bold': True}}})
         self.assertIsInstance(p['visualState'][DATALABELS], str)
 
     def test_a_measure_is_addressed_by_the_name_the_chart_shows(self):
         p = apply_chart_style(waterfall_props(), {'dataLabels': {'measures': {'Sales': {'bold': True}}}})
-        self.assertEqual(list(saved_labels(p)['labelStyle']), ['AC'])
+        self.assertEqual(list(saved_labels(p)['labelStyle']), [' Sales'])
 
     def test_a_measure_the_chart_does_not_have_fails_the_build(self):
         with self.assertRaises(ValueError) as caught:
@@ -134,16 +150,16 @@ class StoreSliceDataLabels(unittest.TestCase):
 
     def test_show_is_the_only_way_labels_are_switched_on_or_off(self):
         p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'bold': True}}})
-        self.assertNotIn('enabled', saved_labels(p)['labelStyle']['AC'])
+        self.assertNotIn('enabled', saved_labels(p)['labelStyle'][' Sales'])
         p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'show': False}}})
-        self.assertFalse(saved_labels(p)['labelStyle']['AC']['enabled'])
+        self.assertFalse(saved_labels(p)['labelStyle'][' Sales']['enabled'])
 
     def test_a_second_write_keeps_the_labels_it_does_not_name(self):
         p = apply_chart_style(waterfall_props(), {'dataLabels': {'measures': {'Sales': {'bold': True}}}})
         p = apply_chart_style(p, {'dataLabels': {'measures': {'Gross Sales': {'color': 'red'}}}})
         saved = saved_labels(p)['labelStyle']
-        self.assertEqual(saved['AC'], {'fontStyle': {'isBold': True}})
-        self.assertEqual(saved['PY'], {'fontColor': 'red', 'contrastColor': False})
+        self.assertEqual(saved[' Sales'], {'fontStyle': {'isBold': True}})
+        self.assertEqual(saved['Gross Sales'], {'fontColor': 'red', 'contrastColor': False})
 
     def test_a_label_option_the_product_does_not_take_is_refused(self):
         for bad in ({'all': {'colour': 'red'}}, {'all': {'position': 'middle'}}, {'labelStyle': {}},
@@ -164,20 +180,41 @@ class StoreSliceDataLabels(unittest.TestCase):
 
     def test_data_labels_read_back_from_the_definition(self):
         p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'bold': True}}})
-        self.assertEqual(data_labels(p)['labelStyle']['AC'], {'fontStyle': {'isBold': True}})
+        self.assertEqual(data_labels(p)['labelStyle'][' Sales'], {'fontStyle': {'isBold': True}})
         self.assertIsNone(data_labels(waterfall_props()))
 
     def test_a_measure_style_overrides_only_the_options_it_names(self):
         p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'fontSize': 10, 'bold': False},
                                                                  'measures': {'Sales': {'bold': True}}}})
         saved = saved_labels(p)['labelStyle']
-        self.assertEqual(saved['AC'], {'fontSize': 10, 'fontStyle': {'isBold': True}})
-        self.assertEqual(saved['PY'], {'fontSize': 10, 'fontStyle': {'isBold': False}})
+        self.assertEqual(saved[' Sales'], {'fontSize': 10, 'isUserChangedFontSize': True, 'fontStyle': {'isBold': True}})
+        self.assertEqual(saved['Gross Sales'], {'fontSize': 10, 'isUserChangedFontSize': True, 'fontStyle': {'isBold': False}})
+
+    def test_a_font_size_is_marked_as_user_changed(self):
+        """Without isUserChangedFontSize a bar-width-based size replaces the authored one at render."""
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'fontSize': 10}}})
+        for entry in saved_labels(p)['labelStyle'].values():
+            self.assertEqual(entry['fontSize'], 10)
+            self.assertTrue(entry['isUserChangedFontSize'])
 
     def test_variance_labels_still_need_the_ai_channel(self):
         p = apply_chart_style(waterfall_props(), {'dataLabels': {'variance': {'show': True, 'display': 'minMax'}}})
         self.assertEqual(p[FIELD], {'dataLabel': {'variance': {'show': True, 'display': 'minMax'}}})
         self.assertNotIn(DATALABELS, p['visualState'])
+
+
+class ThemeOwnedFields(unittest.TestCase):
+    """The product treats label color, background, size and bold as theme-derived and strips them."""
+
+    def test_describe_names_the_styled_fields_a_theme_change_will_strip(self):
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {
+            'bold': True, 'color': 'red', 'background': 'green', 'fontSize': 10, 'position': 'outside'}}})
+        self.assertEqual(describe(p)['labelThemeFields'],
+                         ['background', 'fontColor', 'fontSize', 'fontStyle.isBold'])
+
+    def test_a_style_of_only_store_safe_fields_reports_nothing_to_strip(self):
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'show': True, 'position': 'auto'}}})
+        self.assertEqual(describe(p)['labelThemeFields'], [])
 
 
 class Builders(unittest.TestCase):
@@ -193,10 +230,10 @@ class Builders(unittest.TestCase):
         p = recipe_chart(self.model(), self.chart_spec(style=STYLE), Registry())
         self.assertEqual(chart_theme(p), 'ibcs')
         saved = data_labels(p)['labelStyle']
-        self.assertEqual(saved['AC']['position'], 'outside')
-        self.assertTrue(saved['AC']['fontStyle']['isBold'])
-        self.assertEqual(saved['PY']['fontSize'], 10)
-        self.assertTrue(saved['AC']['enabled'])
+        self.assertEqual(saved['Units']['position'], 'outside')
+        self.assertTrue(saved['Units']['fontStyle']['isBold'])
+        self.assertEqual(saved['Price']['fontSize'], 10)
+        self.assertTrue(saved['Units']['enabled'])
         self.assertEqual(p[FIELD]['dataLabel']['variance']['display'], 'minMax')
         self.assertEqual(describe(p)['style']['canvas']['background'], '#fafafa')
 

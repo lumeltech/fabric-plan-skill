@@ -1,6 +1,7 @@
 # Native chart typography completion
 
-New applications use Arial on all authored text. The builder authors it into the
+Arial on all authored text is this package's convention rather than a Fabric
+requirement, and it has no declination switch: the builder authors it into the
 definition, and `check-application-defaults` rejects non-Arial fonts, including
 effective Matrix overrides and service-expanded `hiddenProperties_!!!_*` JSON.
 

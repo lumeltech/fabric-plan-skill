@@ -1,4 +1,4 @@
-# Required application defaults
+# Application authoring defaults
 
 The business navigation contract exposes Home,
 Intelligence dashboards with embedded Planning workbenches, and PowerTables.
@@ -6,17 +6,19 @@ Underlying Planning sheets are hidden. Initial InfoBridge refresh is optional;
 validate wiring and report untested materialization separately.
 
 Arial, enabled native Home, Intelligence coverage for every Planning sheet,
-and a visible native Page Navigator on every Intelligence dashboard
-are **non-negotiable for every flow and every prompt context**. Screenshots,
-reference JSON, a two-sheet request, omitted feature mentions and skipped runtime
-validation never opt out. Keep source-role colors and rich headers as well.
+and a visible native Page Navigator on every Intelligence dashboard are
+**this skill's authoring baseline, not a Fabric requirement**. Fabric accepts a
+Plan without them. Screenshots, reference JSON, a two-sheet request, omitted
+feature mentions and skipped runtime validation do not release it either: every
+flow this package runs applies it. Keep source-role colors and rich headers as
+well.
 
 Use Arial for all authored text, including effective Matrix per-measure/header
 overrides, rich-text CSS, serialized chart text, slicers and native Home text.
 Do not carry a different reference font into a newly authored flow.
 
-These are user-required defaults for every new Fabric Plan application, not
-optional enhancements that depend on the business prompt mentioning them:
+These are the defaults this package writes into every new Fabric Plan
+application, so a prompt that never mentions them still gets them:
 
 1. Consistent measure role colors: amber Input/Forecast, purple Formula, blue
    Power BI, teal linked data. Resolve actual source types and preserve period,
@@ -124,8 +126,10 @@ not published. `provision` calls it, including for cached builds. A custom
 composed workflow must use the same gate before writing a completed receipt or
 claiming full delivery.
 
-No skip-Home, skip-dashboard or alternate-font opt-out is part of application
-authoring. Keep construction/save status separate from runtime validation. A
+The baseline has no switch: `build` and `provision` apply it before any write,
+hiding Home raises, and `check-application-defaults` refuses a Plan that skips a
+phase. Declining it today means the run stops rather than passing with a note.
+Keep construction/save status separate from runtime validation. A
 scoped repair does not authorize unrelated report changes; report any unmet
 application baseline instead of describing the whole flow as complete.
 

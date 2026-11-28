@@ -7,8 +7,9 @@
 # grader (tests/evals/_graders/connected_grader.py) reads the real state through
 # the public Fabric API, then deletes every Plan with that prefix, pass or fail.
 # The runner sweeps fps-eval-<RUN_ID>-* once more after the run.
-# Expected token range (first run, 2026-11-27): lifecycle, delete and missing under 1M;
-# deploy 1.51M. Calibrate further after more runs.
+# Every case but CN-DEPLOY stays under the default 1M-token ceiling; CN-DEPLOY
+# builds, validates, creates, exports and compares in one session, so it gets its
+# own wider constraint.
 name: fabric-plan-skill-connected
 description: Live Plan lifecycle, deploy and delete safety in a test workspace, graded on service readback.
 tags:
@@ -49,7 +50,7 @@ stimuli:
 
   - name: "CN-DEPLOY Build a Plan locally, create it and read it back"
     tags: *tags
-    # Measured 1.51M tokens on the first run (build, validate, create, export, compare).
+    # One session builds, validates, creates, exports and compares, hence the wider ceiling.
     constraints: { max_turns: 40, max_tokens: 2000000, max_duration: 15m }
     prompt: |
       Using the Fabric Plan skill: build a local candidate Plan from the skill's
