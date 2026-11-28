@@ -1,10 +1,10 @@
-"""Chart styling written as the product's own AI chart schema: keys, placement and page reach."""
+"""Chart styling split across its two channels: the data-label store slice and the AI schema."""
 import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'tests'))  # reuse the offline dashboard example
 import unittest
 from pathlib import Path
-from runtime.chart_styling import (FIELD, ai_chart_state, apply_chart_style, chart_style, merge_styles,
-                                   with_chart_style)
+from runtime.chart_styling import (DATALABELS, FIELD, ai_chart_state, apply_chart_style, chart_style,
+                                   data_labels, merge_styles, with_chart_style)
 from runtime.construct import build
 from runtime.ibcs_charts import chart_theme, describe, recipe_chart
 from runtime.identity import Registry
@@ -21,6 +21,23 @@ STYLE = {'background': '#fafafa', 'font': {'color': '#1f1f1f', 'size': 12},
 
 def props(visual_type=50):
     return {'visualType': visual_type, 'visualState': {}}
+
+
+def waterfall_props():
+    """One Waterfall Sheet chart as exported: AC and PY buckets, commonSettings left at its default."""
+    return {'visualType': 50, 'chartType': 'COLUMN_WATERFALL_VERTICAL',
+            'visualState': {'chartType': 'COLUMN_WATERFALL_VERTICAL', 'reportMode': True},
+            'pivotAssignments': [
+                {'bucketId': 'axis', 'dataRoleType': 'Grouping', 'name': 'Product', 'id': 'financials[Product]'},
+                {'bucketId': 'AC', 'dataRoleType': 'Measure', 'name': ' Sales', 'customName': 'Sales'},
+                {'bucketId': 'PY', 'dataRoleType': 'Measure', 'name': 'Gross Sales', 'customName': 'Gross Sales'}]}
+
+
+def saved_labels(p):
+    """The data-label slice as the chart store reads it off the saved definition."""
+    from runtime.codec import loads
+    value = p['visualState'].get(DATALABELS)
+    return loads(value) if isinstance(value, str) else value
 
 
 class SchemaState(unittest.TestCase):
@@ -53,11 +70,14 @@ class SchemaState(unittest.TestCase):
                 self.assertIn('sets nothing', str(caught.exception))
 
     def test_the_state_is_a_sibling_of_the_saved_slices(self):
-        p = apply_chart_style(props(), STYLE)
+        p = apply_chart_style(waterfall_props(), {'background': '#fafafa', 'font': STYLE['font'],
+                                                 'dataLabels': {'measures': {'Sales': {'bold': True}}}})
         self.assertEqual(p[FIELD]['canvas']['background'], '#fafafa')
-        self.assertEqual(p['visualState'], {})
-        self.assertEqual(chart_style(p)['dataLabel']['measures']['Units']['bold'], True)
+        self.assertIn(FIELD, p)                      # beside visualState, not inside it
+        self.assertIn(DATALABELS, p['visualState'])  # and labels inside visualState
+        self.assertEqual(data_labels(p)['labelStyle']['AC']['fontStyle'], {'isBold': True})
         self.assertIsNone(chart_style(props()))
+        self.assertIsNone(data_labels(props()))
 
     def test_only_an_analytics_plus_chart_carries_chart_style(self):
         for visual_type in (25, 203):
@@ -81,6 +101,85 @@ class SchemaState(unittest.TestCase):
                           'dataLabel': {'all': {'show': True}}})
 
 
+class StoreSliceDataLabels(unittest.TestCase):
+    """Data labels written where the format panel writes them, so no feature switch is needed."""
+
+    def test_labels_land_in_the_chart_store_slice_not_the_ai_channel(self):
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {
+            'bold': True, 'color': 'red', 'background': 'green'}}})
+        saved = saved_labels(p)
+        self.assertEqual(sorted(saved['labelStyle']), ['AC', 'PY'])
+        for role in ('AC', 'PY'):
+            entry = saved['labelStyle'][role]
+            self.assertEqual(entry['fontStyle'], {'isBold': True})
+            self.assertEqual(entry['fontColor'], 'red')
+            self.assertFalse(entry['contrastColor'])
+            self.assertEqual(entry['background'], 'green')
+            self.assertTrue(entry['showBackgroundColor'])
+        self.assertNotIn(FIELD, p)
+
+    def test_the_slice_is_a_stringified_value_like_the_other_sections(self):
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'bold': True}}})
+        self.assertIsInstance(p['visualState'][DATALABELS], str)
+
+    def test_a_measure_is_addressed_by_the_name_the_chart_shows(self):
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'measures': {'Sales': {'bold': True}}}})
+        self.assertEqual(list(saved_labels(p)['labelStyle']), ['AC'])
+
+    def test_a_measure_the_chart_does_not_have_fails_the_build(self):
+        with self.assertRaises(ValueError) as caught:
+            apply_chart_style(waterfall_props(), {'dataLabels': {'measures': {'Margin': {'bold': True}}}})
+        self.assertIn('Margin', str(caught.exception))
+        self.assertIn('Sales', str(caught.exception))
+
+    def test_show_is_the_only_way_labels_are_switched_on_or_off(self):
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'bold': True}}})
+        self.assertNotIn('enabled', saved_labels(p)['labelStyle']['AC'])
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'show': False}}})
+        self.assertFalse(saved_labels(p)['labelStyle']['AC']['enabled'])
+
+    def test_a_second_write_keeps_the_labels_it_does_not_name(self):
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'measures': {'Sales': {'bold': True}}}})
+        p = apply_chart_style(p, {'dataLabels': {'measures': {'Gross Sales': {'color': 'red'}}}})
+        saved = saved_labels(p)['labelStyle']
+        self.assertEqual(saved['AC'], {'fontStyle': {'isBold': True}})
+        self.assertEqual(saved['PY'], {'fontColor': 'red', 'contrastColor': False})
+
+    def test_a_label_option_the_product_does_not_take_is_refused(self):
+        for bad in ({'all': {'colour': 'red'}}, {'all': {'position': 'middle'}}, {'labelStyle': {}},
+                    {'all': {'bold': 'yes'}}):
+            with self.subTest(labels=bad):
+                with self.assertRaises(ValueError):
+                    apply_chart_style(waterfall_props(), {'dataLabels': bad})
+
+    def test_only_an_analytics_plus_chart_carries_data_labels(self):
+        with self.assertRaises(ValueError):
+            apply_chart_style(props(203), {'dataLabels': {'all': {'bold': True}}})
+
+    def test_a_chart_with_no_bound_measures_is_refused(self):
+        with self.assertRaises(ValueError) as caught:
+            apply_chart_style({'visualType': 50, 'visualState': {}, 'pivotAssignments': []},
+                              {'dataLabels': {'all': {'bold': True}}})
+        self.assertIn('no bound measures', str(caught.exception))
+
+    def test_data_labels_read_back_from_the_definition(self):
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'bold': True}}})
+        self.assertEqual(data_labels(p)['labelStyle']['AC'], {'fontStyle': {'isBold': True}})
+        self.assertIsNone(data_labels(waterfall_props()))
+
+    def test_a_measure_style_overrides_only_the_options_it_names(self):
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'all': {'fontSize': 10, 'bold': False},
+                                                                 'measures': {'Sales': {'bold': True}}}})
+        saved = saved_labels(p)['labelStyle']
+        self.assertEqual(saved['AC'], {'fontSize': 10, 'fontStyle': {'isBold': True}})
+        self.assertEqual(saved['PY'], {'fontSize': 10, 'fontStyle': {'isBold': False}})
+
+    def test_variance_labels_still_need_the_ai_channel(self):
+        p = apply_chart_style(waterfall_props(), {'dataLabels': {'variance': {'show': True, 'display': 'minMax'}}})
+        self.assertEqual(p[FIELD], {'dataLabel': {'variance': {'show': True, 'display': 'minMax'}}})
+        self.assertNotIn(DATALABELS, p['visualState'])
+
+
 class Builders(unittest.TestCase):
     def model(self):
         return load(ROOT / 'assets/fixtures/model.json')
@@ -93,7 +192,12 @@ class Builders(unittest.TestCase):
     def test_recipe_chart_keeps_its_theme_and_gains_the_style(self):
         p = recipe_chart(self.model(), self.chart_spec(style=STYLE), Registry())
         self.assertEqual(chart_theme(p), 'ibcs')
-        self.assertEqual(p[FIELD]['dataLabel']['measures']['Units']['position'], 'outside')
+        saved = data_labels(p)['labelStyle']
+        self.assertEqual(saved['AC']['position'], 'outside')
+        self.assertTrue(saved['AC']['fontStyle']['isBold'])
+        self.assertEqual(saved['PY']['fontSize'], 10)
+        self.assertTrue(saved['AC']['enabled'])
+        self.assertEqual(p[FIELD]['dataLabel']['variance']['display'], 'minMax')
         self.assertEqual(describe(p)['style']['canvas']['background'], '#fafafa')
 
     def test_a_chart_on_the_plan_theme_can_still_be_styled(self):
@@ -144,7 +248,7 @@ class PageReach(unittest.TestCase):
         self.assertEqual(len(named), 5)  # three KPI cards and two charts
         for p in named.values():
             self.assertEqual(p[FIELD]['canvas']['font']['color'], '#1f1f1f')
-            self.assertEqual(p[FIELD]['dataLabel']['all']['fontSize'], 10)
+            self.assertEqual({e['fontSize'] for e in data_labels(p)['labelStyle'].values()}, {10})
         charts = [name for name, p in named.items() if p['visualState'].get('chartType') != 'CARD']
         self.assertEqual(len(charts), 2)
         self.assertEqual({named[n][FIELD]['canvas']['background'] for n in charts}, {'#fafafa', '#000000'})

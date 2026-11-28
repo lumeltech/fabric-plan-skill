@@ -236,6 +236,10 @@ def measure_references(value):
 
 def validate_plan(raw):
     root=raw['definition.json']; sheets=root['sheets']; seen=set(); owners={}; measures={}; n=0
+    # An export can hold a visual's parts under a path whose case differs from the ID in
+    # definition.json; match them as the auditor does, case-insensitively (parts() already
+    # rejects two paths that collide).
+    folded={path.casefold(): path for path in raw}
     if not sheets or not root['semanticModelReference'].get('url'): raise ValueError('Missing sheets/model URL')
     for s in sheets:
         sid=s['recordGuid']; base=f'sheets/{sid}/'
@@ -247,6 +251,8 @@ def validate_plan(raw):
             if v.get('isEmbedded'): continue
             if vid in owners: raise ValueError('Multiple visual owners')
             owners[vid]=sid; p=base+f'visuals/{vid}/'
+            found=folded.get((p+'properties.json').casefold())
+            if found: p=found[:len(found)-len('properties.json')]
             if p+'properties.json' not in raw: raise ValueError('Missing visual properties')
             if v['visualType']=='PLANNING':
                 for companion in (p+'dataInput.json',base+'commentSettings.json'):

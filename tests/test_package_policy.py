@@ -18,8 +18,12 @@ ISO_DATE = re.compile(r"\b20\d\d-[01]\d-[0-3]\d\b")
 PRIVATE_DETAIL = re.compile(r"/v2/powertable|x-target-visual|\bPT_WB_\d+", re.I)
 TEXT_SUFFIXES = {".md", ".json", ".py", ".yml", ".yaml", ".txt", ".cjs", ".js"}
 # Chart styling needed its own module: background, font and data labels had no authoring route,
-# and their keys come from the product's schema validator rather than any IBCS recipe.
-RUNTIME_CEILINGS = {"modules": 74, "lines": 9884, "subcommands": 49}
+# and their keys come from the product's schema validator rather than any IBCS recipe. The store
+# slice for data labels is the switch-free half of that route and added 155 lines to the runtime.
+# slice for data labels is the switch-free half of that route and added 155 lines to the runtime.
+# Matching a visual's exported part path case-insensitively, so a Plan read back from the service
+# still passes its invariants, is the rest.
+RUNTIME_CEILINGS = {"modules": 74, "lines": 10045, "subcommands": 49}
 
 
 def cli_subcommands():

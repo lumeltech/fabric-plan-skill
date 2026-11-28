@@ -506,13 +506,14 @@
     },
     "chart-styling": {
       "phase": "local",
-      "description": "Give a chart its own background, global font and data-label formatting through the chart's AI chart schema, saved in the definition and applied by the chart before its first render.",
+      "description": "Give a chart its own data-label formatting through the chart store slice the Data Label panel writes, which renders without a feature switch, and its background, global font and theme through the chart's AI chart schema, which needs the planningAIAssistant switch and is proven only in the browser.",
       "inputs": "Chart style: theme, background, font and dataLabels (all, measures keyed by measure label, variance). See ibcs-charts.md.",
       "command": null,
       "symbols": [
         "runtime.chart_styling.ai_chart_state",
         "runtime.chart_styling.apply_chart_style",
         "runtime.chart_styling.chart_style",
+        "runtime.chart_styling.data_labels",
         "runtime.chart_styling.merge_styles"
       ]
     },
@@ -2780,7 +2781,7 @@
         "Use the IBCS theme for the whole Plan, including Matrix and Planning visuals."
       ],
       "prerequisites": "A resolved category dimension and the measures for each required bucket of a recipe; row dimensions and an AC value for a Matrix table; an explicit request before setting the Plan-wide theme.",
-      "limitations": "Writes chart templates and bindings, the IBCS chart theme with its measure and variance colors on recipe and template charts, a chart's own background, global font and data-label formatting as the chart's AI chart schema, Matrix tables, message titles, footnotes and, on explicit request, the Plan theme type. That schema is applied by the chart only while the tenant has the Planning AI assistant enabled, so styling is saved rather than proven. Other IBCS chart styling (title and number settings, ranking, deviation callouts) is not written. Planning grids follow the Plan theme only when the tenant enables it. Threaded comments are not authorable. Rendering is not tested.",
+      "limitations": "Writes chart templates and bindings, the IBCS chart theme with its measure and variance colors on recipe and template charts, a chart's data labels into the chart store slice the Data Label panel writes, Matrix tables, message titles, footnotes and, on explicit request, the Plan theme type. Data labels need no feature switch. A chart's background, global font, theme and variance labels are saved only as its AI chart schema, applied while the tenant has the Planning AI assistant enabled, so those are saved rather than proven. Other IBCS chart styling (title and number settings, ranking, deviation callouts) is not written. Planning grids follow the Plan theme only when the tenant enables it. Threaded comments are not authorable. Rendering is not tested.",
       "coverage": "local"
     }
   ]

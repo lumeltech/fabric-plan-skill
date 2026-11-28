@@ -89,6 +89,14 @@ class ConstructionTests(unittest.TestCase):
         b=built(); k=next(k for k in b['raw'] if k.endswith('properties.json') and '/visuals/' in k)
         b['raw'][k]['properties']['visualState']['manage_measures'].pop()
         with self.assertRaises(ValueError): validate_plan(b['raw'])
+    def test_exported_part_path_case_does_not_hide_a_visual(self):
+        # An export can carry a visual's parts under a path whose case differs from the ID in
+        # definition.json, as connected-construction.md records for the auditor; invariants match it.
+        b=built(); k=next(k for k in b['raw'] if k.endswith('properties.json') and '/visuals/' in k)
+        prefix=k[:k.index('/properties.json')+1]
+        for path in [p for p in b['raw'] if p.startswith(prefix)]:
+            b['raw'][path.replace(prefix, prefix.upper())]=b['raw'].pop(path)
+        validate_plan(b['raw'])
     def test_missing_companion_detected(self):
         b=built(); k=next(k for k in b['raw'] if k.endswith('dataInput.json')); del b['raw'][k]
         with self.assertRaises(ValueError): validate_plan(b['raw'])

@@ -201,29 +201,30 @@ Each recipe pairs its template with styling: the IBCS theme, data labels, measur
 
 ## Chart styling
 
-`runtime.chart_styling` writes a chart's background, global font and data-label formatting as `visualAiSchemaState`, a top-level object of the chart's properties beside `visualState`. Before its first render the chart hands that object to its schema compiler, which applies each section through the same store services the format panels use, and the field is then cleared. So the styling neither imitates those panels nor stays behind to overwrite what the user changes afterwards.
+`runtime.chart_styling` writes on two channels of unequal reliability; say which one each part used.
 
-- A chart spec takes `"style"`: `{"theme", "background", "font": {"family", "size", "color", "responsive", "autoColor"}, "dataLabels": {"all", "measures": {<measure label>: ...}, "variance"}}`. `runtime.intelligence.card` takes the same key, and a dashboard's page-level `"style"` defaults every card and chart on the page; a visual's own style replaces only the options it names.
-- Address a data label by the measure label the chart shows: the measure's `label` in the spec, or its `valueLabel` on a plain column chart. A label the chart does not have is skipped.
-- `ai_chart_state` refuses an option the product's schema validator does not accept, so a wrong key fails the build. Only an ANALYTICS_PLUS chart carries a style; a tree, slicer or text visual is refused.
-- On an existing chart, call `runtime.chart_styling.apply_chart_style(properties, style)` on freshly exported properties. It merges into the sections the chart already carries and leaves the rest alone.
-- The compiler loads only while the host's `planningAIAssistant` feature switch is on. With it off the saved object is inert, so styling is proven in the browser, not in the definition. Not yet checked in a running Plan.
-- `axis`, `legend`, `measureSeries` and `rows` share the channel and are not written here.
+**Data labels go to the chart store, and this route renders.** `apply_chart_style` writes the store's `dataLabel` slice as the stringified `hiddenProperties_!!!_dataLabel` member of `visualState`; the host re-reads it on load and merges it over the theme defaults. No switch is on that path, and `data_labels` reads it back.
 
-Report these as **not applied**, and name them per chart. The user can apply them in the product. Or the user can export a Plan with a chart already styled in the product, so that its saved state can be reused as observed state for the same template.
+**Background, global font, theme and variance labels go to the AI schema channel**, as `visualAiSchemaState` beside `visualState`: the chart hands it to its schema compiler before its first render, which then clears it. It loads only while the host's `planningAIAssistant` switch is on, which is off by default; with it off the object is inert — no error, no styling, indistinguishable from a broken write.
+
+- A chart spec takes `"style"`: `{"theme", "background", "font": {"family", "size", "color", "responsive", "autoColor"}, "dataLabels": {"all", "measures": {<measure label>: ...}, "variance"}}`. `runtime.intelligence.card` and a page-level `"style"` take the same key, the latter as the page default; a visual's own style overrides only the options it names.
+- Address a data label by the label the chart shows (the spec's `label`, an export's `customName`); the writer resolves it to the store key, the measure's **role** (`AC`, `PY`, …), because `savePropertyAgainstRole` is on by default. A name the chart does not bind, or an option the product rejects, **fails the build** rather than quietly doing nothing.
+- `color` clears `contrastColor`, or the theme's auto-contrast color wins; `background` sets `showBackground`, or it reads as transparent; `show` alone toggles labels.
+- `axis`, `legend`, `measureSeries` and `rows` share the AI channel and are not written here. Only an ANALYTICS_PLUS chart carries a style, and `apply_chart_style` merges with what an export already carries.
 
 ## Check and report
 
 1. Before the build, confirm that every required binding resolves to a current model or query field.
-2. After building, `runtime.ibcs_charts.describe(properties)` lists the template, the matching recipes, the bucket bindings, whether the two template selectors agree, the chart theme (`ibcs`, or `plan` when the chart follows the Plan theme) and the chart's own style. `runtime.chart_styling.chart_style(properties)` reads that style back. `runtime.chart_filters.audit_chart_filters(properties)` checks the filter cards.
+2. After building, `runtime.ibcs_charts.describe(properties)` lists the template, matching recipes, bucket bindings, whether the two template selectors agree, the chart theme (`ibcs` or `plan`), the AI schema style and the data-label slice; `runtime.chart_styling.chart_style` and `data_labels` read the two back. `runtime.chart_filters.audit_chart_filters(properties)` checks the filter cards.
 3. After an authorized update, export the Plan and compare it with what was built:
    - each chart's two `chartType` values;
    - the assignments of each chart and Matrix, by field ID and bucket;
    - each IBCS chart's theme, and the fill color and pattern of its bound roles. The chart saves more appearance settings once it has rendered, so compare these members only;
-   - each styled chart's `visualAiSchemaState`, and whether the chart cleared it on the next export after it rendered;
+   - each styled chart's `hiddenProperties_!!!_dataLabel`, role by role, and its `visualAiSchemaState`, including whether the chart cleared the latter after it rendered;
    - the Plan theme `type`.
 4. Report outcomes separately:
    - templates, bindings, the IBCS chart theme and colors, the Matrix, story text and the Plan theme value as saved;
-   - chart background, global font and data-label formatting as saved through the chart's own schema; claim them as rendered only from the browser;
+   - data labels as written to the chart store, switch-free, pending the browser check;
+   - chart background, global font, theme and variance labels as saved through the AI schema only, rendering only where `planningAIAssistant` is on; claim them rendered only from the browser;
    - the rest of the IBCS chart styling as not applied;
    - rendering as not tested.
