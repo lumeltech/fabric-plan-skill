@@ -295,7 +295,7 @@ def validate_plan(raw):
                         deps[mid].extend(refs)
                     if 'Forecast' in branch:
                         fc=branch['Forecast']; expected=10 if fc.get('bound_to_filter_context',True) else 20
-                        if c.get('boundToFilterContext')!=expected or isinstance(c.get('boundToFilterContext'),bool):
+                        if c.get('boundToFilterContext')!=expected or isinstance(c.get('boundToFilterContext'),bool):  # pragma: no cover  check_records rejects this encoding first
                             raise ValueError('Forecast context binding mismatch')
                         refs=measure_references(fc)
                         if refs-set(deps): raise ValueError('Unresolved Forecast measure reference')

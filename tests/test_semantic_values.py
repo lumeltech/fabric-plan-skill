@@ -9,6 +9,7 @@ from runtime.chart_filters import audit_chart_filters
 from runtime.measure_bindings import registered_measure, resolve_measure
 from runtime.planning_presentation import build_application
 from runtime.semantic_values import semantic_value
+from runtime.validate import validate_plan
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -81,6 +82,29 @@ class SemanticValueTests(unittest.TestCase):
         rate=next(x for x in props['pivotAssignments'] if x['id']=='Facts[Rate]')
         self.assertEqual(props['visualState']['aggregation_config']['measure_aggregation'][amount['measureGuid']],{
             'row':{'WeightedAverage':rate['measureGuid']},'column':{'WeightedAverageRow':'701'}})
+
+    def test_weighted_average_dependency_is_structurally_resolved(self):
+        model,spec=model_spec()
+        spec['sheets'][0]['measures'][0].update(
+            aggregation={'WeightedAverage':'rate'},columnAggregation={'WeightedAverageRow':'701'})
+        result=build(model,spec)
+        key=next(k for k in result['raw'] if k.endswith('/properties.json')
+                 and 'manage_measures' in result['raw'][k]['properties'].get('visualState',{}))
+        amount=next(x for x in result['raw'][key]['properties']['pivotAssignments'] if x['id']=='Facts[Amount]')
+        rate=next(x for x in result['raw'][key]['properties']['pivotAssignments'] if x['id']=='Facts[Rate]')
+        self.assertEqual(validate_plan(result['raw'])['measureRecords'],len(spec['sheets'][0]['measures']))
+        pair=result['raw'][key]['properties']['visualState']['aggregation_config']['measure_aggregation'][amount['measureGuid']]
+        self.assertEqual(pair['row'],{'WeightedAverage':rate['measureGuid']})
+        raw=copy.deepcopy(result['raw'])
+        registered=raw[key]['properties']['visualState']['aggregation_config']['measure_aggregation']
+        # A weight that is not one of the grid's measures cannot be resolved on import.
+        registered[amount['measureGuid']]={**pair,'row':{'WeightedAverage':'9999999999999999999'}}
+        with self.assertRaisesRegex(ValueError,'Unresolved weighted-average measure'):validate_plan(raw)
+        # The aggregation contract refuses a reference that is not even a native id.
+        registered[amount['measureGuid']]={**pair,'row':{'WeightedAverage':'ghost'}}
+        with self.assertRaisesRegex(ValueError,'decimal u64'):validate_plan(raw)
+        registered[amount['measureGuid']]=pair
+        self.assertEqual(validate_plan(raw)['status'],'passed-structural-invariants')
 
     def test_explicit_source_override_and_average_alias(self):
         m,s=model_spec();s['sheets'][0]['measures'][1]['sourceAggregation']='Average'

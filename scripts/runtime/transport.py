@@ -21,7 +21,7 @@ def retry_seconds(headers,default=2):
         try: return max(0,(email.utils.parsedate_to_datetime(s)-datetime.datetime.now(datetime.timezone.utc)).total_seconds())
         except (ValueError,TypeError): return default
 class NoRedirect(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self,*args,**kwargs): return None
+    def redirect_request(self,*args,**kwargs): return None  # pragma: no cover  only reached by a live redirect, which the connected eval tier drives
 # The only public Fabric REST routes this client calls, shared with tools/http.cjs.
 PUBLIC_ROUTE=re.compile(json.loads((Path(__file__).with_name('public_routes.json')).read_text(encoding='utf-8'))['pattern'])
 
@@ -60,7 +60,7 @@ class Client:
             except Exception: c={}
             if c.get('exp',float('inf'))<=time.time()+5: raise ValueError('AUTH_EXPIRED: renew environment credential and resume')
         return t
-    def _http(self,method,url,headers,body):
+    def _http(self,method,url,headers,body):  # pragma: no cover  real HTTPS, so unit tests inject an adapter and the connected eval tier drives this
         node=os.environ.get('FABRIC_PLAN_HTTP_NODE')
         if node:
             # Optional managed-Windows transport. Credentials travel over stdin, not argv/files.

@@ -340,6 +340,86 @@ class TransportTests(unittest.TestCase):
             self.assertTrue(is_secret_key(k),k)
         for k in ('continuationToken','tokenType','secretName','displayName','tokenEnvironment'):
             self.assertFalse(is_secret_key(k),k)
+    def test_retry_after_accepts_seconds_and_http_dates(self):
+        import datetime,email.utils
+        from runtime.transport import retry_seconds
+        self.assertEqual(retry_seconds({}),2)
+        self.assertEqual(retry_seconds({'retry-after':'7'}),7)
+        self.assertEqual(retry_seconds({'retry-after':'-5'}),0)
+        future=email.utils.format_datetime(datetime.datetime.now(datetime.timezone.utc)+datetime.timedelta(seconds=30))
+        self.assertTrue(25<retry_seconds({'retry-after':future})<=30)
+        past=email.utils.format_datetime(datetime.datetime.now(datetime.timezone.utc)-datetime.timedelta(minutes=5))
+        self.assertEqual(retry_seconds({'retry-after':past}),0)
+        self.assertEqual(retry_seconds({'retry-after':'tomorrow maybe'}),2)
+    def test_expired_and_unreadable_tokens(self):
+        import base64,json,time
+        def jwt(claims):
+            payload=base64.urlsafe_b64encode(json.dumps(claims).encode()).decode().rstrip('=')
+            return 'header.'+payload+'.signature'
+        c=self.client([{'status':200,'headers':{},'body':{}},{'status':200,'headers':{},'body':{}}])
+        os.environ['TEST_TOKEN']=jwt({'exp':time.time()-10})
+        with self.assertRaisesRegex(ValueError,'AUTH_EXPIRED'):c.request('GET','/workspaces/w/plans')
+        os.environ['TEST_TOKEN']=jwt({'exp':time.time()+3600})
+        self.assertEqual(c.request('GET','/workspaces/w/plans')['status'],200)
+        # A three-part string whose middle is not a JSON payload stays an opaque credential.
+        os.environ['TEST_TOKEN']='header.NotBase64!@#.signature'
+        self.assertEqual(c.request('GET','/workspaces/w/plans')['status'],200)
+        self.assertEqual(len(self.calls),2)
+        os.environ['TEST_TOKEN']='mock-secret'
+    def test_accept_header_is_sanitized(self):
+        seen={}
+        def adapter(method,url,headers,body):
+            seen.update(headers); return {'status':200,'headers':{},'body':{}}
+        c=Client('https://api.fabric.microsoft.com/v1','TEST_TOKEN',journal=self.tmp.name,adapter=adapter,sleep=lambda t:None)
+        self.assertEqual(c.request('GET','/workspaces/w/plans',accept='application/json')['status'],200)
+        self.assertEqual(seen['Accept'],'application/json')
+        for accept in ('application/json\r\nX-Injected: 1','application/json\nX-Injected: 1',['application/json']):
+            with self.subTest(accept=accept),self.assertRaisesRegex(ValueError,'Invalid Accept header'):
+                c.request('GET','/workspaces/w/plans',accept=accept)
+        self.assertEqual(seen['Accept'],'application/json')
+    def test_binary_response_holding_the_credential_is_refused(self):
+        import base64
+        payload=base64.b64encode(b'archive holding mock-secret inside').decode()
+        c=self.client([{'status':200,'headers':{'content-type':'application/octet-stream'},
+            'body':{'binaryBase64':payload,'bytes':30,'contentType':'application/octet-stream'}}])
+        with self.assertRaisesRegex(RuntimeError,'Binary response contained credential'):
+            c.request('POST','/workspaces/w/plans/p/getDefinition',{},label='binary')
+        self.assertEqual(list(Path(self.tmp.name).glob('binary.response.json')),[])
+    def test_operation_checkpoint_must_match_the_resumed_location(self):
+        import json
+        initial={'status':202,'headers':{'location':'https://api.fabric.microsoft.com/v1/operations/op','retry-after':'0'},'body':None}
+        for label,location in (('mismatch','https://api.fabric.microsoft.com/v1/operations/other'),
+                               ('resume','https://api.fabric.microsoft.com/v1/operations/op')):
+            (Path(self.tmp.name)/(label+'.operation.json')).write_text(
+                json.dumps({'location':location,'phase':'poll','startedAt':'earlier'}),encoding='utf-8')
+            c=self.client([{'status':200,'headers':{},'body':{'status':'Succeeded'}},
+                           {'status':200,'headers':{},'body':{'definition':{'parts':[]}}}])
+            if label=='mismatch':
+                with self.assertRaisesRegex(ValueError,'checkpoint mismatch'):c.finish(initial,label)
+                self.assertEqual(self.calls,[])
+            else:
+                self.assertEqual(c.finish(initial,label)['body'],{'definition':{'parts':[]}})
+                self.assertEqual(load(Path(self.tmp.name)/(label+'.operation.json'))['phase'],'complete')
+                self.assertTrue(self.calls[-1][1].endswith('/result'))
+    def test_poll_budget_is_enforced_before_the_next_request(self):
+        initial={'status':202,'headers':{'location':'https://api.fabric.microsoft.com/v1/operations/op'},'body':None}
+        c=self.client([{'status':200,'headers':{},'body':{'status':'Running'}}])
+        with self.assertRaisesRegex(TimeoutError,'resume same operation checkpoint'):
+            c.finish(initial,'one-poll',max_polls=1)
+        self.assertEqual(len(self.calls),1)
+        with self.assertRaisesRegex(TimeoutError,'resume same operation checkpoint'):
+            c.finish(initial,'no-time',max_seconds=0)
+        self.assertEqual(len(self.calls),1)
+    def test_location_that_answers_with_the_result(self):
+        c=self.client([{'status':202,'headers':{'Location':'https://api.fabric.microsoft.com/v1/operations/op','Retry-After':'0'},'body':None},
+          {'status':200,'headers':{},'body':{'id':'already-final'}}])
+        r=c.finish(c.request('POST','/workspaces/w/plans/p/getDefinition',{},label='direct'),'direct')
+        self.assertEqual(r['body'],{'id':'already-final'})
+        self.assertEqual(load(Path(self.tmp.name)/'direct.operation.json')['phase'],'complete')
+    def test_unknown_plan_operation(self):
+        c=self.client([])
+        with self.assertRaisesRegex(ValueError,'Unknown Plan operation'):
+            plan_operation(c,'w','purge','p')
 class SchemaTests(unittest.TestCase):
     def test_transitive_closure(self):
         s=Schemas()
@@ -358,4 +438,38 @@ class SchemaTests(unittest.TestCase):
     def test_object_enum_equality_ignores_key_order(self):
         s=Schemas(); s._check({'a':1,'b':2},{'const':{'b':2,'a':1}},'https://example.invalid','$')
         with self.assertRaises(Invalid): s._check(True,{'const':1},'https://example.invalid','$')
+    def test_conditional_and_negation_keywords(self):
+        s=Schemas(); url='https://example.invalid'
+        def check(value,schema):
+            return s._check(value,schema,url,'$')
+        check(5,{'not':{'type':'string'}})
+        with self.assertRaisesRegex(Invalid,'not'):check('x',{'not':{'type':'string'}})
+        branch={'if':{'type':'string'},'then':{'minLength':3},'else':{'type':'integer'}}
+        for value in ('abc',4):check(value,branch)
+        for value in ('ab',True):
+            with self.subTest(value=value),self.assertRaises(Invalid):check(value,branch)
+        check(1,{'if':{'type':'string'}})                 # a matching if with no branch keyword accepts anything
+        with self.assertRaises(Invalid):check('ab',{'if':{'type':'string'},'then':{'minLength':3}})
+    def test_date_formats_and_array_containment(self):
+        s=Schemas(); url='https://example.invalid'
+        s._check('2031-01-01',{'format':'date'},url,'$')
+        s._check('2031-01-31T00:00:00Z',{'format':'date-time'},url,'$')
+        with self.assertRaisesRegex(Invalid,'date format'):s._check('2031-13-01',{'format':'date'},url,'$')
+        with self.assertRaisesRegex(Invalid,'date format'):s._check('31/01/2031',{'format':'date-time'},url,'$')
+        contains={'type':'array','contains':{'type':'integer'}}
+        s._check(['x',1],contains,url,'$')
+        for value in (['x'],[]):
+            with self.subTest(value=value),self.assertRaisesRegex(Invalid,'contains'):s._check(value,contains,url,'$')
+    def test_property_and_key_dependencies(self):
+        s=Schemas(); url='https://example.invalid'
+        keys={'dependencies':{'source':['target']}}
+        s._check({'source':1,'target':2},keys,url,'$')
+        with self.assertRaisesRegex(Invalid,'dependent keys'):s._check({'source':1},keys,url,'$')
+        schema={'dependencies':{'source':{'required':['target']}}}
+        s._check({'source':1,'target':2},schema,url,'$')
+        with self.assertRaisesRegex(Invalid,'missing target'):s._check({'source':1},schema,url,'$')
+        pattern={'patternProperties':{'^x':{'type':'integer'}}}
+        s._check({'x1':2,'other':'text',},pattern,url,'$')   # unmatched name falls to additionalProperties
+        with self.assertRaises(Invalid):s._check({'x1':'text'},pattern,url,'$')
+        with self.assertRaises(Invalid):s._check({'b':1},{'propertyNames':{'pattern':'^a'}},url,'$')
 if __name__=='__main__': unittest.main()
