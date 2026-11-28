@@ -1,6 +1,6 @@
 """PowerTable product defaults, catalog intake, Forms, Automations and Row access."""
 import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))  # runtime/ importable under unittest and pytest
-import copy,json,os,subprocess,sys,tempfile,unittest
+import copy,json,os,re,subprocess,sys,tempfile,unittest
 from pathlib import Path
 from runtime.codec import load,pack,parts,unpack
 from runtime.construct import build
@@ -224,6 +224,126 @@ class FormsAndAutomations(unittest.TestCase):
         form['formFields'][0]['columnConfigId']='stale'
         raw[prefix+'forms.json']={'forms':[form]}
         with self.assertRaisesRegex(ValueError,'unknown column'):check_powertable_parts(raw,prefix)
+
+    def with_part(self,mutate):
+        raw=copy.deepcopy(self.raw);prefix=prefix_of(raw);mutate(raw,prefix)
+        return raw,prefix
+
+    def part_columns(self,raw,prefix):
+        return raw[prefix+'columnConfigs.json']['columnConfigs']
+
+    def test_source_part_guards(self):
+        def column(leaf,patch=None):
+            def mutate(raw,prefix):
+                if leaf=='drop':raw[prefix+patch].pop('source');raw[prefix+'source.json']['source']=None
+                elif leaf=='fields':self.part_columns(raw,prefix)[0].pop(patch)
+                elif leaf=='rename':self.part_columns(raw,prefix)[-1]['columnName']=self.part_columns(raw,prefix)[0]['columnName']
+                elif leaf=='blank-guid':self.part_columns(raw,prefix)[0]['recordGuid']=''
+                elif leaf=='same-guid':self.part_columns(raw,prefix)[-1]['recordGuid']=self.part_columns(raw,prefix)[0]['recordGuid']
+                elif leaf=='none-guid':self.part_columns(raw,prefix)[0]['recordGuid']=None
+            return mutate
+        def setting(**patch):
+            def mutate(raw,prefix):
+                item=raw[prefix+'sourceSettings.json']['sourceSettings'][0]
+                if 'drop' in patch:item.pop(patch['drop'])
+                if 'sourceId' in patch:item['sourceId']=patch['sourceId']
+                if 'enabled' in patch:item['settings']['enabled']=patch['enabled']
+                if 'filters' in patch:item['filters']=patch['filters']
+                if 'name' in patch:item['name']=patch['name']
+            return mutate
+        def visual(**patch):
+            def mutate(raw,prefix):
+                state=raw[prefix+'properties.json']['properties']['properties']['visualState']
+                for key,value in patch.items():
+                    if key=='pop':state.pop(value)
+                    else:state[key]=value
+            return mutate
+        cases=[
+            ('drop source part','Missing PowerTable companion',lambda raw,prefix:raw.pop(prefix+'source.json')),
+            ('drop settings part','Missing PowerTable companion',lambda raw,prefix:raw.pop(prefix+'sourceSettings.json')),
+            ('source identity','PowerTable source record identity required',
+                lambda raw,prefix:raw[prefix+'source.json']['source'].pop('recordGuid')),
+            ('source object','PowerTable source record identity required',
+                lambda raw,prefix:raw[prefix+'source.json'].__setitem__('source',{'recordGuid':''})),
+            ('no columns','PowerTable requires configured columns',lambda raw,prefix:raw[prefix+'columnConfigs.json'].__setitem__('columnConfigs',[])),
+            ('column fields','Incomplete PowerTable column configuration',column('fields','displayName')),
+
+            ('duplicate names','PowerTable physical column names must be unique',column('rename')),
+            ('duplicate identities','PowerTable column record identities must be unique',column('same-guid')),
+            ('blank identity','PowerTable column record identities must be unique',column('blank-guid')),
+            ('no settings','PowerTable source settings required',lambda raw,prefix:raw[prefix+'sourceSettings.json'].__setitem__('sourceSettings',[])),
+            ('settings type','PowerTable source settings required',lambda raw,prefix:raw[prefix+'sourceSettings.json'].__setitem__('sourceSettings',None)),
+            ('foreign source','PowerTable setting belongs to a different source',setting(sourceId='other')),
+            ('setting shape','Incomplete PowerTable source setting',setting(drop='name')),
+            ('setting body','Incomplete PowerTable source setting',lambda raw,prefix:raw[prefix+'sourceSettings.json']['sourceSettings'][0].pop('settings')),
+            ('enabled type','PowerTable source setting requires Boolean enabled',setting(enabled='true')),
+            ('filters type','PowerTable row-access filters must be a list',setting(filters='all_users')),
+            ('enabled without filters','Enabled PowerTable row action requires a row-access selection',setting(filters=[])),
+            ('filter identity','PowerTable row-access filter record identity required',
+                lambda raw,prefix:raw[prefix+'sourceSettings.json']['sourceSettings'][0]['filters'][0].pop('recordGuid')),
+            ('filter name','PowerTable row-access filter name required',
+                lambda raw,prefix:raw[prefix+'sourceSettings.json']['sourceSettings'][0]['filters'][0].pop('name')),
+            ('filter shape','Invalid PowerTable row-access filter',
+                lambda raw,prefix:raw[prefix+'sourceSettings.json']['sourceSettings'][0]['filters'][0].update({'filterType':9})),
+            ('duplicate setting','Duplicate PowerTable source setting',
+                lambda raw,prefix:raw[prefix+'sourceSettings.json']['sourceSettings'][1].update(
+                    {'name':raw[prefix+'sourceSettings.json']['sourceSettings'][0]['name']})),
+            ('visual type','Invalid configured PowerTable visual properties',
+                lambda raw,prefix:raw[prefix+'properties.json']['properties']['properties'].__setitem__('visualType',50)),
+            ('column catalog','PowerTable visual column catalog differs from columnConfigs',visual(pop='columnMeta')),
+            ('column catalog','PowerTable visual column catalog differs from columnConfigs',
+                lambda raw,prefix:raw[prefix+'properties.json']['properties']['properties']['visualState']['columnMeta'].pop('Code')),
+            ('managed order','PowerTable managed-column order differs from columnConfigs',
+                lambda raw,prefix:raw[prefix+'properties.json']['properties']['properties']['visualState']['manageMeasures'].reverse()),
+        ]
+        for label,message,mutate in cases:
+            with self.subTest(case=label):
+                raw,prefix=self.with_part(mutate)
+                with self.assertRaisesRegex(ValueError,re.escape(message)):check_powertable_parts(raw,prefix)
+        # A column without a recordGuid is not an identity violation: only concrete ids are
+        # compared, and the feature parts resolve columns through them.
+        raw,prefix=self.with_part(column('none-guid'))
+        self.assertEqual(check_powertable_parts(raw,prefix)['columns'],len(self.columns))
+
+    def test_feature_part_guards(self):
+        def forms(*records):
+            value={'forms':list(records)}
+            return lambda raw,prefix:raw.__setitem__(prefix+'forms.json',value)
+        def automations(*records):
+            value={'automations':list(records)}
+            return lambda raw,prefix:raw.__setitem__(prefix+'automations.json',value)
+        good=form_record('F',[{'column':c} for c in ('Code','FullName','JoinDate','Active')],self.columns)
+        auto=automation_record('Notify HR',ROW_UPDATED,[mail()],self.columns,watch_columns=['Active'])
+        def broken(record,**patch):
+            copy_of=copy.deepcopy(record)
+            for key,value in patch.items():copy_of[key]=value
+            return copy_of
+        cases=[
+            ('forms list','PowerTable forms.json requires a forms list',lambda raw,prefix:raw.__setitem__(prefix+'forms.json',{'forms':{}})),
+            ('form identity','PowerTable form record identity required',forms(broken(good,recordGuid=None))),
+            ('form title','PowerTable form requires a title and list layout children',forms(broken(good,title=None))),
+            ('form layout','PowerTable form requires a title and list layout children',forms(broken(good,layoutMeta={'type':'form','children':{}}))),
+            ('field identity','PowerTable form field identity required',forms(broken(good,formFields=[{'columnConfigId':self.guids['Code']}]))),
+            ('field required flag','PowerTable form field required must be 0 or 1',forms(broken(good,formFields=[{**good['formFields'][0],'required':2}]))),
+            ('duplicate form','Duplicate PowerTable form identity',forms(good,broken(good,title='Second'))),
+            ('automations list','PowerTable automations.json requires an automations list',lambda raw,prefix:raw.__setitem__(prefix+'automations.json',{'automations':None})),
+            ('automation shape','PowerTable automation requires a name and numeric triggerType',automations({'name':'No trigger'})),
+            ('automation shape','PowerTable automation requires a name and numeric triggerType',automations({'triggerType':1})),
+            ('automation entry group','PowerTable automation entry group is unresolved',
+                automations(broken(auto,config={**auto['config'],'entryGroupId':'missing'}))),
+        ]
+        for label,message,mutate in cases:
+            with self.subTest(case=label):
+                raw,prefix=self.with_part(mutate)
+                with self.assertRaisesRegex(ValueError,re.escape(message)):check_powertable_parts(raw,prefix)
+        # Product exports hold a JSON object as text; an unparseable one is treated as absent
+        # rather than failing the import, which is what the exporter does for legacy forms.
+        raw,prefix=self.with_part(forms(broken(good,layoutMeta='{"children":[]}')))
+        self.assertEqual(check_powertable_parts(raw,prefix)['forms'],1)
+        raw,prefix=self.with_part(forms(broken(good,layoutMeta='not json')))
+        self.assertEqual(check_powertable_parts(raw,prefix)['forms'],1)
+        raw,prefix=self.with_part(automations({'name':'Text trigger','triggerType':'3','config':json.dumps(auto['config'])}))
+        self.assertEqual(check_powertable_parts(raw,prefix)['automations'],1)
 
     def test_product_export_shapes_validate_and_can_be_extended(self):
         # Shapes emitted by the product's ALM export: string configs, an empty layout,
