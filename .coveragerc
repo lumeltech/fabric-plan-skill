@@ -1,0 +1,21 @@
+# Coverage of the shipped runtime only: scripts/runtime, the modules the CLI and the tests import
+# in-process. scripts/plan.py dispatch and scripts/vendor stay out of the measure because unit
+# tests reach them through a subprocess, which coverage.py does not trace.
+#
+# Real HTTPS and timing/polling behaviour belongs to the connected eval tier
+# (tests/run-evals.sh), so those paths carry "# pragma: no cover" with a reason instead of a test.
+#
+# Note: coverage.py cannot record a branch that leaves a function through `raise`, so every
+# guard-raising module carries structural "X -> exit" partial branches. The 100% demand for the
+# two write-critical files is therefore on statements, with branches on a ratchet (see CI).
+[run]
+branch = True
+source = scripts/runtime
+relative_files = True
+
+[report]
+precision = 1
+show_missing = True
+# Measured 86.6% with every branch counted and 94.3% of statements. The branch-aware figure is the
+# one that can regress, so it is the ratchet: raise this in the change that lifts the measurement.
+fail_under = 85

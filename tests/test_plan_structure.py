@@ -4,7 +4,7 @@ import copy, unittest
 from pathlib import Path
 from runtime.bridge import Query, planning_source, portable
 from runtime.codec import load, loads, parts, unpack
-from runtime.validate import measure_references, public_schema_view, validate_plan
+from runtime.validate import measure_references, public_schema_view, schema_report, validate_plan
 from test_forecast_repair import envelope
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -76,6 +76,12 @@ class PlanStructure(unittest.TestCase):
         raw['connectedPlanning/infobridge.json']['sources'][0]['queries'][0]['transformationSteps'] = []
         with self.assertRaisesRegex(ValueError, 'Query has no source operation'):
             validate_plan(raw)
+
+    def test_schema_report_keeps_sweeping_after_an_undocumented_part(self):
+        report = schema_report({'sheets/s/visuals/v/visual.json': {'value': 1},
+                                'cube/cube.json': {'$schema': 'https://example.invalid/not-bundled'}})
+        self.assertEqual([(entry['path'], entry['status']) for entry in report],
+                         [('sheets/s/visuals/v/visual.json', 'uncovered'), ('cube/cube.json', 'schema-gap')])
 
     def test_target_input_policy_normalization_is_reported_once(self):
         value = {'columns': [{'columnMeta': {'measure_type': {'DataInput': {'allow_input': 'Edit',

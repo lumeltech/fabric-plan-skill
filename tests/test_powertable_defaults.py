@@ -304,6 +304,11 @@ class FormsAndAutomations(unittest.TestCase):
         # compared, and the feature parts resolve columns through them.
         raw,prefix=self.with_part(column('none-guid'))
         self.assertEqual(check_powertable_parts(raw,prefix)['columns'],len(self.columns))
+        # Row-access rules only apply to the three row actions; a source setting such as the
+        # conditional-formatting or refresh entry carries no filters and stays valid.
+        raw,prefix=self.with_part(setting(name='CONDITIONAL_FORMATTING',filters=[]))
+        self.assertEqual(raw[prefix+'sourceSettings.json']['sourceSettings'][0]['name'],'CONDITIONAL_FORMATTING')
+        self.assertEqual(check_powertable_parts(raw,prefix)['columns'],len(self.columns))
 
     def test_feature_part_guards(self):
         def forms(*records):

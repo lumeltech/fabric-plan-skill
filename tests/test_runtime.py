@@ -272,6 +272,20 @@ class TransportTests(unittest.TestCase):
             c.finish(c.request('POST','/workspaces/w/plans/p/updateDefinition',{},label='update'),'update')
         checkpoint=load(Path(self.tmp.name)/'update.operation.json')
         self.assertEqual((checkpoint['lastStatus'],checkpoint['phase'],checkpoint['error']),('Failed','failed',error))
+    def test_transient_read_failure_retries_and_succeeds(self):
+        # The retry arc is the only thing standing between a dropped socket and a lost page.
+        c=self.client([TimeoutError(),{'status':200,'headers':{},'body':{'value':[{'id':'p'}]}}])
+        self.assertEqual(c.request('GET','/workspaces/w/plans')['body']['value'],[{'id':'p'}])
+        self.assertEqual(len(self.calls),2)
+    def test_resumed_update_replays_without_a_second_baseline_read(self):
+        from runtime.codec import definition_hash, pack
+        from runtime.transport import plan_operation
+        before=pack({'example.json':{'value':1}}); after=pack({'example.json':{'value':2}})
+        c=self.client([{'status':200,'headers':{},'body':before},{'status':200,'headers':{},'body':{'id':'p'}}])
+        first=plan_operation(c,'w','update','p',definition=after,baseline_hash=definition_hash(before))
+        self.assertEqual([url.rsplit('/',1)[-1] for _,url,_ in self.calls],['getDefinition','updateDefinition'])
+        self.assertEqual(plan_operation(c,'w','update','p',definition=after,baseline_hash=definition_hash(before)),first)
+        self.assertEqual(len(self.calls),2)
     def test_read_throttle(self):
         c=self.client([{'status':429,'headers':{'retry-after':'0'},'body':{}},{'status':200,'headers':{},'body':{'value':1}}]); self.assertEqual(c.request('GET','/workspaces/w/plans')['status'],200)
     def test_uncertain_create_not_repeated(self):
@@ -465,6 +479,7 @@ class SchemaTests(unittest.TestCase):
         keys={'dependencies':{'source':['target']}}
         s._check({'source':1,'target':2},keys,url,'$')
         with self.assertRaisesRegex(Invalid,'dependent keys'):s._check({'source':1},keys,url,'$')
+        s._check({'unrelated':1},keys,url,'$')   # an absent key adds no requirement
         schema={'dependencies':{'source':{'required':['target']}}}
         s._check({'source':1,'target':2},schema,url,'$')
         with self.assertRaisesRegex(Invalid,'missing target'):s._check({'source':1},schema,url,'$')
