@@ -12,7 +12,7 @@ def checked_request(fn,request):
     try: inspect.signature(fn).bind(None,**request)
     except TypeError as e: raise ValueError('Invalid request: '+str(e)) from None
     return request
-def main():
+def build_parser():
     p=argparse.ArgumentParser(description=__doc__); sp=p.add_subparsers(dest='cmd',required=True)
     ds=sp.add_parser('discover',help='Find bundled guides and supported operations for a business request; local/read-only')
     ds.add_argument('query',nargs='?',default='');ds.add_argument('--module');ds.add_argument('--list',action='store_true');ds.add_argument('--json',action='store_true')
@@ -26,11 +26,16 @@ def main():
     dd.add_argument('--input',required=True);dd.add_argument('--out',required=True)
     cp=sp.add_parser('planning-column-presentation',help='Local Planning column expansion, sizing, totals and unrestricted Values cards; no live writes')
     cp.add_argument('--input',required=True);cp.add_argument('--out',required=True);cp.add_argument('--expansion-only',action='store_true')
-    for command in ('inspect-reference-views','fit-planning-header','planning-hierarchy-icons'):
-        hf=sp.add_parser(command,help='Local content-based header sizing or gmate hierarchy defaults; no live writes')
+    for command,hf_help in (
+        ('inspect-reference-views','Audit which views a report reference list binds and how; writes the audit locally'),
+        ('fit-planning-header','Size Planning header cells from their rendered text; local candidate, no live writes'),
+        ('planning-hierarchy-icons','Apply gmate hierarchy icons to Planning rows; local candidate, no live writes')):
+        hf=sp.add_parser(command,help=hf_help)
         hf.add_argument('--input',required=True);hf.add_argument('--out',required=True)
-    for command in ('planning-totals','roll-forward-presentation'):
-        rf=sp.add_parser(command,help='Local native Planning totals or resolved Measures in Rows hierarchy; no live writes')
+    for command,rf_help in (
+        ('planning-totals','Set native Planning totals rows on a fresh export; local candidate, no live writes'),
+        ('roll-forward-presentation','Carry a resolved Measures-in-Rows hierarchy forward; local candidate, no live writes')):
+        rf=sp.add_parser(command,help=rf_help)
         rf.add_argument('--input',required=True);rf.add_argument('--out',required=True)
     iv=sp.add_parser('integrated-variance',help='Style a resolved AC/PY column comparison as native integrated variance; preserve field bindings')
     iv.add_argument('--input',required=True);iv.add_argument('--out',required=True)
@@ -42,21 +47,23 @@ def main():
     ac.add_argument('--input',required=True);ac.add_argument('--out',required=True)
     ad=sp.add_parser('check-application-defaults',help='Check typography, dashboard coverage, public Home visibility and a local Home layout; does not publish role-specific content')
     ad.add_argument('--input',required=True);ad.add_argument('--home',required=True);ad.add_argument('--out',required=True)
-    for command in ('check-planning-properties','repair-planning-properties'):
-        pi=sp.add_parser(command,help='Offline complete-formatting and canonical semantic-name checks/repair; preserves IDs and stored values')
+    for command,pi_help in (
+        ('check-planning-properties','Report complete-formatting gaps and non-canonical semantic names; preserves IDs and stored values'),
+        ('repair-planning-properties','Rewrite complete-formatting gaps and semantic names to canonical form; preserves IDs and stored values')):
+        pi=sp.add_parser(command,help=pi_help)
         pi.add_argument('--input',required=True);pi.add_argument('--out',required=True);pi.add_argument('--model')
     lk=sp.add_parser('leaf-key-mapping',help='Offline leaf ID and ancestor Skip storage defaults; no value migration')
     lk.add_argument('--input',required=True);lk.add_argument('--out',required=True)
-    b=sp.add_parser('build'); b.add_argument('--model',required=True); b.add_argument('--spec',required=True); b.add_argument('--out',required=True); b.add_argument('--registry')
+    b=sp.add_parser('build',help='Construct a candidate draft from a model and spec; local files only, no workspace writes'); b.add_argument('--model',required=True); b.add_argument('--spec',required=True); b.add_argument('--out',required=True); b.add_argument('--registry')
     ic=sp.add_parser('check-import-contract',help='Verify original requested inputs, formulas and CF against a construction/candidate before import')
     ic.add_argument('--spec',required=True);ic.add_argument('--construction',required=True);ic.add_argument('--candidate');ic.add_argument('--out',required=True)
-    v=sp.add_parser('validate'); v.add_argument('raw'); v.add_argument('--out',required=True)
-    d=sp.add_parser('decode'); d.add_argument('envelope'); d.add_argument('--out',required=True)
-    e=sp.add_parser('encode'); e.add_argument('raw'); e.add_argument('--out',required=True)
-    a=sp.add_parser('audit-layout'); a.add_argument('response'); a.add_argument('--gap',type=float,default=0)
-    da=sp.add_parser('audit-definition'); da.add_argument('raw'); da.add_argument('--out',required=True)
-    r=sp.add_parser('reference'); r.add_argument('name'); r.add_argument('--heading'); r.add_argument('--list',action='store_true')
-    t=sp.add_parser('test')
+    v=sp.add_parser('validate',help='Check invariants and public schema acceptance of a raw definition; writes local evidence'); v.add_argument('raw'); v.add_argument('--out',required=True)
+    d=sp.add_parser('decode',help='Unpack a definition envelope into its parts and recorded hashes; local files'); d.add_argument('envelope'); d.add_argument('--out',required=True)
+    e=sp.add_parser('encode',help='Pack a raw definition into an envelope after the stored-value check'); e.add_argument('raw'); e.add_argument('--out',required=True)
+    a=sp.add_parser('audit-layout',help='Report dashboard tile overlaps and gaps from a saved layout response'); a.add_argument('response'); a.add_argument('--gap',type=float,default=0)
+    da=sp.add_parser('audit-definition',help='Audit a raw definition to a findings file; runtime behavior is verified separately'); da.add_argument('raw'); da.add_argument('--out',required=True)
+    r=sp.add_parser('reference',help='Print a bundled reference guide, its heading list, or one heading section'); r.add_argument('name'); r.add_argument('--heading'); r.add_argument('--list',action='store_true')
+    t=sp.add_parser('test',help='Run the unittest suite in a separate process; nothing ships live calls there')
     fre=sp.add_parser('forecast-repair',help='Prepare a scoped ALM update from a working reference sheet')
     fre.add_argument('--baseline',required=True);fre.add_argument('--input',required=True);fre.add_argument('--out',required=True)
     pt=sp.add_parser('repair-powertable-config',help='Local lookup/source metadata candidate; preserves editability, row actions and unrelated parts')
@@ -71,20 +78,30 @@ def main():
     cbp.add_argument('--baseline',required=True);cbp.add_argument('--input',required=True);cbp.add_argument('--out',required=True)
     pra=sp.add_parser('repair-powertable-row-access',help='Give enabled row actions without a Row access selection the product default All users')
     pra.add_argument('--baseline',required=True);pra.add_argument('--out',required=True);pra.add_argument('--input')
-    ib=sp.add_parser('construct-bridge');ib.add_argument('action',choices=['query','planning-source','append','merge','join','sql','editable-source']);ib.add_argument('--input',required=True);ib.add_argument('--out',required=True)
-    for command in ('bridge-planning-catalog','check-bridge-mappings','resolve-bridge-output','bind-bridge-outputs'):
-        bm=sp.add_parser(command,help='Local Planning-source lineage construction, graph check, or current query-output identity resolution')
+    ib=sp.add_parser('construct-bridge',help='Construct an InfoBridge query, merge, join or source payload locally');ib.add_argument('action',choices=['query','planning-source','append','merge','join','sql','editable-source']);ib.add_argument('--input',required=True);ib.add_argument('--out',required=True)
+    for command,bm_help in (
+        ('bridge-planning-catalog','List the Planning output catalog identities behind an InfoBridge source; local read'),
+        ('check-bridge-mappings','Check the InfoBridge planning graph for missing or stale mappings; local read'),
+        ('resolve-bridge-output','Resolve one InfoBridge query output to its current Planning identity; local read'),
+        ('bind-bridge-outputs','Rebind InfoBridge query outputs to current Planning identities; local candidate')):
+        bm=sp.add_parser(command,help=bm_help)
         bm.add_argument('--input',required=True);bm.add_argument('--out',required=True)
-    api=sp.add_parser('api'); api.add_argument('action',choices=['export','create','create-blank','update','list','get','rename','delete']); api.add_argument('--config',required=True); api.add_argument('--payload'); api.add_argument('--run',required=True); api.add_argument('--label',required=True)
-    w=sp.add_parser('provision'); w.add_argument('--config',required=True); w.add_argument('--model',required=True); w.add_argument('--spec',required=True); w.add_argument('--run',required=True)
-    ms=sp.add_parser('prepare-maintenance');ms.add_argument('--baseline',required=True);ms.add_argument('--requests',required=True);ms.add_argument('--out',required=True)
-    ps=sp.add_parser('prepare-scope');ps.add_argument('--spec',required=True);ps.add_argument('--model');ps.add_argument('--out',required=True)
-    cb=sp.add_parser('construct-native'); cb.add_argument('action',choices=['anchor','number-parameter','input','formula','cube-settings','rule','weighted-rule','powertable-source','powertable-rows','navigator','dimension-mapping','table-column','bridge-consumer','contribution','embedded-planning']); cb.add_argument('--input',required=True); cb.add_argument('--out',required=True)
-    for command in ('check-formula-syntax','repair-formula-equality','planning-time-axis','planning-time-column'):
-        ti=sp.add_parser(command,help='Local native equality/date-axis/as-of VisualColumn helper; no live writes')
+    api=sp.add_parser('api',help='Call one public Fabric Plan route; export/list/get read, create/update/rename/delete write'); api.add_argument('action',choices=['export','create','create-blank','update','list','get','rename','delete']); api.add_argument('--config',required=True); api.add_argument('--payload'); api.add_argument('--run',required=True); api.add_argument('--label',required=True)
+    w=sp.add_parser('provision',help='Create or resume a Plan from config, model and spec; writes only to the named destination'); w.add_argument('--config',required=True); w.add_argument('--model',required=True); w.add_argument('--spec',required=True); w.add_argument('--run',required=True)
+    ms=sp.add_parser('prepare-maintenance',help='Add deferred PowerTable sheets to a baseline; publish and bind the catalog separately');ms.add_argument('--baseline',required=True);ms.add_argument('--requests',required=True);ms.add_argument('--out',required=True)
+    ps=sp.add_parser('prepare-scope',help='Map a spec onto supported features with retained scope and per-feature coverage');ps.add_argument('--spec',required=True);ps.add_argument('--model');ps.add_argument('--out',required=True)
+    cb=sp.add_parser('construct-native',help='Build one native source object, such as an anchor, rule or navigator, from a request'); cb.add_argument('action',choices=['anchor','number-parameter','input','formula','cube-settings','rule','weighted-rule','powertable-source','powertable-rows','navigator','dimension-mapping','table-column','bridge-consumer','contribution','embedded-planning']); cb.add_argument('--input',required=True); cb.add_argument('--out',required=True)
+    for command,ti_help in (
+        ('check-formula-syntax','Report native comparison-equality defects in a formula; runtime validation not run'),
+        ('repair-formula-equality','Rewrite native comparison equality to a supported form; runtime validation not run'),
+        ('planning-time-axis','Apply a date axis to a Planning time VisualColumn; local candidate, no live writes'),
+        ('planning-time-column','Add an as-of VisualColumn to a baseline definition; local candidate, no live writes')):
+        ti=sp.add_parser(command,help=ti_help)
         ti.add_argument('--input',required=True);ti.add_argument('--out',required=True)
         if command=='planning-time-column':ti.add_argument('--baseline',required=True)
-    args=p.parse_args()
+    return p
+def main():
+    args=build_parser().parse_args()
     if hasattr(args,'label') and not re.fullmatch(r'[a-zA-Z0-9_.-]+',args.label): raise ValueError('Unsafe operation label')
     # These helpers construct local candidates only; deployment remains explicit.
     if args.cmd in ('check-formula-syntax','repair-formula-equality'):
@@ -267,7 +284,8 @@ def main():
         if isinstance(result,tuple):result={'source':result[0],'linkedQueries':result[1]}
         save(args.out,result);print('Constructed InfoBridge payload; import, output catalog and values require destination API readback.')
     elif args.cmd=='test':
-        # Isolated test process uses only this extracted runtime and explicitly blocks network.
+        # A separate process keeps the suite on this extracted runtime; the flag marks the run,
+        # and each test that needs isolation patches its own socket.
         env=dict(os.environ); env['FABRIC_SKILL_OFFLINE_TEST']='1'; env['PYTHONPATH']=os.pathsep.join(filter(None,[str(ROOT),env.get('PYTHONPATH')]))
         r=subprocess.run([sys.executable,'-m','unittest','discover','-s',str(ROOT.parent/'tests'),'-v'],cwd=str(ROOT.parent),env=env)
         if r.returncode: raise SystemExit(r.returncode)
